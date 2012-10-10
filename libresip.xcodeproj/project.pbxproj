@@ -1,0 +1,329 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		850277A21625B53E00AB5038 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850277A11625B53E00AB5038 /* Foundation.framework */; };
+		850277A71625B53E00AB5038 /* libresip.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277A61625B53E00AB5038 /* libresip.h */; };
+		850277A91625B53E00AB5038 /* libresip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277A81625B53E00AB5038 /* libresip.m */; };
+		850277CF1625B59800AB5038 /* sound_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277B91625B59700AB5038 /* sound_utils.c */; };
+		850277D01625B59800AB5038 /* sound.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277BB1625B59700AB5038 /* sound.c */; };
+		850277D11625B59800AB5038 /* TXBaseOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277BE1625B59700AB5038 /* TXBaseOp.m */; };
+		850277D21625B59800AB5038 /* TXCallMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C01625B59700AB5038 /* TXCallMedia.m */; };
+		850277D31625B59800AB5038 /* TXRTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C21625B59700AB5038 /* TXRTP.m */; };
+		850277D41625B59800AB5038 /* TXSip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C41625B59700AB5038 /* TXSip.m */; };
+		850277D51625B59800AB5038 /* TXSipAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C61625B59700AB5038 /* TXSipAuth.m */; };
+		850277D61625B59800AB5038 /* TXSipCall.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C81625B59700AB5038 /* TXSipCall.m */; };
+		850277D71625B59800AB5038 /* TXSipMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CA1625B59800AB5038 /* TXSipMessage.m */; };
+		850277D81625B59800AB5038 /* TXSipReg.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CC1625B59800AB5038 /* TXSipReg.m */; };
+		850277D91625B59800AB5038 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
+		850277E11625B5C300AB5038 /* MailBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277DE1625B5C300AB5038 /* MailBox.m */; };
+		850277E21625B5C300AB5038 /* MProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277E01625B5C300AB5038 /* MProxy.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8502779C1625B53E00AB5038 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/${PRODUCT_NAME}";
+			dstSubfolderSpec = 16;
+			files = (
+				850277A71625B53E00AB5038 /* libresip.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		8502779E1625B53E00AB5038 /* liblibresip.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibresip.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		850277A11625B53E00AB5038 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		850277A51625B53E00AB5038 /* libresip-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "libresip-Prefix.pch"; sourceTree = "<group>"; };
+		850277A61625B53E00AB5038 /* libresip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libresip.h; sourceTree = "<group>"; };
+		850277A81625B53E00AB5038 /* libresip.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = libresip.m; sourceTree = "<group>"; };
+		850277B91625B59700AB5038 /* sound_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sound_utils.c; sourceTree = "<group>"; };
+		850277BA1625B59700AB5038 /* sound_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sound_utils.h; sourceTree = "<group>"; };
+		850277BB1625B59700AB5038 /* sound.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sound.c; sourceTree = "<group>"; };
+		850277BC1625B59700AB5038 /* sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
+		850277BD1625B59700AB5038 /* TXBaseOp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXBaseOp.h; sourceTree = "<group>"; };
+		850277BE1625B59700AB5038 /* TXBaseOp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXBaseOp.m; sourceTree = "<group>"; };
+		850277BF1625B59700AB5038 /* TXCallMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXCallMedia.h; sourceTree = "<group>"; };
+		850277C01625B59700AB5038 /* TXCallMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXCallMedia.m; sourceTree = "<group>"; };
+		850277C11625B59700AB5038 /* TXRTP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXRTP.h; sourceTree = "<group>"; };
+		850277C21625B59700AB5038 /* TXRTP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXRTP.m; sourceTree = "<group>"; };
+		850277C31625B59700AB5038 /* TXSip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSip.h; sourceTree = "<group>"; };
+		850277C41625B59700AB5038 /* TXSip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSip.m; sourceTree = "<group>"; };
+		850277C51625B59700AB5038 /* TXSipAuth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipAuth.h; sourceTree = "<group>"; };
+		850277C61625B59700AB5038 /* TXSipAuth.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipAuth.m; sourceTree = "<group>"; };
+		850277C71625B59700AB5038 /* TXSipCall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipCall.h; sourceTree = "<group>"; };
+		850277C81625B59700AB5038 /* TXSipCall.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipCall.m; sourceTree = "<group>"; };
+		850277C91625B59800AB5038 /* TXSipMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipMessage.h; sourceTree = "<group>"; };
+		850277CA1625B59800AB5038 /* TXSipMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipMessage.m; sourceTree = "<group>"; };
+		850277CB1625B59800AB5038 /* TXSipReg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipReg.h; sourceTree = "<group>"; };
+		850277CC1625B59800AB5038 /* TXSipReg.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipReg.m; sourceTree = "<group>"; };
+		850277CD1625B59800AB5038 /* TXSipUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipUser.h; sourceTree = "<group>"; };
+		850277CE1625B59800AB5038 /* TXSipUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipUser.m; sourceTree = "<group>"; };
+		850277DD1625B5C300AB5038 /* MailBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MailBox.h; path = utils/MailBox.h; sourceTree = "<group>"; };
+		850277DE1625B5C300AB5038 /* MailBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MailBox.m; path = utils/MailBox.m; sourceTree = "<group>"; };
+		850277DF1625B5C300AB5038 /* MProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MProxy.h; path = utils/MProxy.h; sourceTree = "<group>"; };
+		850277E01625B5C300AB5038 /* MProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MProxy.m; path = utils/MProxy.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8502779B1625B53E00AB5038 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				850277A21625B53E00AB5038 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		850277931625B53E00AB5038 = {
+			isa = PBXGroup;
+			children = (
+				850277DB1625B5A400AB5038 /* util */,
+				850277A31625B53E00AB5038 /* libresip */,
+				850277A01625B53E00AB5038 /* Frameworks */,
+				8502779F1625B53E00AB5038 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8502779F1625B53E00AB5038 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8502779E1625B53E00AB5038 /* liblibresip.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		850277A01625B53E00AB5038 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				850277A11625B53E00AB5038 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		850277A31625B53E00AB5038 /* libresip */ = {
+			isa = PBXGroup;
+			children = (
+				850277B91625B59700AB5038 /* sound_utils.c */,
+				850277BA1625B59700AB5038 /* sound_utils.h */,
+				850277BB1625B59700AB5038 /* sound.c */,
+				850277BC1625B59700AB5038 /* sound.h */,
+				850277BD1625B59700AB5038 /* TXBaseOp.h */,
+				850277BE1625B59700AB5038 /* TXBaseOp.m */,
+				850277BF1625B59700AB5038 /* TXCallMedia.h */,
+				850277C01625B59700AB5038 /* TXCallMedia.m */,
+				850277C11625B59700AB5038 /* TXRTP.h */,
+				850277C21625B59700AB5038 /* TXRTP.m */,
+				850277C31625B59700AB5038 /* TXSip.h */,
+				850277C41625B59700AB5038 /* TXSip.m */,
+				850277C51625B59700AB5038 /* TXSipAuth.h */,
+				850277C61625B59700AB5038 /* TXSipAuth.m */,
+				850277C71625B59700AB5038 /* TXSipCall.h */,
+				850277C81625B59700AB5038 /* TXSipCall.m */,
+				850277C91625B59800AB5038 /* TXSipMessage.h */,
+				850277CA1625B59800AB5038 /* TXSipMessage.m */,
+				850277CB1625B59800AB5038 /* TXSipReg.h */,
+				850277CC1625B59800AB5038 /* TXSipReg.m */,
+				850277CD1625B59800AB5038 /* TXSipUser.h */,
+				850277CE1625B59800AB5038 /* TXSipUser.m */,
+				850277A61625B53E00AB5038 /* libresip.h */,
+				850277A81625B53E00AB5038 /* libresip.m */,
+				850277A41625B53E00AB5038 /* Supporting Files */,
+			);
+			path = libresip;
+			sourceTree = "<group>";
+		};
+		850277A41625B53E00AB5038 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				850277A51625B53E00AB5038 /* libresip-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		850277DB1625B5A400AB5038 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				850277DD1625B5C300AB5038 /* MailBox.h */,
+				850277DE1625B5C300AB5038 /* MailBox.m */,
+				850277DF1625B5C300AB5038 /* MProxy.h */,
+				850277E01625B5C300AB5038 /* MProxy.m */,
+			);
+			name = util;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8502779D1625B53E00AB5038 /* libresip */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 850277AC1625B53E00AB5038 /* Build configuration list for PBXNativeTarget "libresip" */;
+			buildPhases = (
+				8502779A1625B53E00AB5038 /* Sources */,
+				8502779B1625B53E00AB5038 /* Frameworks */,
+				8502779C1625B53E00AB5038 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libresip;
+			productName = libresip;
+			productReference = 8502779E1625B53E00AB5038 /* liblibresip.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		850277951625B53E00AB5038 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0440;
+				ORGANIZATIONNAME = enodev;
+			};
+			buildConfigurationList = 850277981625B53E00AB5038 /* Build configuration list for PBXProject "libresip" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 850277931625B53E00AB5038;
+			productRefGroup = 8502779F1625B53E00AB5038 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8502779D1625B53E00AB5038 /* libresip */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8502779A1625B53E00AB5038 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				850277A91625B53E00AB5038 /* libresip.m in Sources */,
+				850277CF1625B59800AB5038 /* sound_utils.c in Sources */,
+				850277D01625B59800AB5038 /* sound.c in Sources */,
+				850277D11625B59800AB5038 /* TXBaseOp.m in Sources */,
+				850277D21625B59800AB5038 /* TXCallMedia.m in Sources */,
+				850277D31625B59800AB5038 /* TXRTP.m in Sources */,
+				850277D41625B59800AB5038 /* TXSip.m in Sources */,
+				850277D51625B59800AB5038 /* TXSipAuth.m in Sources */,
+				850277D61625B59800AB5038 /* TXSipCall.m in Sources */,
+				850277D71625B59800AB5038 /* TXSipMessage.m in Sources */,
+				850277D81625B59800AB5038 /* TXSipReg.m in Sources */,
+				850277D91625B59800AB5038 /* TXSipUser.m in Sources */,
+				850277E11625B5C300AB5038 /* MailBox.m in Sources */,
+				850277E21625B5C300AB5038 /* MProxy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		850277AA1625B53E00AB5038 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		850277AB1625B53E00AB5038 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		850277AD1625B53E00AB5038 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/libresip.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "libresip/libresip-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		850277AE1625B53E00AB5038 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/libresip.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "libresip/libresip-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		850277981625B53E00AB5038 /* Build configuration list for PBXProject "libresip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				850277AA1625B53E00AB5038 /* Debug */,
+				850277AB1625B53E00AB5038 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		850277AC1625B53E00AB5038 /* Build configuration list for PBXNativeTarget "libresip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				850277AD1625B53E00AB5038 /* Debug */,
+				850277AE1625B53E00AB5038 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 850277951625B53E00AB5038 /* Project object */;
+}
