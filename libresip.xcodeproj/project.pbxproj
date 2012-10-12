@@ -23,7 +23,34 @@
 		850277D91625B59800AB5038 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		850277E11625B5C300AB5038 /* MailBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277DE1625B5C300AB5038 /* MailBox.m */; };
 		850277E21625B5C300AB5038 /* MProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277E01625B5C300AB5038 /* MProxy.m */; };
+		8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8E1628ADF700CE9AE6 /* TXAccount.m */; };
+		8507AA941628AEEF00CE9AE6 /* Callback.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA921628AEEF00CE9AE6 /* Callback.m */; };
+		8507AAA91628B6BC00CE9AE6 /* TXRestApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8507AAA11628B64700CE9AE6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E4399A0D10A33C1200209906;
+			remoteInfo = "iOS Static Library";
+		};
+		8507AAA31628B64700CE9AE6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5DFBC2D710A7540A007BF56F;
+			remoteInfo = "iOS Unit Testing";
+		};
+		8507AAA51628B64700CE9AE6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5DFBC1ED10A74964007BF56F;
+			remoteInfo = "iOS Unit Testing App";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		8502779C1625B53E00AB5038 /* CopyFiles */ = {
@@ -70,6 +97,13 @@
 		850277DE1625B5C300AB5038 /* MailBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MailBox.m; path = utils/MailBox.m; sourceTree = "<group>"; };
 		850277DF1625B5C300AB5038 /* MProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MProxy.h; path = utils/MProxy.h; sourceTree = "<group>"; };
 		850277E01625B5C300AB5038 /* MProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MProxy.m; path = utils/MProxy.m; sourceTree = "<group>"; };
+		8507AA8E1628ADF700CE9AE6 /* TXAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXAccount.m; sourceTree = "<group>"; };
+		8507AA8F1628ADF700CE9AE6 /* TXAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXAccount.h; sourceTree = "<group>"; };
+		8507AA921628AEEF00CE9AE6 /* Callback.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Callback.m; path = utils/Callback.m; sourceTree = "<group>"; };
+		8507AA931628AEEF00CE9AE6 /* Callback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Callback.h; path = utils/Callback.h; sourceTree = "<group>"; };
+		8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "CHDataStructures-iOS.xcodeproj"; path = "../CHDataStructures/CHDataStructures-iOS.xcodeproj"; sourceTree = "<group>"; };
+		8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXRestApi.h; path = utils/TXRestApi.h; sourceTree = "<group>"; };
+		8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TXRestApi.m; path = utils/TXRestApi.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +121,7 @@
 		850277931625B53E00AB5038 = {
 			isa = PBXGroup;
 			children = (
+				8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */,
 				850277DB1625B5A400AB5038 /* util */,
 				850277A31625B53E00AB5038 /* libresip */,
 				850277A01625B53E00AB5038 /* Frameworks */,
@@ -113,6 +148,8 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				8507AA8E1628ADF700CE9AE6 /* TXAccount.m */,
+				8507AA8F1628ADF700CE9AE6 /* TXAccount.h */,
 				850277B91625B59700AB5038 /* sound_utils.c */,
 				850277BA1625B59700AB5038 /* sound_utils.h */,
 				850277BB1625B59700AB5038 /* sound.c */,
@@ -153,12 +190,26 @@
 		850277DB1625B5A400AB5038 /* util */ = {
 			isa = PBXGroup;
 			children = (
+				8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */,
+				8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */,
+				8507AA921628AEEF00CE9AE6 /* Callback.m */,
+				8507AA931628AEEF00CE9AE6 /* Callback.h */,
 				850277DD1625B5C300AB5038 /* MailBox.h */,
 				850277DE1625B5C300AB5038 /* MailBox.m */,
 				850277DF1625B5C300AB5038 /* MProxy.h */,
 				850277E01625B5C300AB5038 /* MProxy.m */,
 			);
 			name = util;
+			sourceTree = "<group>";
+		};
+		8507AA981628B64600CE9AE6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8507AAA21628B64700CE9AE6 /* libCHDataStructures.a */,
+				8507AAA41628B64700CE9AE6 /* CHDataStructures-iOS.octest */,
+				8507AAA61628B64700CE9AE6 /* CHDataStructures.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,12 +251,42 @@
 			mainGroup = 850277931625B53E00AB5038;
 			productRefGroup = 8502779F1625B53E00AB5038 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 8507AA981628B64600CE9AE6 /* Products */;
+					ProjectRef = 8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				8502779D1625B53E00AB5038 /* libresip */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		8507AAA21628B64700CE9AE6 /* libCHDataStructures.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCHDataStructures.a;
+			remoteRef = 8507AAA11628B64700CE9AE6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8507AAA41628B64700CE9AE6 /* CHDataStructures-iOS.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "CHDataStructures-iOS.octest";
+			remoteRef = 8507AAA31628B64700CE9AE6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8507AAA61628B64700CE9AE6 /* CHDataStructures.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = CHDataStructures.app;
+			remoteRef = 8507AAA51628B64700CE9AE6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8502779A1625B53E00AB5038 /* Sources */ = {
@@ -226,6 +307,9 @@
 				850277D91625B59800AB5038 /* TXSipUser.m in Sources */,
 				850277E11625B5C300AB5038 /* MailBox.m in Sources */,
 				850277E21625B5C300AB5038 /* MProxy.m in Sources */,
+				8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */,
+				8507AA941628AEEF00CE9AE6 /* Callback.m in Sources */,
+				8507AAA91628B6BC00CE9AE6 /* TXRestApi.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,8 +366,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DSTROOT = /tmp/libresip.dst;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "libresip/libresip-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					/Users/muromec/sources/speex/include,
+					"/Users/muromec/sources/re-0.4.2/include",
+					/Users/muromec/sources/srtp/include,
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -294,8 +385,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DSTROOT = /tmp/libresip.dst;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "libresip/libresip-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					/Users/muromec/sources/speex/include,
+					"/Users/muromec/sources/re-0.4.2/include",
+					/Users/muromec/sources/srtp/include,
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
