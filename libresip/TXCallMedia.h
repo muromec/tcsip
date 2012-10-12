@@ -11,7 +11,6 @@
 #include <re.h>
 
 #include <speex/speex.h>
-#include "speex_jitter_buffer.h"
 
 #include "sound.h"
 
