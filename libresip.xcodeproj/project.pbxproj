@@ -26,26 +26,29 @@
 		8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8E1628ADF700CE9AE6 /* TXAccount.m */; };
 		8507AA941628AEEF00CE9AE6 /* Callback.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA921628AEEF00CE9AE6 /* Callback.m */; };
 		8507AAA91628B6BC00CE9AE6 /* TXRestApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */; };
+		8507AAE81628BD9400CE9AE6 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAE71628BD9400CE9AE6 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		8507AAE91628BEB100CE9AE6 /* TXAccount.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; };
+		8507AAEA1628BED400CE9AE6 /* Callback.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA931628AEEF00CE9AE6 /* Callback.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		8507AAA11628B64700CE9AE6 /* PBXContainerItemProxy */ = {
+		8507AADC1628BAFB00CE9AE6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
+			containerPortal = 8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = E4399A0D10A33C1200209906;
 			remoteInfo = "iOS Static Library";
 		};
-		8507AAA31628B64700CE9AE6 /* PBXContainerItemProxy */ = {
+		8507AADE1628BAFB00CE9AE6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
+			containerPortal = 8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 5DFBC2D710A7540A007BF56F;
 			remoteInfo = "iOS Unit Testing";
 		};
-		8507AAA51628B64700CE9AE6 /* PBXContainerItemProxy */ = {
+		8507AAE01628BAFB00CE9AE6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
+			containerPortal = 8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 5DFBC1ED10A74964007BF56F;
 			remoteInfo = "iOS Unit Testing App";
@@ -59,6 +62,8 @@
 			dstPath = "include/${PRODUCT_NAME}";
 			dstSubfolderSpec = 16;
 			files = (
+				8507AAEA1628BED400CE9AE6 /* Callback.h in CopyFiles */,
+				8507AAE91628BEB100CE9AE6 /* TXAccount.h in CopyFiles */,
 				850277A71625B53E00AB5038 /* libresip.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -101,9 +106,11 @@
 		8507AA8F1628ADF700CE9AE6 /* TXAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXAccount.h; sourceTree = "<group>"; };
 		8507AA921628AEEF00CE9AE6 /* Callback.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Callback.m; path = utils/Callback.m; sourceTree = "<group>"; };
 		8507AA931628AEEF00CE9AE6 /* Callback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Callback.h; path = utils/Callback.h; sourceTree = "<group>"; };
-		8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "CHDataStructures-iOS.xcodeproj"; path = "../CHDataStructures/CHDataStructures-iOS.xcodeproj"; sourceTree = "<group>"; };
 		8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXRestApi.h; path = utils/TXRestApi.h; sourceTree = "<group>"; };
 		8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TXRestApi.m; path = utils/TXRestApi.m; sourceTree = "<group>"; };
+		8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "CHDataStructures-iOS.xcodeproj"; path = "../CHDataStructures/CHDataStructures-iOS.xcodeproj"; sourceTree = "<group>"; };
+		8507AAE61628BD9400CE9AE6 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSONKit.h; path = JSONKit/JSONKit.h; sourceTree = "<group>"; };
+		8507AAE71628BD9400CE9AE6 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSONKit.m; path = JSONKit/JSONKit.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,7 +128,8 @@
 		850277931625B53E00AB5038 = {
 			isa = PBXGroup;
 			children = (
-				8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */,
+				8507AAE51628BD8300CE9AE6 /* JSONKit */,
+				8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */,
 				850277DB1625B5A400AB5038 /* util */,
 				850277A31625B53E00AB5038 /* libresip */,
 				850277A01625B53E00AB5038 /* Frameworks */,
@@ -202,14 +210,23 @@
 			name = util;
 			sourceTree = "<group>";
 		};
-		8507AA981628B64600CE9AE6 /* Products */ = {
+		8507AAD31628BAFB00CE9AE6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8507AAA21628B64700CE9AE6 /* libCHDataStructures.a */,
-				8507AAA41628B64700CE9AE6 /* CHDataStructures-iOS.octest */,
-				8507AAA61628B64700CE9AE6 /* CHDataStructures.app */,
+				8507AADD1628BAFB00CE9AE6 /* libCHDataStructures.a */,
+				8507AADF1628BAFB00CE9AE6 /* CHDataStructures-iOS.octest */,
+				8507AAE11628BAFB00CE9AE6 /* CHDataStructures.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8507AAE51628BD8300CE9AE6 /* JSONKit */ = {
+			isa = PBXGroup;
+			children = (
+				8507AAE61628BD9400CE9AE6 /* JSONKit.h */,
+				8507AAE71628BD9400CE9AE6 /* JSONKit.m */,
+			);
+			name = JSONKit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -253,8 +270,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 8507AA981628B64600CE9AE6 /* Products */;
-					ProjectRef = 8507AA971628B64600CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
+					ProductGroup = 8507AAD31628BAFB00CE9AE6 /* Products */;
+					ProjectRef = 8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -265,25 +282,25 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		8507AAA21628B64700CE9AE6 /* libCHDataStructures.a */ = {
+		8507AADD1628BAFB00CE9AE6 /* libCHDataStructures.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libCHDataStructures.a;
-			remoteRef = 8507AAA11628B64700CE9AE6 /* PBXContainerItemProxy */;
+			remoteRef = 8507AADC1628BAFB00CE9AE6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		8507AAA41628B64700CE9AE6 /* CHDataStructures-iOS.octest */ = {
+		8507AADF1628BAFB00CE9AE6 /* CHDataStructures-iOS.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = "CHDataStructures-iOS.octest";
-			remoteRef = 8507AAA31628B64700CE9AE6 /* PBXContainerItemProxy */;
+			remoteRef = 8507AADE1628BAFB00CE9AE6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		8507AAA61628B64700CE9AE6 /* CHDataStructures.app */ = {
+		8507AAE11628BAFB00CE9AE6 /* CHDataStructures.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
 			path = CHDataStructures.app;
-			remoteRef = 8507AAA51628B64700CE9AE6 /* PBXContainerItemProxy */;
+			remoteRef = 8507AAE01628BAFB00CE9AE6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -310,6 +327,7 @@
 				8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */,
 				8507AA941628AEEF00CE9AE6 /* Callback.m in Sources */,
 				8507AAA91628B6BC00CE9AE6 /* TXRestApi.m in Sources */,
+				8507AAE81628BD9400CE9AE6 /* JSONKit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,6 +392,8 @@
 					/Users/muromec/sources/speex/include,
 					"/Users/muromec/sources/re-0.4.2/include",
 					/Users/muromec/sources/srtp/include,
+					/Users/muromec/sources/srtp/crypto/include,
+					/Users/muromec/sources/CHDataStructures/source,
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -393,6 +413,8 @@
 					/Users/muromec/sources/speex/include,
 					"/Users/muromec/sources/re-0.4.2/include",
 					/Users/muromec/sources/srtp/include,
+					/Users/muromec/sources/srtp/crypto/include,
+					/Users/muromec/sources/CHDataStructures/source,
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
