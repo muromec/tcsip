@@ -30,6 +30,13 @@ typedef struct {
     struct tls *tls;
 } uac_serv_t;
 
+@protocol SipDelegate <NSObject>
+
+- (void) addCall: (id)call;
+- (void) dropCall: (id)call;
+
+@end
+
 @interface TXSip : NSObject {
     // sip core and sip services
     uac_t uac;
@@ -46,6 +53,7 @@ typedef struct {
     NSMutableArray * chats;
 
     MProxy *proxy;
+    id delegate;
 }
 - (TXSip*) initWithAccount: (id) account;
 - (void) register:(NSString*)user;

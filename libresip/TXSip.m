@@ -12,11 +12,10 @@
 #import "TXSipCall.h"
 #import "TXSipMessage.h"
 #import "TXSipAuth.h"
-#import "TXAppDelegate.h"
 
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
-#define delegate( ) [[NSApp delegate] proxy]
+#define delegate( ) (self->delegate)
 #define here(obj) ([MProxy withTargetBox: obj box:proxy.mbox])
 
 
