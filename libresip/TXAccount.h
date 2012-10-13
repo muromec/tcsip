@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Callback.h"
+#import <libresip/Callback.h>
 
 #define kSipUser @"sipu"
 

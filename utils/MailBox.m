@@ -7,7 +7,7 @@
 //
 
 #import "MailBox.h"
-#import <CHDataStructures/CHCircularBufferQueue.h>
+#import <CHCircularBufferQueue.h>
 
 @implementation MailBox
 - (id) init
