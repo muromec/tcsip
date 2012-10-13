@@ -96,6 +96,7 @@ static void exit_handler(void *arg)
 - (void) create_ua {
 	
 	int err; /* errno return values */
+    err = libre_init(); /// XXX: do this conditionally!!!
 
 	/* fetch local IP address */
 	err = net_default_source_addr_get(AF_INET, &uac.laddr);

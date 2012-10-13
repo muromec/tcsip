@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#include <re.h>
+#include "re.h"
 
 @interface TXSipUser : NSObject {
     NSString* user;

@@ -14,7 +14,7 @@
 #import "MProxy.h"
 
 #include <string.h>
-#include <re.h>
+#include "re.h"
 
 typedef struct {
     struct sip *sip;
