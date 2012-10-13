@@ -25,6 +25,7 @@
 }
 + (bool) available: (NSString*)user
 {
+    if(!user) return NO;
     NSFileManager *fm = [[NSFileManager alloc] init];
     bool ok = [fm isReadableFileAtPath:[self
                               userCert: user]];
@@ -67,6 +68,7 @@
     NSLog(@"try auth");
 
     auth_cb = CB;
+    user = pUser;
     TXRestApi *api = [[TXRestApi alloc] init];
     [api setAuth: pUser password:pPassw];
     [api rload: @"cert" cb: CB(self, certLoaded:)];
