@@ -40,7 +40,11 @@
 #define THIS_FILE "iphonesound.c"
 
 #define MANAGE_AUDIO_SESSION  0
+#if TARGET_OS_IPHONE
+#define IPHONE 1
+#else
 #define IPHONE 0
+#endif
 
 
 #define PJ_LOG(x, y) ({})
@@ -130,7 +134,7 @@ static void stopAudioSession()
  * Invoked when our audio session is interrupted, or uninterrupted.
 **/
 #if IPHONE
-void pjmedia_snd_audio_session_interruption(void *userData, pj_uint32_t interruptionState)
+void pjmedia_snd_audio_session_interruption(void *userData, uint32_t interruptionState)
 {
 	if(interruptionState == kAudioSessionBeginInterruption)
 	{
@@ -142,14 +146,6 @@ void pjmedia_snd_audio_session_interruption(void *userData, pj_uint32_t interrup
 			
 			// Stop the audio unit
 			AudioOutputUnitStop(snd_strm_instance->out_unit);
-			
-			// Once you stop the audio unit the related threads might disappear as well.
-			// So we should clear any thread registration variables at this point.
-			input_thread_registered = PJ_FALSE;
-			output_thread_registered = PJ_FALSE;
-			
-			pj_bzero(inputThreadDesc, sizeof(inputThreadDesc));
-			pj_bzero(outputThreadDesc, sizeof(outputThreadDesc));
 		}
 	}
 	else if(interruptionState == kAudioSessionEndInterruption)
@@ -381,7 +377,11 @@ int media_snd_init()
 	// };
 	
 	desc.componentType = kAudioUnitType_Output;
-	desc.componentSubType = kAudioUnitSubType_HALOutput;
+#if IPHONE
+	desc.componentSubType = kAudioUnitSubType_RemoteIO;
+#else
+    desc.componentSubType = kAudioUnitSubType_HALOutput;
+#endif
 	desc.componentManufacturer = kAudioUnitManufacturer_Apple;
 	desc.componentFlags = 0;
 	desc.componentFlagsMask = 0;
