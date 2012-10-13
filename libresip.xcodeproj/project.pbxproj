@@ -35,6 +35,7 @@
 		852716981628F3AA00C4B8DD /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716971628F3AA00C4B8DD /* libcrypto.dylib */; };
 		8527169A1628F3B200C4B8DD /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716991628F3B200C4B8DD /* libz.dylib */; };
 		8527169B1628F48D00C4B8DD /* Callback.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AA931628AEEF00CE9AE6 /* Callback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8527169C1628F89800C4B8DD /* libCHDataStructures.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8507AADD1628BAFB00CE9AE6 /* libCHDataStructures.a */; };
 		859D3D461628D6A400385248 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D451628D6A400385248 /* Cocoa.framework */; };
 		859D3D501628D6A400385248 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 859D3D4E1628D6A400385248 /* InfoPlist.strings */; };
 		859D3D541628D6A400385248 /* libresip_osx.m in Sources */ = {isa = PBXBuildFile; fileRef = 859D3D531628D6A400385248 /* libresip_osx.m */; };
@@ -210,6 +211,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8527169C1628F89800C4B8DD /* libCHDataStructures.a in Frameworks */,
 				850277A21625B53E00AB5038 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
