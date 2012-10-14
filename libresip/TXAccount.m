@@ -63,6 +63,12 @@
     return [self available: [self deflt]];
 }
 
+- (void) saveUser {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:user forKey:kSipUser];
+    [defaults synchronize];
+}
+
 - (void) auth:(NSString*)pUser password:(NSString*)pPassw cb:(Callback*)CB
 {
     NSLog(@"try auth");
@@ -83,6 +89,7 @@
         return;
     }
 
+    [self saveUser];
     NSFileManager *fm = [[NSFileManager alloc] init];
     [fm
         createDirectoryAtPath: [TXAccount certDir]
