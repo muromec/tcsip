@@ -1,5 +1,13 @@
+#include <AudioUnit/AudioUnit.h>
+
 #ifndef SOUND_UTILS_H
 #define SOUND_UTILS_H
+
+#if TARGET_OS_IPHONE
+#define IPHONE 1
+#else
+#define IPHONE 0
+#endif
 
 int default_device(char in);
 int get_current(AudioUnit unit);
@@ -16,7 +24,7 @@ int set_cb(AudioUnit unit, int bus, void *cb, void *user);
 
 #define ERR(msg) {\
 	if(status != noErr) {\
-		printf(msg"\n", status);\
+		printf(msg"\n", (int)status);\
 		goto err;\
 	}}
 

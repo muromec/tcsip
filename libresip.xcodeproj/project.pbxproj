@@ -126,8 +126,10 @@
 		859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		859D3D7E1628D6D300385248 /* TXAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		859D3D831628D79200385248 /* TXRestApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		859D3D8F1628D99F00385248 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D8E1628D99F00385248 /* AudioUnit.framework */; };
 		859D3DA71628DA4500385248 /* CHDataStructures.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D9F1628D9E400385248 /* CHDataStructures.framework */; };
+		85B57C7A1632999F00456ADD /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D8E1628D99F00385248 /* AudioUnit.framework */; };
+		85B57C7C163299AD00456ADD /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7B163299AD00456ADD /* CoreAudio.framework */; };
+		85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7D163299B100456ADD /* AudioToolbox.framework */; };
 		85FF742516290A60005C64D5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742316290A60005C64D5 /* libcrypto.a */; };
 		85FF742616290A60005C64D5 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742416290A60005C64D5 /* libssl.a */; };
 		85FF742F16291027005C64D5 /* TXSip.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277C31625B59700AB5038 /* TXSip.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -310,6 +312,9 @@
 		859D3D531628D6A400385248 /* libresip_osx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = libresip_osx.m; sourceTree = "<group>"; };
 		859D3D8E1628D99F00385248 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AudioUnit.framework; sourceTree = DEVELOPER_DIR; };
 		859D3D911628D9E300385248 /* CHDataStructures.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CHDataStructures.xcodeproj; path = ../CHDataStructures/CHDataStructures.xcodeproj; sourceTree = "<group>"; };
+		85B57C781632999000456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
+		85B57C7B163299AD00456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		85B57C7D163299B100456ADD /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		85FF73D8162909F4005C64D5 /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
 		85FF73D9162909F4005C64D5 /* asn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1.h; sourceTree = "<group>"; };
 		85FF73DA162909F4005C64D5 /* asn1_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1_mac.h; sourceTree = "<group>"; };
@@ -394,6 +399,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */,
+				85B57C7C163299AD00456ADD /* CoreAudio.framework in Frameworks */,
 				855707631629201300407CCC /* libre.a in Frameworks */,
 				85FF742516290A60005C64D5 /* libcrypto.a in Frameworks */,
 				85FF742616290A60005C64D5 /* libssl.a in Frameworks */,
@@ -408,6 +415,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85B57C7A1632999F00456ADD /* AudioUnit.framework in Frameworks */,
 				8557076216291C9000407CCC /* libre.a in Frameworks */,
 				8557070B1629192800407CCC /* libcrypto.dylib in Frameworks */,
 				8557070A1629191A00407CCC /* libssl.dylib in Frameworks */,
@@ -415,7 +423,6 @@
 				852716941628F39A00C4B8DD /* libresolv.dylib in Frameworks */,
 				852716921628F35B00C4B8DD /* SystemConfiguration.framework in Frameworks */,
 				859D3DA71628DA4500385248 /* CHDataStructures.framework in Frameworks */,
-				859D3D8F1628D99F00385248 /* AudioUnit.framework in Frameworks */,
 				859D3D461628D6A400385248 /* Cocoa.framework in Frameworks */,
 				855707061629187C00407CCC /* libspeexdsp.a in Frameworks */,
 				855707071629188000407CCC /* libspeex.a in Frameworks */,
@@ -428,6 +435,9 @@
 		850277931625B53E00AB5038 = {
 			isa = PBXGroup;
 			children = (
+				85B57C7D163299B100456ADD /* AudioToolbox.framework */,
+				85B57C7B163299AD00456ADD /* CoreAudio.framework */,
+				85B57C781632999000456ADD /* CoreAudio.framework */,
 				855706FF1629185700407CCC /* libre.a */,
 				855707001629185700407CCC /* libspeexdsp.a */,
 				855707011629185700407CCC /* libspeex.a */,

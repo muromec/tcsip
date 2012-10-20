@@ -31,7 +31,7 @@
  * possibility of such damage.
 **/
 
-#include <AudioUnit/AudioUnit.h>
+#import <CoreAudio/CoreAudioTypes.h>
 #include <AudioToolbox/AudioServices.h>
 
 #include "sound.h"
@@ -40,12 +40,6 @@
 #define THIS_FILE "iphonesound.c"
 
 #define MANAGE_AUDIO_SESSION  0
-#if TARGET_OS_IPHONE
-#define IPHONE 1
-#else
-#define IPHONE 0
-#endif
-
 
 #define PJ_LOG(x, y) ({})
 

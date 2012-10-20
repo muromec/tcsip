@@ -1,9 +1,9 @@
-#include <AudioUnit/AudioUnit.h>
-#include <AudioToolbox/AudioServices.h>
-
 #include "sound_utils.h"
 
 int default_device(char in) {
+#ifdef IPHONE
+    return 0;
+#else
 	OSStatus status;
 	AudioDeviceID deviceID;
 	AudioObjectPropertyAddress prop;
@@ -20,6 +20,7 @@ int default_device(char in) {
 
 	return (int)deviceID;
 
+#endif
 err:
 	return -1;
 };
