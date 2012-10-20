@@ -44,6 +44,7 @@
 
     [anInvocation setTarget: target];
     if([sign isOneway]) {
+        [anInvocation retainArguments];
         [mbox qput: anInvocation];
     } else {
 	[anInvocation invoke];
