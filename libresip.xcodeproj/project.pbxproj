@@ -38,54 +38,16 @@
 		8527169E1628FA6500C4B8DD /* TXSipUser.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277CD1625B59800AB5038 /* TXSipUser.h */; };
 		852716F51628FB6600C4B8DD /* MProxy.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277DF1625B5C300AB5038 /* MProxy.h */; };
 		852716F61628FB7200C4B8DD /* MailBox.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277DD1625B5C300AB5038 /* MailBox.h */; };
+		8536A06B1634D6A2007543B4 /* TXSipCall.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277C71625B59700AB5038 /* TXSipCall.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8536A0751634D6C4007543B4 /* TXSipCall.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277C71625B59700AB5038 /* TXSipCall.h */; };
+		8536A0761634D6D1007543B4 /* TXBaseOp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; };
+		8536A0A21634D807007543B4 /* TXBaseOp.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		855707031629185700407CCC /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707001629185700407CCC /* libspeexdsp.a */; };
 		855707041629185700407CCC /* libspeex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707011629185700407CCC /* libspeex.a */; };
 		855707061629187C00407CCC /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707001629185700407CCC /* libspeexdsp.a */; };
 		855707071629188000407CCC /* libspeex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707011629185700407CCC /* libspeex.a */; };
 		8557070A1629191A00407CCC /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716951628F3A300C4B8DD /* libssl.dylib */; };
 		8557070B1629192800407CCC /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716971628F3AA00C4B8DD /* libcrypto.dylib */; };
-		8557073816291BA200407CCC /* re_base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557070E16291BA200407CCC /* re_base64.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557073916291BA200407CCC /* re_bfcp.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557070F16291BA200407CCC /* re_bfcp.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557073A16291BA200407CCC /* re_bitv.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071016291BA200407CCC /* re_bitv.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557073B16291BA200407CCC /* re_conf.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071116291BA200407CCC /* re_conf.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557073C16291BA200407CCC /* re_crc32.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071216291BA200407CCC /* re_crc32.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557073D16291BA200407CCC /* re_dbg.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071316291BA200407CCC /* re_dbg.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557073E16291BA200407CCC /* re_dns.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071416291BA200407CCC /* re_dns.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557073F16291BA200407CCC /* re_fmt.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071516291BA200407CCC /* re_fmt.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074016291BA200407CCC /* re_hash.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071616291BA200407CCC /* re_hash.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074116291BA200407CCC /* re_hmac.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071716291BA200407CCC /* re_hmac.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074216291BA200407CCC /* re_httpauth.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071816291BA200407CCC /* re_httpauth.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074316291BA200407CCC /* re_ice.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071916291BA200407CCC /* re_ice.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074416291BA200407CCC /* re_jbuf.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071A16291BA200407CCC /* re_jbuf.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074516291BA200407CCC /* re_list.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071B16291BA200407CCC /* re_list.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074616291BA200407CCC /* re_lock.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071C16291BA200407CCC /* re_lock.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074716291BA200407CCC /* re_main.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071D16291BA200407CCC /* re_main.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074816291BA200407CCC /* re_mbuf.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071E16291BA200407CCC /* re_mbuf.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074916291BA200407CCC /* re_md5.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557071F16291BA200407CCC /* re_md5.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074A16291BA200407CCC /* re_mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072016291BA200407CCC /* re_mem.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074B16291BA200407CCC /* re_mod.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072116291BA200407CCC /* re_mod.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074C16291BA200407CCC /* re_mqueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072216291BA200407CCC /* re_mqueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074D16291BA200407CCC /* re_natbd.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072316291BA200407CCC /* re_natbd.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074E16291BA200407CCC /* re_net.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072416291BA200407CCC /* re_net.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557074F16291BA200407CCC /* re_rtp.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072516291BA200407CCC /* re_rtp.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075016291BA200407CCC /* re_sa.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072616291BA200407CCC /* re_sa.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075116291BA200407CCC /* re_sdp.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072716291BA200407CCC /* re_sdp.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075216291BA200407CCC /* re_sha.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072816291BA200407CCC /* re_sha.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075316291BA200407CCC /* re_sip.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072916291BA200407CCC /* re_sip.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075416291BA200407CCC /* re_sipevent.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072A16291BA200407CCC /* re_sipevent.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075516291BA200407CCC /* re_sipreg.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072B16291BA200407CCC /* re_sipreg.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075616291BA200407CCC /* re_sipsess.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072C16291BA200407CCC /* re_sipsess.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075716291BA200407CCC /* re_stun.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072D16291BA200407CCC /* re_stun.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075816291BA200407CCC /* re_sys.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072E16291BA200407CCC /* re_sys.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075916291BA200407CCC /* re_tcp.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557072F16291BA200407CCC /* re_tcp.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075A16291BA200407CCC /* re_telev.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557073016291BA200407CCC /* re_telev.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075B16291BA200407CCC /* re_tls.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557073116291BA200407CCC /* re_tls.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075C16291BA200407CCC /* re_tmr.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557073216291BA200407CCC /* re_tmr.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075D16291BA200407CCC /* re_turn.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557073316291BA200407CCC /* re_turn.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075E16291BA200407CCC /* re_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557073416291BA200407CCC /* re_types.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557075F16291BA200407CCC /* re_udp.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557073516291BA200407CCC /* re_udp.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557076016291BA200407CCC /* re_uri.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557073616291BA200407CCC /* re_uri.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8557076116291BA200407CCC /* re.h in Headers */ = {isa = PBXBuildFile; fileRef = 8557073716291BA200407CCC /* re.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8557076216291C9000407CCC /* libre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855706FF1629185700407CCC /* libre.a */; };
 		855707631629201300407CCC /* libre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855706FF1629185700407CCC /* libre.a */; };
 		859D3D461628D6A400385248 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D451628D6A400385248 /* Cocoa.framework */; };
@@ -197,6 +159,8 @@
 			dstPath = "include/${PRODUCT_NAME}";
 			dstSubfolderSpec = 16;
 			files = (
+				8536A0761634D6D1007543B4 /* TXBaseOp.h in CopyFiles */,
+				8536A0751634D6C4007543B4 /* TXSipCall.h in CopyFiles */,
 				852716F61628FB7200C4B8DD /* MailBox.h in CopyFiles */,
 				852716F51628FB6600C4B8DD /* MProxy.h in CopyFiles */,
 				8527169E1628FA6500C4B8DD /* TXSipUser.h in CopyFiles */,
@@ -744,48 +708,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8557073816291BA200407CCC /* re_base64.h in Headers */,
-				8557073916291BA200407CCC /* re_bfcp.h in Headers */,
-				8557073A16291BA200407CCC /* re_bitv.h in Headers */,
-				8557073B16291BA200407CCC /* re_conf.h in Headers */,
-				8557073C16291BA200407CCC /* re_crc32.h in Headers */,
-				8557073D16291BA200407CCC /* re_dbg.h in Headers */,
-				8557073E16291BA200407CCC /* re_dns.h in Headers */,
-				8557073F16291BA200407CCC /* re_fmt.h in Headers */,
-				8557074016291BA200407CCC /* re_hash.h in Headers */,
-				8557074116291BA200407CCC /* re_hmac.h in Headers */,
-				8557074216291BA200407CCC /* re_httpauth.h in Headers */,
-				8557074316291BA200407CCC /* re_ice.h in Headers */,
-				8557074416291BA200407CCC /* re_jbuf.h in Headers */,
-				8557074516291BA200407CCC /* re_list.h in Headers */,
-				8557074616291BA200407CCC /* re_lock.h in Headers */,
-				8557074716291BA200407CCC /* re_main.h in Headers */,
-				8557074816291BA200407CCC /* re_mbuf.h in Headers */,
-				8557074916291BA200407CCC /* re_md5.h in Headers */,
-				8557074A16291BA200407CCC /* re_mem.h in Headers */,
-				8557074B16291BA200407CCC /* re_mod.h in Headers */,
-				8557074C16291BA200407CCC /* re_mqueue.h in Headers */,
-				8557074D16291BA200407CCC /* re_natbd.h in Headers */,
-				8557074E16291BA200407CCC /* re_net.h in Headers */,
-				8557074F16291BA200407CCC /* re_rtp.h in Headers */,
-				8557075016291BA200407CCC /* re_sa.h in Headers */,
-				8557075116291BA200407CCC /* re_sdp.h in Headers */,
-				8557075216291BA200407CCC /* re_sha.h in Headers */,
-				8557075316291BA200407CCC /* re_sip.h in Headers */,
-				8557075416291BA200407CCC /* re_sipevent.h in Headers */,
-				8557075516291BA200407CCC /* re_sipreg.h in Headers */,
-				8557075616291BA200407CCC /* re_sipsess.h in Headers */,
-				8557075716291BA200407CCC /* re_stun.h in Headers */,
-				8557075816291BA200407CCC /* re_sys.h in Headers */,
-				8557075916291BA200407CCC /* re_tcp.h in Headers */,
-				8557075A16291BA200407CCC /* re_telev.h in Headers */,
-				8557075B16291BA200407CCC /* re_tls.h in Headers */,
-				8557075C16291BA200407CCC /* re_tmr.h in Headers */,
-				8557075D16291BA200407CCC /* re_turn.h in Headers */,
-				8557075E16291BA200407CCC /* re_types.h in Headers */,
-				8557075F16291BA200407CCC /* re_udp.h in Headers */,
-				8557076016291BA200407CCC /* re_uri.h in Headers */,
-				8557076116291BA200407CCC /* re.h in Headers */,
 				859D3D7E1628D6D300385248 /* TXAccount.h in Headers */,
 				859D3D831628D79200385248 /* TXRestApi.h in Headers */,
 				8527169B1628F48D00C4B8DD /* Callback.h in Headers */,
@@ -793,6 +715,8 @@
 				85FF74301629103B005C64D5 /* TXSipUser.h in Headers */,
 				85FF745C162910DD005C64D5 /* MailBox.h in Headers */,
 				85FF745B162910D2005C64D5 /* MProxy.h in Headers */,
+				8536A0A21634D807007543B4 /* TXBaseOp.h in Headers */,
+				8536A06B1634D6A2007543B4 /* TXSipCall.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
