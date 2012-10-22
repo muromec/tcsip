@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "TXBaseOp.h"
-#import "TXCallMedia.h"
 
 typedef struct {
     int magic;
@@ -42,6 +41,8 @@ call_action_t;
 // bitmath helpers
 #define DROP(x, bit) x&=x^bit
 #define TEST(x, bit) ((x&(bit))==(bit))
+
+@class TXCallMedia;
 
 @interface TXSipCall : TXBaseOp {
     TXCallMedia *media;

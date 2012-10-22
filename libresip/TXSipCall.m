@@ -7,6 +7,7 @@
 //
 #import "TXSip.h"
 #import "TXSipCall.h"
+#import "TXCallMedia.h"
 
 static int offer_handler(struct mbuf **mbp, const struct sip_msg *msg,
 			 void *arg) {

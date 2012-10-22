@@ -8,7 +8,7 @@
 
 #import "TXRTP.h"
 #import "TXSip.h" // XXX: move byte macros to utils.h
-#import "TXSipCall.h"
+#import "TXCallMedia.h"
 
 #if 0
 #define DRTP(act, _m) {\

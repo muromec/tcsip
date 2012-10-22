@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include <re.h>
+#include "re.h"
 
 #include <speex/speex.h>
 

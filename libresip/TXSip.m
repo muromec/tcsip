@@ -71,6 +71,7 @@ static void exit_handler(void *arg)
 @synthesize auth;
 @synthesize user;
 @synthesize proxy;
+@synthesize delegate;
 
 - (id) initWithAccount: (id) pAccount
 {
@@ -128,6 +129,11 @@ static void exit_handler(void *arg)
 	/* create SIP session socket */
 	err = sipsess_listen(&uac.sock, uac.sip, 32, connect_handler, (__bridge void*)self);
 
+}
+
+- (oneway void) stop
+{
+	NSLog(@"stop sip worker");
 }
 
 - (oneway void) register:(NSString*)pUser

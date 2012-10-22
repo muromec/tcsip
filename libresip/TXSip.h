@@ -53,7 +53,7 @@ typedef struct {
     NSMutableArray * chats;
 
     MProxy *proxy;
-    id delegate;
+    id<SipDelegate> delegate;
 }
 - (TXSip*) initWithAccount: (id) account;
 - (void) register:(NSString*)user;
@@ -66,10 +66,12 @@ typedef struct {
 
 - (uac_t*) getUa;
 - (oneway void) worker;
+- (oneway void) stop;
 
 @property id auth;
 @property (readonly) TXSipUser* user;
 @property (readonly) id proxy;
+@property id delegate;
 
 @end
 
