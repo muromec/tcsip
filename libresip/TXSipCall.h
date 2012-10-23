@@ -48,6 +48,7 @@ call_action_t;
 - (void) control:(call_action_t)action;
 
 @property (readonly)NSInteger cid;
+@property (readonly)TXSipUser* dest;
 @end
 
 @interface TXSipCall : TXBaseOp<Call> {
