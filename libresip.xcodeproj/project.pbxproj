@@ -52,39 +52,22 @@
 		855707631629201300407CCC /* libre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855706FF1629185700407CCC /* libre.a */; };
 		859D3D461628D6A400385248 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D451628D6A400385248 /* Cocoa.framework */; };
 		859D3D501628D6A400385248 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 859D3D4E1628D6A400385248 /* InfoPlist.strings */; };
-		859D3D5C1628D6BC00385248 /* JSONKit.h in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAE61628BD9400CE9AE6 /* JSONKit.h */; };
 		859D3D5D1628D6BC00385248 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAE71628BD9400CE9AE6 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		859D3D5E1628D6BC00385248 /* TXRestApi.h in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; };
 		859D3D5F1628D6BC00385248 /* TXRestApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */; };
 		859D3D601628D6BC00385248 /* Callback.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA921628AEEF00CE9AE6 /* Callback.m */; };
-		859D3D611628D6BC00385248 /* Callback.h in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA931628AEEF00CE9AE6 /* Callback.h */; };
-		859D3D621628D6BC00385248 /* MailBox.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277DD1625B5C300AB5038 /* MailBox.h */; };
 		859D3D631628D6BC00385248 /* MailBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277DE1625B5C300AB5038 /* MailBox.m */; };
-		859D3D641628D6BC00385248 /* MProxy.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277DF1625B5C300AB5038 /* MProxy.h */; };
 		859D3D651628D6BC00385248 /* MProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277E01625B5C300AB5038 /* MProxy.m */; };
 		859D3D661628D6BC00385248 /* TXAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8E1628ADF700CE9AE6 /* TXAccount.m */; };
-		859D3D671628D6BC00385248 /* TXAccount.h in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; };
 		859D3D681628D6BC00385248 /* sound_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277B91625B59700AB5038 /* sound_utils.c */; };
-		859D3D691628D6BC00385248 /* sound_utils.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277BA1625B59700AB5038 /* sound_utils.h */; };
 		859D3D6A1628D6BC00385248 /* sound.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277BB1625B59700AB5038 /* sound.c */; };
-		859D3D6B1628D6BC00385248 /* sound.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277BC1625B59700AB5038 /* sound.h */; };
-		859D3D6C1628D6BC00385248 /* TXBaseOp.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; };
 		859D3D6D1628D6BC00385248 /* TXBaseOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277BE1625B59700AB5038 /* TXBaseOp.m */; };
-		859D3D6E1628D6BC00385248 /* TXCallMedia.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277BF1625B59700AB5038 /* TXCallMedia.h */; };
 		859D3D6F1628D6BC00385248 /* TXCallMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C01625B59700AB5038 /* TXCallMedia.m */; };
-		859D3D701628D6BC00385248 /* TXRTP.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277C11625B59700AB5038 /* TXRTP.h */; };
 		859D3D711628D6BC00385248 /* TXRTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C21625B59700AB5038 /* TXRTP.m */; };
-		859D3D721628D6BC00385248 /* TXSip.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277C31625B59700AB5038 /* TXSip.h */; };
 		859D3D731628D6BC00385248 /* TXSip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C41625B59700AB5038 /* TXSip.m */; };
-		859D3D741628D6BC00385248 /* TXSipAuth.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277C51625B59700AB5038 /* TXSipAuth.h */; };
 		859D3D751628D6BC00385248 /* TXSipAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C61625B59700AB5038 /* TXSipAuth.m */; };
-		859D3D761628D6BC00385248 /* TXSipCall.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277C71625B59700AB5038 /* TXSipCall.h */; };
 		859D3D771628D6BC00385248 /* TXSipCall.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C81625B59700AB5038 /* TXSipCall.m */; };
-		859D3D781628D6BC00385248 /* TXSipMessage.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277C91625B59800AB5038 /* TXSipMessage.h */; };
 		859D3D791628D6BC00385248 /* TXSipMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CA1625B59800AB5038 /* TXSipMessage.m */; };
-		859D3D7A1628D6BC00385248 /* TXSipReg.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277CB1625B59800AB5038 /* TXSipReg.h */; };
 		859D3D7B1628D6BC00385248 /* TXSipReg.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CC1625B59800AB5038 /* TXSipReg.m */; };
-		859D3D7C1628D6BC00385248 /* TXSipUser.h in Sources */ = {isa = PBXBuildFile; fileRef = 850277CD1625B59800AB5038 /* TXSipUser.h */; };
 		859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		859D3D7E1628D6D300385248 /* TXAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		859D3D831628D79200385248 /* TXRestApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -884,39 +867,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				859D3D5C1628D6BC00385248 /* JSONKit.h in Sources */,
 				859D3D5D1628D6BC00385248 /* JSONKit.m in Sources */,
-				859D3D5E1628D6BC00385248 /* TXRestApi.h in Sources */,
 				859D3D5F1628D6BC00385248 /* TXRestApi.m in Sources */,
 				859D3D601628D6BC00385248 /* Callback.m in Sources */,
-				859D3D611628D6BC00385248 /* Callback.h in Sources */,
-				859D3D621628D6BC00385248 /* MailBox.h in Sources */,
 				859D3D631628D6BC00385248 /* MailBox.m in Sources */,
-				859D3D641628D6BC00385248 /* MProxy.h in Sources */,
 				859D3D651628D6BC00385248 /* MProxy.m in Sources */,
 				859D3D661628D6BC00385248 /* TXAccount.m in Sources */,
-				859D3D671628D6BC00385248 /* TXAccount.h in Sources */,
 				859D3D681628D6BC00385248 /* sound_utils.c in Sources */,
-				859D3D691628D6BC00385248 /* sound_utils.h in Sources */,
 				859D3D6A1628D6BC00385248 /* sound.c in Sources */,
-				859D3D6B1628D6BC00385248 /* sound.h in Sources */,
-				859D3D6C1628D6BC00385248 /* TXBaseOp.h in Sources */,
 				859D3D6D1628D6BC00385248 /* TXBaseOp.m in Sources */,
-				859D3D6E1628D6BC00385248 /* TXCallMedia.h in Sources */,
 				859D3D6F1628D6BC00385248 /* TXCallMedia.m in Sources */,
-				859D3D701628D6BC00385248 /* TXRTP.h in Sources */,
 				859D3D711628D6BC00385248 /* TXRTP.m in Sources */,
-				859D3D721628D6BC00385248 /* TXSip.h in Sources */,
 				859D3D731628D6BC00385248 /* TXSip.m in Sources */,
-				859D3D741628D6BC00385248 /* TXSipAuth.h in Sources */,
 				859D3D751628D6BC00385248 /* TXSipAuth.m in Sources */,
-				859D3D761628D6BC00385248 /* TXSipCall.h in Sources */,
 				859D3D771628D6BC00385248 /* TXSipCall.m in Sources */,
-				859D3D781628D6BC00385248 /* TXSipMessage.h in Sources */,
 				859D3D791628D6BC00385248 /* TXSipMessage.m in Sources */,
-				859D3D7A1628D6BC00385248 /* TXSipReg.h in Sources */,
 				859D3D7B1628D6BC00385248 /* TXSipReg.m in Sources */,
-				859D3D7C1628D6BC00385248 /* TXSipUser.h in Sources */,
 				859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
