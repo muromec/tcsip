@@ -9,7 +9,7 @@
 #import "TXSip.h"
 #import "TXSipReg.h"
 
-#import "txsip_private.h"
+#include "txsip_private.h"
 
 static const char *registrar = "sip:crap.muromec.org.ua";
 
@@ -72,7 +72,6 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void) dealloc
 {
-   NSLog(@"dealloc sreg");
    mem_deref(reg);
 }
 

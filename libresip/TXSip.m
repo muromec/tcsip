@@ -147,11 +147,16 @@ static void exit_handler(void *arg)
     NSLog(@"close");
     sreg = nil;
     
-    mem_deref(uac->sock);
+    sipsess_close_all(uac->sock);
+    sip_transp_flush(uac->sip);
+    sip_close(uac->sip, 1);
     mem_deref(uac->sip);
+    mem_deref(uac->sock);
     mem_deref(uac_serv->dns);
     mem_deref(uac_serv->tls);
 
+    free(uac);
+    free(uac_serv);
 
     /* free librar state */
     libre_close();
@@ -180,6 +185,7 @@ static void exit_handler(void *arg)
     cb->arg = (__bridge void*)proxy;
     tmr_start(&cb->tmr, 100, timer_cb, cb);
     re_main(NULL);
+    tmr_cancel(&cb->tmr);
 
     NSLog(@"loop end");
     [self close];
