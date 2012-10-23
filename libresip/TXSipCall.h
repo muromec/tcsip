@@ -47,7 +47,7 @@ call_action_t;
 @protocol Call
 - (void) control:(call_action_t)action;
 
-@property NSInteger cid;
+@property (readonly)NSInteger cid;
 @end
 
 @interface TXSipCall : TXBaseOp<Call> {

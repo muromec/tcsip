@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#include "re.h"
+
+struct sip_taddr;
 
 @interface TXSipUser : NSObject {
     NSString* user;

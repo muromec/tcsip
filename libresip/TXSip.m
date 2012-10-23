@@ -13,6 +13,8 @@
 #import "TXSipMessage.h"
 #import "TXSipAuth.h"
 
+#include <re.h>
+#include "txsip_private.h"
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 #define delegate( ) (self->delegate)
@@ -98,19 +100,22 @@ static void exit_handler(void *arg)
 	
 	int err; /* errno return values */
     err = libre_init(); /// XXX: do this conditionally!!!
+    
+    uac = malloc(sizeof(uac_t));
+    uac_serv = malloc(sizeof(uac_serv_t));
 
 	/* fetch local IP address */
-	err = net_default_source_addr_get(AF_INET, &uac.laddr);
+	err = net_default_source_addr_get(AF_INET, &uac->laddr);
 
-	uac_serv.nsc = ARRAY_SIZE(uac_serv.nsv);
+	uac_serv->nsc = ARRAY_SIZE(uac_serv->nsv);
 	/* fetch list of DNS server IP addresses */
-	err = dns_srv_get(NULL, 0, uac_serv.nsv, &uac_serv.nsc);
+	err = dns_srv_get(NULL, 0, uac_serv->nsv, &uac_serv->nsc);
 	
 	/* create DNS client */
-	err = dnsc_alloc(&uac_serv.dns, NULL, uac_serv.nsv, uac_serv.nsc);
+	err = dnsc_alloc(&uac_serv->dns, NULL, uac_serv->nsv, uac_serv->nsc);
 
 	/* create SIP stack instance */
-	err = sip_alloc(&uac.sip, uac_serv.dns, 32, 32, 32,
+	err = sip_alloc(&uac->sip, uac_serv->dns, 32, 32, 32,
 			"TexR/OSX libre",
 			exit_handler, NULL);
 
@@ -118,22 +123,42 @@ static void exit_handler(void *arg)
         NSBundle *b = [NSBundle mainBundle];
         NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
 	NSString *cert = [account cert];
-        err = tls_alloc(&uac_serv.tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
-        tls_add_ca(uac_serv.tls, _byte(ca_cert));
+        err = tls_alloc(&uac_serv->tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
+        tls_add_ca(uac_serv->tls, _byte(ca_cert));
 	/* listen on random port */
-	sa_set_port(&uac.laddr, 0);
+	sa_set_port(&uac->laddr, 0);
 
 	/* add supported SIP transports */
-	err |= sip_transp_add(uac.sip, SIP_TRANSP_TLS, &uac.laddr, uac_serv.tls);
+	err |= sip_transp_add(uac->sip, SIP_TRANSP_TLS, &uac->laddr, uac_serv->tls);
 
 	/* create SIP session socket */
-	err = sipsess_listen(&uac.sock, uac.sip, 32, connect_handler, (__bridge void*)self);
+	err = sipsess_listen(&uac->sock, uac->sip, 32, connect_handler, (__bridge void*)self);
 
 }
 
 - (oneway void) stop
 {
-	NSLog(@"stop sip worker");
+    re_cancel();
+}
+
+- (void) close
+{
+
+    NSLog(@"close");
+    sreg = nil;
+    
+    mem_deref(uac->sock);
+    mem_deref(uac->sip);
+    mem_deref(uac_serv->dns);
+    mem_deref(uac_serv->tls);
+
+
+    /* free librar state */
+    libre_close();
+
+    tmr_debug();
+    mem_debug();
+
 }
 
 - (oneway void) register:(NSString*)pUser
@@ -155,6 +180,9 @@ static void exit_handler(void *arg)
     cb->arg = (__bridge void*)proxy;
     tmr_start(&cb->tmr, 100, timer_cb, cb);
     re_main(NULL);
+
+    NSLog(@"loop end");
+    [self close];
 }
 
 - (oneway void) startCall: (NSString*)dest {
@@ -194,7 +222,7 @@ static void exit_handler(void *arg)
 
 - (uac_t*) getUa
 {
-    return &uac;
+    return uac;
 }
 
 - (oneway void) setRegObserver: (id)obs {

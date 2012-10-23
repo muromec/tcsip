@@ -9,6 +9,8 @@
 #import "TXSipCall.h"
 #import "TXCallMedia.h"
 
+#import "txsip_private.h"
+
 static int offer_handler(struct mbuf **mbp, const struct sip_msg *msg,
 			 void *arg) {
     NSLog(@"sdp offer");

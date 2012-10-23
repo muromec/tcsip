@@ -9,6 +9,8 @@
 #import "TXSip.h"
 #import "TXSipReg.h"
 
+#import "txsip_private.h"
+
 static const char *registrar = "sip:crap.muromec.org.ua";
 
 /* called when register responses are received */
@@ -66,6 +68,12 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 	rstate &= rstate^REG_ONLINE;
 	[cb response: @"lost"];
     }
+}
+
+- (void) dealloc
+{
+   NSLog(@"dealloc sreg");
+   mem_deref(reg);
 }
 
 @end

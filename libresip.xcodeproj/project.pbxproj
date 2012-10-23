@@ -264,6 +264,7 @@
 		8557073516291BA200407CCC /* re_udp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re_udp.h; sourceTree = "<group>"; };
 		8557073616291BA200407CCC /* re_uri.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re_uri.h; sourceTree = "<group>"; };
 		8557073716291BA200407CCC /* re.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re.h; sourceTree = "<group>"; };
+		8580184A1636FEFE00E9D54B /* txsip_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = txsip_private.h; sourceTree = "<group>"; };
 		859D3D441628D6A400385248 /* libresip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = libresip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		859D3D451628D6A400385248 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		859D3D481628D6A400385248 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -447,6 +448,7 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				8580184A1636FEFE00E9D54B /* txsip_private.h */,
 				8507AA8E1628ADF700CE9AE6 /* TXAccount.m */,
 				8507AA8F1628ADF700CE9AE6 /* TXAccount.h */,
 				850277B91625B59700AB5038 /* sound_utils.c */,
