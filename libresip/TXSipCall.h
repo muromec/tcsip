@@ -44,7 +44,13 @@ call_action_t;
 
 @class TXCallMedia;
 
-@interface TXSipCall : TXBaseOp {
+@protocol Call
+- (void) control:(call_action_t)action;
+
+@property NSInteger cid;
+@end
+
+@interface TXSipCall : TXBaseOp<Call> {
     TXCallMedia *media;
     call_state_t cstate;
     const struct sip_msg *msg;
