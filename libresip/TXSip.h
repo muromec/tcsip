@@ -37,6 +37,8 @@ typedef struct {
 
 @end
 
+@class TXSipReg;
+
 @interface TXSip : NSObject {
     // sip core and sip services
     uac_t uac;
@@ -45,7 +47,7 @@ typedef struct {
     // move invite listener to separate class
     TXAccount *account;
 
-    id sreg;
+    TXSipReg *sreg;
     id auth;
     id user;
 
@@ -67,6 +69,7 @@ typedef struct {
 - (uac_t*) getUa;
 - (oneway void) worker;
 - (oneway void) stop;
+- (oneway void) setRegObserver: (id)obs;
 
 @property id auth;
 @property (readonly) TXSipUser* user;

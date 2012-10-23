@@ -192,17 +192,13 @@ static void exit_handler(void *arg)
     [chats addObject: out_chat];
 }
 
-- (oneway void) callControl:(int)action
-{
-    if(![calls count])
-        return;
-
-    [[calls lastObject] control:action];
-}
-
 - (uac_t*) getUa
 {
     return &uac;
+}
+
+- (oneway void) setRegObserver: (id)obs {
+    sreg.cb = CB(obs, onlineState:);
 }
 
 @end

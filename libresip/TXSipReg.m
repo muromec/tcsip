@@ -64,6 +64,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 	// fallthrough!
     default:
 	rstate &= rstate^REG_ONLINE;
+	[cb response: @"lost"];
     }
 }
 
