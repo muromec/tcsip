@@ -42,8 +42,12 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
                           NULL, 0, 1, auth_handler, ctx, false,
                           register_handler, ctx, NULL, NULL);
 
-    NSLog(@"send register %d", err);
-    rstate |= REG_START;
+    NSLog(@"send register %d %@", err, cb);
+    if(err) {
+        [cb response: @"off"];
+    } else {
+        rstate |= REG_START;
+    }
 }
 
 - (void) response: (int) status phrase:(const char*)phrase
@@ -52,16 +56,14 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
     switch(status) {
     case 200:
-	if((rstate & REG_AUTH)==0)
-	    [cb response: @"ok"];
+	[cb response: @"ok"];
 
 	rstate |= REG_AUTH;
 	rstate |= REG_ONLINE;
 	break;
     case 401:
 	if(cb && (rstate & REG_AUTH)==0) {
-	    mem_deref(reg);
-	    [cb response: nil];
+            NSLog(@"auth fail. how this can be?");
 	}
 	// fallthrough!
     default:
