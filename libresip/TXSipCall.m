@@ -150,6 +150,22 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 	// 200
         err = [media offer: msg->mb ret:&mb];
 
+        /*
+         * Workarround
+         *
+         * libre uses msg->dst to fill in Contact header
+         * value.
+         * This works well for UDP where one socket used
+         * for both send and recieve, but no for TCP
+         * TCP transport uses one socket for listen
+         * and other to connect to registar.
+         * Address msg->dst is the recieving part
+         * of upstream socket UAC->REGISTAR
+         * and cannot be used to connect from outside
+         *
+         * */
+        sa_set_port(&msg->dst, sa_port(&uac->laddr));
+
 	err = sipsess_accept(&sess, uac->sock, msg, 200, "OK",
 			     my_name, "application/sdp", mb,
 			     auth_handler, NULL, false,

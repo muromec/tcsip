@@ -126,8 +126,16 @@ static void exit_handler(void *arg)
 	NSString *cert = [account cert];
         err = tls_alloc(&uac_serv->tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
         tls_add_ca(uac_serv->tls, _byte(ca_cert));
-	/* listen on random port */
-	sa_set_port(&uac->laddr, 0);
+        /*
+         * Workarround.
+         *
+         * When using sa_set_port(0) we cant get port
+         * number we bind for listening.
+         * This indead is faulty cz random port cant
+         * bue guarranted to be free to bind
+         * */
+        int port = rand_u32() | 1024;
+	sa_set_port(&uac->laddr, port);
 
 	/* add supported SIP transports */
 	err |= sip_transp_add(uac->sip, SIP_TRANSP_TLS, &uac->laddr, uac_serv->tls);
