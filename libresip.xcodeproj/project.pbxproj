@@ -1095,6 +1095,7 @@
 					/Users/muromec/sources/CHDataStructures/source,
 				);
 				INFOPLIST_FILE = "libresip-osx/libresip-osx-Info.plist";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
@@ -1165,6 +1166,7 @@
 					/Users/muromec/sources/CHDataStructures/source,
 				);
 				INFOPLIST_FILE = "libresip-osx/libresip-osx-Info.plist";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
