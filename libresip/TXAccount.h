@@ -10,6 +10,7 @@
 #import <libresip/Callback.h>
 
 #define kSipUser @"sipu"
+#define kSipUUID @"sipuuid"
 
 @interface TXAccount : NSObject {
     NSString* user;
@@ -23,5 +24,6 @@
 - (void) auth:(NSString*)pUser password:(NSString*)pPassw cb:(Callback*)CB;
 
 @property (readonly) NSString* user;
+@property (readonly) NSString* uuid;
 
 @end

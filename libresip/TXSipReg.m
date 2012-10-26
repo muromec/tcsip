@@ -38,9 +38,15 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     const char *uri = _byte(dest.addr);
     const char *name = _byte(dest.name);
 
+    NSString* np = [NSString
+        stringWithFormat:@"+sip.instance=\"<urn:uuid:%@>\"",
+        instance_id
+    ];
+    const char *params = _byte(np);
+
     err = sipreg_register(&reg, uac->sip, registrar, uri, uri, 60, name,
                           NULL, 0, 1, auth_handler, ctx, false,
-                          register_handler, ctx, NULL, NULL);
+                          register_handler, ctx, params, NULL);
 
     NSLog(@"send register %d %@", err, cb);
     if(err) {
@@ -75,6 +81,11 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 - (void) dealloc
 {
    mem_deref(reg);
+}
+
+- (void) setInstanceId: (NSString*) pUUID
+{
+    instance_id = pUUID;
 }
 
 @end

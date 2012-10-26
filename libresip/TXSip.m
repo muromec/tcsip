@@ -90,6 +90,7 @@ static void exit_handler(void *arg)
     
     auth = [[TXSipAuth alloc] initWithApp: self];
     sreg = [[TXSipReg alloc] initWithApp:self];
+    [sreg setInstanceId: account.uuid];
 
     proxy = [MProxy withTarget: self];
 
@@ -138,6 +139,7 @@ static void exit_handler(void *arg)
 
 - (oneway void) stop
 {
+    sreg = nil;
     re_cancel();
 }
 

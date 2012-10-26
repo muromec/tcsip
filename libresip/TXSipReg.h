@@ -19,6 +19,7 @@ typedef enum {
 @interface TXSipReg : TXBaseOp {
     struct sipreg *reg;
     reg_state_t rstate;
+    NSString* instance_id;
 }
 
 - (void) setup;
@@ -26,5 +27,6 @@ typedef enum {
 - (void) send;
 
 - (void) response: (int) status phrase:(const char*)phrase;
+- (void) setInstanceId: (NSString*) pUUID;
 
 @end

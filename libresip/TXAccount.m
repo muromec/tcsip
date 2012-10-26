@@ -107,4 +107,22 @@
 
 }
 
+- (NSString*) uuid
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString* ret;
+    ret = [defaults stringForKey:kSipUUID];
+    if(ret)
+        return ret;
+
+    CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+    ret = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+    CFRelease(uuid);
+
+    [defaults setObject:ret forKey:kSipUUID];
+    [defaults synchronize];
+
+    return ret;
+}
+
 @end
