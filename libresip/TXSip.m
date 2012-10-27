@@ -101,6 +101,7 @@ static void exit_handler(void *arg)
 	
 	int err; /* errno return values */
     err = libre_init(); /// XXX: do this conditionally!!!
+    err = media_snd_init();
     
     uac = malloc(sizeof(uac_t));
     uac_serv = malloc(sizeof(uac_serv_t));
@@ -174,6 +175,7 @@ static void exit_handler(void *arg)
     tmr_debug();
     mem_debug();
 
+    media_snd_deinit();
 }
 
 - (oneway void) register:(NSString*)pUser

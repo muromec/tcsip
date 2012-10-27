@@ -227,9 +227,9 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     DROP(cstate, CSTATE_RING);
     cstate |= CSTATE_EST;
 
-    bool ok;
-    ok = [media start];
-    if(!ok) {
+    int ret;
+    ret = [media start];
+    if(ret) {
         cstate |= CSTATE_ERR;
         NSLog(@"media failed to start");
         goto out;

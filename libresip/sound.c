@@ -410,7 +410,7 @@ int media_snd_init()
 /**
  * Deinitialize sound library.
 **/
-int pjmedia_snd_deinit(void)
+int media_snd_deinit(void)
 {
 	PJ_LOG(5, (THIS_FILE, "pjmedia_snd_deinit"));
 	

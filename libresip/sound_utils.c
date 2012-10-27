@@ -1,7 +1,9 @@
 #include "sound_utils.h"
+#include <AudioToolbox/AudioServices.h>
+
 
 int default_device(char in) {
-#ifdef IPHONE
+#if IPHONE
     return 0;
 #else
 	OSStatus status;

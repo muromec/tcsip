@@ -66,5 +66,6 @@ int media_snd_stream_stop(struct pjmedia_snd_stream *snd_strm);
 int media_snd_stream_close(struct pjmedia_snd_stream *snd_strm);
 
 int media_snd_init();
+int media_snd_deinit(void);
 
 #endif

@@ -111,6 +111,12 @@
     int ok;
     [rtp runLoop];
 
+    if(!media)
+        [self open];
+
+    if(!media)
+        return -1;
+
     ok = media_snd_stream_start(media);
 
     return (bool)ok;
