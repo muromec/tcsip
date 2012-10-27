@@ -223,6 +223,12 @@ static void exit_handler(void *arg)
     if((call.cstate & CSTATE_ALIVE) == 0) {
         [calls removeObject: call];
 	[delegate() dropCall: call];
+	return;
+    }
+
+    if(call.cstate & CSTATE_EST) {
+	[delegate() estabCall: call];
+	return;
     }
 }
 

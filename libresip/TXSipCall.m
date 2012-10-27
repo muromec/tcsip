@@ -46,6 +46,8 @@ static void establish_handler(const struct sip_msg *msg, void *arg)
 
         re_printf("session established: %u %r\n", msg->scode, &msg->reason);
 
+        id ctx = (__bridge id)arg;
+        [ctx callActivate];
 }
 
 /* called when the session fails to connect or is terminated from peer */
@@ -129,7 +131,11 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
      * TODO: free all frames
      * TODO: move frames to call context
      * */
+    [self upd];
 
+}
+
+- (void) upd {
     [cb response: self];
 }
 
@@ -168,10 +174,10 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 
 	err = sipsess_accept(&sess, uac->sock, msg, 200, "OK",
 			     my_name, "application/sdp", mb,
-			     auth_handler, NULL, false,
+			     auth_handler, ctx, false,
 			     offer_handler, answer_handler,
 			     establish_handler, NULL, NULL,
-			     close_handler, NULL, NULL);
+			     close_handler, ctx, NULL);
 
         DROP(cstate, CSTATE_RING);
 	cstate |= CSTATE_EST;
@@ -226,11 +232,14 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     if(!ok) {
         cstate |= CSTATE_ERR;
         NSLog(@"media failed to start");
-        return;
+        goto out;
     }
     // XXX: assert rtp not null
     cstate |= CSTATE_FLOW;
     cstate |= CSTATE_MEDIA;
+
+out:
+    [self upd];
 }
 
 - (NSInteger) cid

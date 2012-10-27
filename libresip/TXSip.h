@@ -24,6 +24,7 @@ typedef struct uac_serv uac_serv_t;
 
 - (void) addCall: (id)call;
 - (void) dropCall: (id)call;
+- (void) estabCall: (id)call;
 
 @end
 
