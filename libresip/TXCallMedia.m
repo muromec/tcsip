@@ -158,6 +158,9 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 - (void) rtpData: (char *)data len:(int)len ts:(unsigned int) ts
 {
 
+    if(!media)
+        return;
+
     speex_bits_read_from(&dec_bits, data, len);
     speex_decode_int(dec_state, &dec_bits, (spx_int16_t*)(media->render_ring + write_off));
     write_off += frame_size;
