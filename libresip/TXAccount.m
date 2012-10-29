@@ -51,8 +51,11 @@
 + (NSString*) deflt
 {
     NSArray *args = [[NSProcessInfo processInfo] arguments];
+    NSString *first;
     if([args count] == 2) {
-        return [args objectAtIndex:1];
+        first = [args objectAtIndex:1];
+        if([first characterAtIndex:0] != '-')
+            return first;
     }
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
