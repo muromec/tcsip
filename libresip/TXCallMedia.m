@@ -171,27 +171,27 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 - (int) rtpInput: (char *)__data
 {
 
+    int len = 0;
+restart:
     if(media->record_ring_fill < frame_size)
-        return 0;
+        return len;
 
-    int len;
-    speex_encode_int(enc_state, (spx_int16_t*)(media->record_ring + read_off), &enc_bits);
+    media->record_ring_fill -= frame_size;
+
+    len = speex_encode_int(enc_state, (spx_int16_t*)(media->record_ring + read_off), &enc_bits);
     read_off += frame_size;
-
     if(read_off >= O_LIM)
         read_off = 0;
 
     struct mbuf *mb = mbuf_alloc(200 + RTP_HEADER_SIZE);
     mb->pos = RTP_HEADER_SIZE;
-    len = speex_bits_write(&enc_bits, mbuf_buf(mb), 200); // XXX: constant
-    media->record_ring_fill -= frame_size; // err threadsafe damn!
+    len = speex_bits_write_whole_bytes(&enc_bits, mbuf_buf(mb), 200); // XXX: constant
     mb->end = len + RTP_HEADER_SIZE;
-
 
     rtp_send(rtp, dst, 0, pt, ts, mb);
     mem_deref(mb);
 
-    return len;
+    goto restart;
 }
 
 - (int) offer: (struct mbuf*)offer ret:(struct mbuf **)ret {
