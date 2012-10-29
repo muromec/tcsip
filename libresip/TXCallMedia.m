@@ -12,11 +12,13 @@ void rtp_send_io(void *arg)
 {
     int len;
     timer_cb_t *cb = arg;
+    if(!cb->arg)
+        return;
     TXCallMedia *media = (__bridge TXCallMedia*)(cb->arg);
     [media rtpInput: NULL];
 
 next:
-    tmr_start(&cb->tmr, 1, rtp_send_io, arg);
+    tmr_start(&cb->tmr, 10, rtp_send_io, arg);
 }
 
 
@@ -35,8 +37,8 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     self = [super init];
     if(!self) return self;
 
-    laddr = malloc(sizeof(struct sa));
-    memcpy(laddr, pLaddr, sizeof(struct sa));
+    laddr = pLaddr;
+
     [self setup];
 
     return self;
@@ -86,7 +88,6 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
 
 
-    dst = malloc(sizeof(struct sa));
     ts = 0;
 }
 
@@ -99,9 +100,12 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 
     if(rtp) {
         mem_deref(rtp);
-        tmr_cancel(&rtp_timer.tmr);
-
 	rtp = NULL;
+    }
+
+    if(rtp_timer.arg) {
+        rtp_timer.arg = NULL;
+        tmr_cancel(&rtp_timer.tmr);
     }
 
     if(dec_state) {
