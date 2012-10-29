@@ -45,7 +45,7 @@ call_action_t;
 @class TXCallMedia;
 
 @protocol Call
-- (void) control:(call_action_t)action;
+- (oneway void) control:(call_action_t)action;
 
 @property (readonly)NSInteger cid;
 @property (readonly)TXSipUser* dest;
