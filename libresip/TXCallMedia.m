@@ -178,6 +178,7 @@ restart:
 
     media->record_ring_fill -= frame_size;
 
+    speex_bits_reset(&enc_bits);
     len = speex_encode_int(enc_state, (spx_int16_t*)(media->record_ring + read_off), &enc_bits);
     read_off += frame_size;
     if(read_off >= O_LIM)
@@ -185,7 +186,7 @@ restart:
 
     struct mbuf *mb = mbuf_alloc(200 + RTP_HEADER_SIZE);
     mb->pos = RTP_HEADER_SIZE;
-    len = speex_bits_write_whole_bytes(&enc_bits, mbuf_buf(mb), 200); // XXX: constant
+    len = speex_bits_write(&enc_bits, mbuf_buf(mb), 200); // XXX: constant
     mb->end = len + RTP_HEADER_SIZE;
 
     rtp_send(rtp, dst, 0, pt, ts, mb);
