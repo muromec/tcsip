@@ -17,9 +17,15 @@
 // ring buffer limit
 #define O_LIM (320*20)
 
+typedef struct {
+    struct tmr tmr;
+    void *arg;
+} timer_cb_t;
+
 @interface TXCallMedia : NSObject {
     struct pjmedia_snd_stream *media;
-    id rtp;
+    struct rtp_sock *rtp;
+    timer_cb_t rtp_timer;
 
     void *enc_state;
     void *dec_state;
@@ -34,6 +40,9 @@
     struct sdp_media *sdp_media;
 
     struct sa *laddr;
+    struct sa *dst;
+    int pt;
+    int ts;
 }
 
 - (id) initWithLaddr: (struct sa*)pLaddr;

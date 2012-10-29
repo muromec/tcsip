@@ -7,7 +7,27 @@
 //
 
 #import "TXCallMedia.h"
-#import "TXRTP.h"
+
+void rtp_send_io(void *arg)
+{
+    int len;
+    timer_cb_t *cb = arg;
+    TXCallMedia *media = (__bridge TXCallMedia*)(cb->arg);
+    [media rtpInput: NULL];
+
+next:
+    tmr_start(&cb->tmr, 1, rtp_send_io, arg);
+}
+
+
+void rtp_io (const struct sa *src, const struct rtp_header *hdr,
+        struct mbuf *mb, void *arg)
+{
+    TXCallMedia *media = (__bridge TXCallMedia*)arg;
+    [media rtpData: mbuf_buf(mb) 
+               len:mbuf_get_left(mb)
+                ts: hdr->ts];
+}
 
 @implementation TXCallMedia
 - (id) initWithLaddr: (struct sa*)pLaddr {
@@ -15,7 +35,8 @@
     self = [super init];
     if(!self) return self;
 
-    laddr = pLaddr;
+    laddr = malloc(sizeof(struct sa));
+    memcpy(laddr, pLaddr, sizeof(struct sa));
     [self setup];
 
     return self;
@@ -39,12 +60,14 @@
     frame_size *= 2;
 
     /* create SDP session */
+
+    rtp_listen(&rtp, IPPROTO_UDP, laddr, 6000, 7000, false,
+            rtp_io, NULL, (__bridge void*)self);
+
+    laddr = rtp_local(rtp);
+
     err = sdp_session_alloc(&sdp, laddr);
-
-    port = rand_u16();
-    port |= 0x400;
-
-    err = sdp_media_add(&sdp_media, sdp, "audio", port, "RTP/AVP");
+    err = sdp_media_add(&sdp_media, sdp, "audio", sa_port(laddr), "RTP/AVP");
 
     err = sdp_format_add(NULL, sdp_media, true, 
 	"97", "speex", 8000, 1,
@@ -63,8 +86,8 @@
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
 
 
-    rtp = [[TXRTP alloc] initWithCaller:self];
-    [rtp listen: @"0.0.0.0" port:port];
+    dst = malloc(sizeof(struct sa));
+    ts = 0;
 }
 
 - (void) stop {
@@ -75,7 +98,9 @@
     }
 
     if(rtp) {
-        [rtp stopSocket];
+        mem_deref(rtp);
+        tmr_cancel(&rtp_timer.tmr);
+
 	rtp = NULL;
     }
 
@@ -109,7 +134,11 @@
 
 - (bool) start {
     int ok;
-    [rtp runLoop];
+
+    tmr_init(&rtp_timer.tmr);
+    rtp_timer.arg = (__bridge void*)self;
+
+    tmr_start(&rtp_timer.tmr, 10, rtp_send_io, &rtp_timer);
 
     if(!media)
         [self open];
@@ -135,7 +164,7 @@
 
 }
 
-- (int) rtpInput: (char *)data
+- (int) rtpInput: (char *)__data
 {
 
     if(media->record_ring_fill < frame_size)
@@ -148,8 +177,15 @@
     if(read_off >= O_LIM)
         read_off = 0;
 
-    len = speex_bits_write(&enc_bits, data, 200); // XXX: constant
+    struct mbuf *mb = mbuf_alloc(200 + RTP_HEADER_SIZE);
+    mb->pos = RTP_HEADER_SIZE;
+    len = speex_bits_write(&enc_bits, mbuf_buf(mb), 200); // XXX: constant
     media->record_ring_fill -= frame_size; // err threadsafe damn!
+    mb->end = len + RTP_HEADER_SIZE;
+
+
+    rtp_send(rtp, dst, 0, pt, ts, mb);
+    mem_deref(mb);
 
     return len;
 }
@@ -225,6 +261,9 @@ out:
 
     re_printf("SDP media format: %s/%u/%u (payload type: %u)\n",
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
+
+    dst = sdp_media_raddr(sdp_media);
+    pt = fmt->pt;
 }
 
 @end
