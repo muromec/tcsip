@@ -10,8 +10,11 @@
 
 @interface MailBox : NSObject {
     id queue;
+    NSInteger kickFd;
 }
 - (id) qpop;
 - (void) qput: (id) data;
+
+@property NSInteger kickFd;
 
 @end

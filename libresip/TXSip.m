@@ -32,22 +32,27 @@ char* byte(NSString * input){
 }
 
 typedef struct {
-    struct tmr tmr;
+    int fd[2];
     void *arg;
-} timer_cb_t;
+} pq_t;
 
-void timer_cb(void *arg)
+void pq_cb(int flags, void *arg)
 {
-    timer_cb_t *cb = arg;
+    if(!(flags & FD_READ))
+        return;
 
-    MProxy *proxy = (__bridge MProxy *)(cb->arg);
+    pq_t *pq = arg;
+    int magic, ret;
+    ret = read(pq->fd[0], &magic, sizeof(magic));
+    if(ret<=0)
+        return;
+
+    MProxy *proxy = (__bridge MProxy *)(pq->arg);
     id inv;
     while((inv = [proxy.mbox qpop])) {
 	[inv invoke];
     }
 
-next:
-    tmr_start(&cb->tmr, 100, timer_cb, arg);
 }
 
 /* called upon incoming calls */
@@ -192,12 +197,12 @@ static void exit_handler(void *arg)
 - (oneway void) worker
 {
     NSLog(@"start worker");
-    timer_cb_t *cb = malloc(sizeof(timer_cb_t));
-    tmr_init(&cb->tmr);
-    cb->arg = (__bridge void*)proxy;
-    tmr_start(&cb->tmr, 100, timer_cb, cb);
+    pq_t *pq = malloc(sizeof(pq_t));
+    pq->arg = (__bridge void*)proxy;
+    pipe(pq->fd);
+    proxy.mbox.kickFd = pq->fd[1];
+    fd_listen(pq->fd[0], FD_READ, pq_cb, pq);
     re_main(NULL);
-    tmr_cancel(&cb->tmr);
 
     NSLog(@"loop end");
     [self close];

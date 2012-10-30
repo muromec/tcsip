@@ -10,6 +10,7 @@
 #import <CHCircularBufferQueue.h>
 
 @implementation MailBox
+@synthesize kickFd;
 - (id) init
 {
     self = [super init];
@@ -41,6 +42,12 @@
     {
 	[queue addObject: data];
     }
+
+    if(!kickFd)
+        return;
+
+    int magic = 0xDEADF00D;
+    write(kickFd, &magic, sizeof(magic));
 }
 
 @end
