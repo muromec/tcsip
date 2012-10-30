@@ -69,11 +69,11 @@
 		859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		859D3D7E1628D6D300385248 /* TXAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		859D3D831628D79200385248 /* TXRestApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		859D3DA71628DA4500385248 /* CHDataStructures.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D9F1628D9E400385248 /* CHDataStructures.framework */; };
 		85B57C7A1632999F00456ADD /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D8E1628D99F00385248 /* AudioUnit.framework */; };
 		85B57C7C163299AD00456ADD /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7B163299AD00456ADD /* CoreAudio.framework */; };
 		85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7D163299B100456ADD /* AudioToolbox.framework */; };
 		85D6414F163C62F4008D3974 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C781632999000456ADD /* CoreAudio.framework */; };
+		85DC288D163FCC1800723E22 /* CHDataStructures.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85DC288C163FCC1800723E22 /* CHDataStructures.framework */; };
 		85FF742516290A60005C64D5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742316290A60005C64D5 /* libcrypto.a */; };
 		85FF742616290A60005C64D5 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742416290A60005C64D5 /* libssl.a */; };
 		85FF742F16291027005C64D5 /* TXSip.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277C31625B59700AB5038 /* TXSip.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -103,34 +103,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 5DFBC1ED10A74964007BF56F;
 			remoteInfo = "iOS Unit Testing App";
-		};
-		859D3D9E1628D9E400385248 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 859D3D911628D9E300385248 /* CHDataStructures.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
-			remoteInfo = Framework;
-		};
-		859D3DA01628D9E400385248 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 859D3D911628D9E300385248 /* CHDataStructures.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = E473CB550E9346CB005CA997;
-			remoteInfo = "Unit Testing";
-		};
-		859D3DA21628D9E400385248 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 859D3D911628D9E300385248 /* CHDataStructures.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = E44B59B40E95850F00F9DD1A;
-			remoteInfo = Benchmarks;
-		};
-		859D3DA41628DA0400385248 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 859D3D911628D9E300385248 /* CHDataStructures.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = Framework;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -256,11 +228,11 @@
 		859D3D521628D6A400385248 /* libresip_osx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libresip_osx.h; sourceTree = "<group>"; };
 		859D3D531628D6A400385248 /* libresip_osx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = libresip_osx.m; sourceTree = "<group>"; };
 		859D3D8E1628D99F00385248 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AudioUnit.framework; sourceTree = DEVELOPER_DIR; };
-		859D3D911628D9E300385248 /* CHDataStructures.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CHDataStructures.xcodeproj; path = ../CHDataStructures/CHDataStructures.xcodeproj; sourceTree = "<group>"; };
 		85B57C781632999000456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
 		85B57C7B163299AD00456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		85B57C7D163299B100456ADD /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		85D64144163C62EA008D3974 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
+		85DC288C163FCC1800723E22 /* CHDataStructures.framework */ = {isa = PBXFileReference; lastKnownFileType = file; name = CHDataStructures.framework; path = ../CHDataStructures/build/Debug/CHDataStructures.framework; sourceTree = "<group>"; };
 		85FF73D8162909F4005C64D5 /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
 		85FF73D9162909F4005C64D5 /* asn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1.h; sourceTree = "<group>"; };
 		85FF73DA162909F4005C64D5 /* asn1_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1_mac.h; sourceTree = "<group>"; };
@@ -361,6 +333,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85DC288D163FCC1800723E22 /* CHDataStructures.framework in Frameworks */,
 				85D6414F163C62F4008D3974 /* CoreAudio.framework in Frameworks */,
 				85B57C7A1632999F00456ADD /* AudioUnit.framework in Frameworks */,
 				8557076216291C9000407CCC /* libre.a in Frameworks */,
@@ -369,7 +342,6 @@
 				8527169A1628F3B200C4B8DD /* libz.dylib in Frameworks */,
 				852716941628F39A00C4B8DD /* libresolv.dylib in Frameworks */,
 				852716921628F35B00C4B8DD /* SystemConfiguration.framework in Frameworks */,
-				859D3DA71628DA4500385248 /* CHDataStructures.framework in Frameworks */,
 				859D3D461628D6A400385248 /* Cocoa.framework in Frameworks */,
 				855707061629187C00407CCC /* libspeexdsp.a in Frameworks */,
 				855707071629188000407CCC /* libspeex.a in Frameworks */,
@@ -382,6 +354,7 @@
 		850277931625B53E00AB5038 = {
 			isa = PBXGroup;
 			children = (
+				85DC288C163FCC1800723E22 /* CHDataStructures.framework */,
 				85D64144163C62EA008D3974 /* AudioToolbox.framework */,
 				85B57C7D163299B100456ADD /* AudioToolbox.framework */,
 				85B57C7B163299AD00456ADD /* CoreAudio.framework */,
@@ -398,7 +371,6 @@
 				852716931628F39A00C4B8DD /* libresolv.dylib */,
 				852716911628F35B00C4B8DD /* SystemConfiguration.framework */,
 				859D3D8E1628D99F00385248 /* AudioUnit.framework */,
-				859D3D911628D9E300385248 /* CHDataStructures.xcodeproj */,
 				8507AAE51628BD8300CE9AE6 /* JSONKit */,
 				8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */,
 				850277DB1625B5A400AB5038 /* util */,
@@ -531,16 +503,6 @@
 				859D3D511628D6A400385248 /* libresip-osx-Prefix.pch */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		859D3D921628D9E300385248 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				859D3D9F1628D9E400385248 /* CHDataStructures.framework */,
-				859D3DA11628D9E400385248 /* CHDataStructures.octest */,
-				859D3DA31628D9E400385248 /* Benchmarks */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		85FF73D5162909E3005C64D5 /* deps */ = {
@@ -735,7 +697,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				859D3DA51628DA0400385248 /* PBXTargetDependency */,
 			);
 			name = "libresip-osx";
 			productName = "libresip-osx";
@@ -766,10 +727,6 @@
 					ProductGroup = 8507AAD31628BAFB00CE9AE6 /* Products */;
 					ProjectRef = 8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
 				},
-				{
-					ProductGroup = 859D3D921628D9E300385248 /* Products */;
-					ProjectRef = 859D3D911628D9E300385248 /* CHDataStructures.xcodeproj */;
-				},
 			);
 			projectRoot = "";
 			targets = (
@@ -799,27 +756,6 @@
 			fileType = wrapper.application;
 			path = CHDataStructures.app;
 			remoteRef = 8507AAE01628BAFB00CE9AE6 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		859D3D9F1628D9E400385248 /* CHDataStructures.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = CHDataStructures.framework;
-			remoteRef = 859D3D9E1628D9E400385248 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		859D3DA11628D9E400385248 /* CHDataStructures.octest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = CHDataStructures.octest;
-			remoteRef = 859D3DA01628D9E400385248 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		859D3DA31628D9E400385248 /* Benchmarks */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = Benchmarks;
-			remoteRef = 859D3DA21628D9E400385248 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -884,14 +820,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		859D3DA51628DA0400385248 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Framework;
-			targetProxy = 859D3DA41628DA0400385248 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		859D3D4E1628D6A400385248 /* InfoPlist.strings */ = {
@@ -1074,10 +1002,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				FRAMEWORK_VERSION = A;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1096,7 +1021,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DUSE_OPENSSL",
@@ -1132,7 +1057,7 @@
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.7;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -1145,10 +1070,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				FRAMEWORK_VERSION = A;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1167,7 +1089,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = (
 					"-DUSE_OPENSSL",
 					"-DUSE_TLS",
@@ -1202,7 +1124,7 @@
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.7;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
