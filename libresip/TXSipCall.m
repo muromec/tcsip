@@ -61,6 +61,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 @implementation TXSipCall
 @synthesize cstate;
 @synthesize end_reason;
+@synthesize cdir;
 @synthesize media;
 - (id) initIncoming: (const struct sip_msg *)pMsg app:(id)pApp;
 {
@@ -71,6 +72,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     cstate = CSTATE_IN_RING;
     msg = mem_ref((void*)pMsg);
     [self parseFrom];
+    cdir = CALL_IN;
 
     return self;
 }
@@ -85,6 +87,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     media = [[TXCallMedia alloc] initWithLaddr: &uac->laddr];
 
     cstate = CSTATE_STOP;
+    cdir = CALL_OUT;
 }
 
 - (void) send

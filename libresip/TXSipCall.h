@@ -43,6 +43,10 @@ typedef enum {
 }
 call_action_t;
 
+typedef enum {
+    CALL_IN,
+    CALL_OUT,
+} call_dir_t;
 
 // bitmath helpers
 #define DROP(x, bit) x&=x^bit
@@ -56,12 +60,14 @@ call_action_t;
 @property (readonly)NSInteger cid;
 @property (readonly)TXSipUser* dest;
 @property (readonly)call_end_t end_reason;
+@property (readonly)call_dir_t cdir;
 @end
 
 @interface TXSipCall : TXBaseOp<Call> {
     TXCallMedia *media;
     call_state_t cstate;
     call_end_t end_reason;
+    call_dir_t cdir;
     const struct sip_msg *msg;
 
     // XXX: move out speex-specific code
