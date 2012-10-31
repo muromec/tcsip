@@ -27,8 +27,8 @@
     self = [super self];
     if (!self) return self;
 
-    user = pUser;
-    name = pUser;
+    user = [[NSString alloc] initWithFormat: @"%@", pUser];
+    name = user;
     addr = [self netaddr];
 
     return self;
