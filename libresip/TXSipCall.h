@@ -31,6 +31,12 @@ typedef enum {
 } call_state_t;
 
 typedef enum {
+    CEND_OK=1,
+    CEND_CANCEL,
+    CEND_HANG,
+} call_end_t;
+
+typedef enum {
     CALL_ACCEPT,
     CALL_REJECT,
     CALL_BYE,
@@ -49,11 +55,13 @@ call_action_t;
 
 @property (readonly)NSInteger cid;
 @property (readonly)TXSipUser* dest;
+@property (readonly)call_end_t end_reason;
 @end
 
 @interface TXSipCall : TXBaseOp<Call> {
     TXCallMedia *media;
     call_state_t cstate;
+    call_end_t end_reason;
     const struct sip_msg *msg;
 
     // XXX: move out speex-specific code

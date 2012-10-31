@@ -60,6 +60,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 
 @implementation TXSipCall
 @synthesize cstate;
+@synthesize end_reason;
 @synthesize media;
 - (id) initIncoming: (const struct sip_msg *)pMsg app:(id)pApp;
 {
@@ -116,8 +117,14 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 - (void) hangup
 {
     NSLog(@"handgup");
-    DROP(cstate, CSTATE_ALIVE);
+    if(!end_reason && (cstate & CSTATE_EST)==CSTATE_EST)
+        end_reason = CEND_OK;
 
+    if(!end_reason && (cstate & CSTATE_EST)==0)
+        end_reason = CEND_HANG;
+
+    DROP(cstate, CSTATE_ALIVE);
+    DROP(cstate, CSTATE_EST);
     /*
      * Call terminated
      * Remote party dropped something heavy
@@ -195,12 +202,14 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 	    // bye sent automatically in deref
 	    mem_deref(sess);
 	    DROP(cstate, CSTATE_EST);
+            end_reason = CEND_OK;
 	}
 
 	if( TEST(cstate, CSTATE_OUT_RING ) ) {
 	    // cancel
 	    mem_deref(sess);
 	    DROP(cstate, CSTATE_EST);
+            end_reason = CEND_CANCEL;
 	}
 
         [self hangup];
