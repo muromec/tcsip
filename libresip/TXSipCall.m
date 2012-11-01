@@ -199,6 +199,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 	if( TEST(cstate, CSTATE_IN_RING) ) {
 	    (void)sip_treply(NULL, uac->sip, msg, 486, "Busy Here");
 	    DROP(cstate, CSTATE_IN_RING);
+            end_reason = CEND_HANG;
 	}
 
 	if( TEST(cstate, CSTATE_EST) ) {
