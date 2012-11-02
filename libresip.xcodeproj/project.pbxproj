@@ -41,6 +41,7 @@
 		8536A0751634D6C4007543B4 /* TXSipCall.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277C71625B59700AB5038 /* TXSipCall.h */; };
 		8536A0761634D6D1007543B4 /* TXBaseOp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; };
 		8536A0A21634D807007543B4 /* TXBaseOp.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; };
 		855707031629185700407CCC /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707001629185700407CCC /* libspeexdsp.a */; };
 		855707041629185700407CCC /* libspeex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707011629185700407CCC /* libspeex.a */; };
 		855707061629187C00407CCC /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707001629185700407CCC /* libspeexdsp.a */; };
@@ -113,6 +114,7 @@
 			dstPath = "include/${PRODUCT_NAME}";
 			dstSubfolderSpec = 16;
 			files = (
+				854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */,
 				8536A0761634D6D1007543B4 /* TXBaseOp.h in CopyFiles */,
 				8536A0751634D6C4007543B4 /* TXSipCall.h in CopyFiles */,
 				852716F61628FB7200C4B8DD /* MailBox.h in CopyFiles */,
@@ -232,7 +234,7 @@
 		85B57C7B163299AD00456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		85B57C7D163299B100456ADD /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		85D64144163C62EA008D3974 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
-		85DC288C163FCC1800723E22 /* CHDataStructures.framework */ = {isa = PBXFileReference; lastKnownFileType = file; name = CHDataStructures.framework; path = ../CHDataStructures/build/Debug/CHDataStructures.framework; sourceTree = "<group>"; };
+		85DC288C163FCC1800723E22 /* CHDataStructures.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CHDataStructures.framework; path = ../CHDataStructures/build/Debug/CHDataStructures.framework; sourceTree = "<group>"; };
 		85FF73D8162909F4005C64D5 /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
 		85FF73D9162909F4005C64D5 /* asn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1.h; sourceTree = "<group>"; };
 		85FF73DA162909F4005C64D5 /* asn1_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1_mac.h; sourceTree = "<group>"; };
