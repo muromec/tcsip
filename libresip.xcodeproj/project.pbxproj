@@ -41,6 +41,8 @@
 		8536A0751634D6C4007543B4 /* TXSipCall.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277C71625B59700AB5038 /* TXSipCall.h */; };
 		8536A0761634D6D1007543B4 /* TXBaseOp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; };
 		8536A0A21634D807007543B4 /* TXBaseOp.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8545D51A164447CE00DD7533 /* JSONKit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AAE61628BD9400CE9AE6 /* JSONKit.h */; };
+		8545D51F164447E400DD7533 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AAE61628BD9400CE9AE6 /* JSONKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; };
 		855707031629185700407CCC /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707001629185700407CCC /* libspeexdsp.a */; };
 		855707041629185700407CCC /* libspeex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707011629185700407CCC /* libspeex.a */; };
@@ -114,6 +116,7 @@
 			dstPath = "include/${PRODUCT_NAME}";
 			dstSubfolderSpec = 16;
 			files = (
+				8545D51A164447CE00DD7533 /* JSONKit.h in CopyFiles */,
 				854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */,
 				8536A0761634D6D1007543B4 /* TXBaseOp.h in CopyFiles */,
 				8536A0751634D6C4007543B4 /* TXSipCall.h in CopyFiles */,
@@ -664,6 +667,7 @@
 				85FF745B162910D2005C64D5 /* MProxy.h in Headers */,
 				8536A0A21634D807007543B4 /* TXBaseOp.h in Headers */,
 				8536A06B1634D6A2007543B4 /* TXSipCall.h in Headers */,
+				8545D51F164447E400DD7533 /* JSONKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
