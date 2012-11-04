@@ -63,4 +63,15 @@
     ];
 }
 
+- (NSDictionary*) asDict
+{
+
+    return [NSDictionary 
+        dictionaryWithObjectsAndKeys:
+        name, @"name",
+	user, @"login", 
+	addr, @"addr",
+       nil];
+}
+
 @end

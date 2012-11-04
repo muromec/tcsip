@@ -27,5 +27,6 @@ struct sip_taddr;
 @property NSString* host;
 
 @property (readonly) NSString* addr;
+@property (readonly) NSDictionary* asDict;
 
 @end
