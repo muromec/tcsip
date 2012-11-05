@@ -901,6 +901,7 @@
 					/Users/muromec/sources/CHDataStructures/source,
 					deps/include,
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
@@ -959,6 +960,7 @@
 					/Users/muromec/sources/CHDataStructures/source,
 					deps/include,
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
