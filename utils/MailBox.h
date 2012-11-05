@@ -9,12 +9,12 @@
 #import <Foundation/Foundation.h>
 
 @interface MailBox : NSObject {
-    id queue;
-    NSInteger kickFd;
+    int kickFd;
+    int readFd;
 }
 - (id) qpop;
 - (void) qput: (id) data;
 
-@property NSInteger kickFd;
+@property int readFd;
 
 @end

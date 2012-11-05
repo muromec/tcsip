@@ -7,16 +7,23 @@
 //
 
 #import "MailBox.h"
-#import <CHCircularBufferQueue.h>
+
+typedef struct {
+    int magic;
+    void *arg;
+} box_msg;
 
 @implementation MailBox
-@synthesize kickFd;
+@synthesize readFd;
 - (id) init
 {
     self = [super init];
     if(!self) return self;
 
-    queue = [[CHCircularBufferQueue alloc] init];
+    int pipe_fd[2];
+    pipe(pipe_fd);
+    kickFd = pipe_fd[1];
+    readFd = pipe_fd[0];
 
     return self;
 }
@@ -24,30 +31,33 @@
 - (id) qpop
 {
 
-    id ret; 
-    @synchronized(queue)
-    {
-	ret = [queue firstObject];
-	[queue removeFirstObject];
-    }
+    id ret;
+    box_msg msg;
 
+    read(readFd, &msg, sizeof(msg));
+
+    ret = (__bridge_transfer id)msg.arg;
     return ret;
 }
 
 - (void) qput: (id) data;
 {
     if(!data) return;
+    box_msg msg;
+    msg.arg = (__bridge_retained void*)data;
+    msg.magic = 0xDEADF123;
 
-    @synchronized(queue)
-    {
-	[queue addObject: data];
+    if(!kickFd) {
+        NSLog(@"wtf??");
+        return;
     }
 
-    if(!kickFd)
-        return;
+    write(kickFd, &msg, sizeof(msg));
+}
 
-    int magic = 0xDEADF00D;
-    write(kickFd, &magic, sizeof(magic));
+- (void) dealloc
+{
+    close(readFd);
 }
 
 @end

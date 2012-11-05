@@ -31,28 +31,14 @@ char* byte(NSString * input){
       return toReturn;
 }
 
-typedef struct {
-    int fd[2];
-    void *arg;
-} pq_t;
-
 void pq_cb(int flags, void *arg)
 {
     if(!(flags & FD_READ))
         return;
 
-    pq_t *pq = arg;
-    int magic, ret;
-    ret = read(pq->fd[0], &magic, sizeof(magic));
-    if(ret<=0)
-        return;
-
-    MProxy *proxy = (__bridge MProxy *)(pq->arg);
-    id inv;
-    while((inv = [proxy.mbox qpop])) {
-	[inv invoke];
-    }
-
+    MailBox *mbox  = (__bridge MailBox *)arg;
+    id inv = [mbox qpop];
+    [inv invoke];
 }
 
 /* called upon incoming calls */
@@ -196,12 +182,8 @@ static void exit_handler(void *arg)
 }
 - (oneway void) worker
 {
-    NSLog(@"start worker");
-    pq_t *pq = malloc(sizeof(pq_t));
-    pq->arg = (__bridge void*)proxy;
-    pipe(pq->fd);
-    proxy.mbox.kickFd = pq->fd[1];
-    fd_listen(pq->fd[0], FD_READ, pq_cb, pq);
+    NSLog(@"start worker %d", proxy.mbox.readFd);
+    fd_listen(proxy.mbox.readFd, FD_READ, pq_cb, (__bridge void*)proxy.mbox);
     re_main(NULL);
 
     NSLog(@"loop end");
