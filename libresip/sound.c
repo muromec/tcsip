@@ -39,7 +39,7 @@
 
 #define THIS_FILE "iphonesound.c"
 
-#define MANAGE_AUDIO_SESSION  0
+#define MANAGE_AUDIO_SESSION  IPHONE
 
 #define PJ_LOG(x, y) ({})
 
@@ -61,22 +61,18 @@ static struct pjmedia_snd_stream *snd_strm_instance = NULL;
 **/
 static void initializeAudioSession()
 {
-#if IPHONE
 #if MANAGE_AUDIO_SESSION
 	
 	if(!audio_session_initialized)
 	{
 		PJ_LOG(5, (THIS_FILE, "AudioSessionInitialize"));
 		
-		AudioSessionInitialize(NULL,                                   // Run loop (NULL = main run loop)
-		                       kCFRunLoopDefaultMode,                  // Run loop mode
-		(void(*)(void*,UInt32))pjmedia_snd_audio_session_interruption, // Interruption callback
-		                       NULL);                                  // Optional User data
+		AudioSessionInitialize(NULL, kCFRunLoopDefaultMode,
+		    (void(*)(void*,UInt32))session_int_cb, NULL);
 		
-		audio_session_initialized = PJ_TRUE;
+		audio_session_initialized = 1;
 	}
 
-#endif
 #endif
 }
 
@@ -127,9 +123,11 @@ static void stopAudioSession()
 /**
  * Invoked when our audio session is interrupted, or uninterrupted.
 **/
-#if IPHONE
-void pjmedia_snd_audio_session_interruption(void *userData, uint32_t interruptionState)
+void session_int_cb(void *userData, uint32_t interruptionState)
 {
+#if MANAGE_AUDIO_SESSION
+
+        printf("session interrupted\n");
 	if(interruptionState == kAudioSessionBeginInterruption)
 	{
 		PJ_LOG(3, (THIS_FILE, "interruptionListenerCallback: kAudioSessionBeginInterruption"));
@@ -155,8 +153,8 @@ void pjmedia_snd_audio_session_interruption(void *userData, uint32_t interruptio
 			AudioOutputUnitStart(snd_strm_instance->out_unit);
 		}
 	}
-}
 #endif
+}
 
 int fetch_ring(struct pjmedia_snd_stream *snd_strm, char *buffer, UInt32 want) {
 
@@ -346,7 +344,7 @@ int media_snd_init()
 	PJ_LOG(5, (THIS_FILE, "pjmedia_snd_init"));
 	
 	// Initialize audio session for iPhone
-	//initializeAudioSession();
+	initializeAudioSession();
 	
 	// To setup and use an audio unit, the following steps are performed in order:
 	// 

@@ -68,4 +68,6 @@ int media_snd_stream_close(struct pjmedia_snd_stream *snd_strm);
 int media_snd_init();
 int media_snd_deinit(void);
 
+void session_int_cb(void *userData, uint32_t interruptionState);
+
 #endif
