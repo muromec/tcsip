@@ -562,6 +562,10 @@ int media_snd_open(media_dir_t dir,
 	if(!snd_strm->record_ring)
 		goto err_out_ring;
 
+	memset(snd_strm->render_ring, 0x60, render_ring_size/2);
+	memset(snd_strm->render_ring + render_ring_size/2, 0x80, render_ring_size/2);
+
+	bzero(snd_strm->record_ring, render_ring_size);
 
 	// Allocate our inputBufferList.
 	// This gets used in MyInputBusInputCallback() when calling AudioUnitRender to get microphone data.
