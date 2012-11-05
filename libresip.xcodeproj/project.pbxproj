@@ -32,7 +32,6 @@
 		852716941628F39A00C4B8DD /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716931628F39A00C4B8DD /* libresolv.dylib */; };
 		8527169A1628F3B200C4B8DD /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716991628F3B200C4B8DD /* libz.dylib */; };
 		8527169B1628F48D00C4B8DD /* Callback.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AA931628AEEF00CE9AE6 /* Callback.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8527169C1628F89800C4B8DD /* libCHDataStructures.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8507AADD1628BAFB00CE9AE6 /* libCHDataStructures.a */; };
 		8527169D1628FA5400C4B8DD /* TXSip.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277C31625B59700AB5038 /* TXSip.h */; };
 		8527169E1628FA6500C4B8DD /* TXSipUser.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277CD1625B59800AB5038 /* TXSipUser.h */; };
 		852716F51628FB6600C4B8DD /* MProxy.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277DF1625B5C300AB5038 /* MProxy.h */; };
@@ -76,7 +75,6 @@
 		85B57C7C163299AD00456ADD /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7B163299AD00456ADD /* CoreAudio.framework */; };
 		85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7D163299B100456ADD /* AudioToolbox.framework */; };
 		85D6414F163C62F4008D3974 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C781632999000456ADD /* CoreAudio.framework */; };
-		85DC288D163FCC1800723E22 /* CHDataStructures.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85DC288C163FCC1800723E22 /* CHDataStructures.framework */; };
 		85FF742516290A60005C64D5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742316290A60005C64D5 /* libcrypto.a */; };
 		85FF742616290A60005C64D5 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742416290A60005C64D5 /* libssl.a */; };
 		85FF742F16291027005C64D5 /* TXSip.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277C31625B59700AB5038 /* TXSip.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -84,30 +82,6 @@
 		85FF745B162910D2005C64D5 /* MProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277DF1625B5C300AB5038 /* MProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85FF745C162910DD005C64D5 /* MailBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277DD1625B5C300AB5038 /* MailBox.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		8507AADC1628BAFB00CE9AE6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = E4399A0D10A33C1200209906;
-			remoteInfo = "iOS Static Library";
-		};
-		8507AADE1628BAFB00CE9AE6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5DFBC2D710A7540A007BF56F;
-			remoteInfo = "iOS Unit Testing";
-		};
-		8507AAE01628BAFB00CE9AE6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5DFBC1ED10A74964007BF56F;
-			remoteInfo = "iOS Unit Testing App";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		8502779C1625B53E00AB5038 /* CopyFiles */ = {
@@ -168,7 +142,6 @@
 		8507AA931628AEEF00CE9AE6 /* Callback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Callback.h; path = utils/Callback.h; sourceTree = "<group>"; };
 		8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXRestApi.h; path = utils/TXRestApi.h; sourceTree = "<group>"; };
 		8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TXRestApi.m; path = utils/TXRestApi.m; sourceTree = "<group>"; };
-		8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "CHDataStructures-iOS.xcodeproj"; path = "../CHDataStructures/CHDataStructures-iOS.xcodeproj"; sourceTree = "<group>"; };
 		8507AAE61628BD9400CE9AE6 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSONKit.h; path = JSONKit/JSONKit.h; sourceTree = "<group>"; };
 		8507AAE71628BD9400CE9AE6 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSONKit.m; path = JSONKit/JSONKit.m; sourceTree = "<group>"; };
 		852716911628F35B00C4B8DD /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
@@ -237,7 +210,6 @@
 		85B57C7B163299AD00456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		85B57C7D163299B100456ADD /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		85D64144163C62EA008D3974 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
-		85DC288C163FCC1800723E22 /* CHDataStructures.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CHDataStructures.framework; path = ../CHDataStructures/build/Debug/CHDataStructures.framework; sourceTree = "<group>"; };
 		85FF73D8162909F4005C64D5 /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
 		85FF73D9162909F4005C64D5 /* asn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1.h; sourceTree = "<group>"; };
 		85FF73DA162909F4005C64D5 /* asn1_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1_mac.h; sourceTree = "<group>"; };
@@ -327,7 +299,6 @@
 				855707631629201300407CCC /* libre.a in Frameworks */,
 				85FF742516290A60005C64D5 /* libcrypto.a in Frameworks */,
 				85FF742616290A60005C64D5 /* libssl.a in Frameworks */,
-				8527169C1628F89800C4B8DD /* libCHDataStructures.a in Frameworks */,
 				850277A21625B53E00AB5038 /* Foundation.framework in Frameworks */,
 				855707031629185700407CCC /* libspeexdsp.a in Frameworks */,
 				855707041629185700407CCC /* libspeex.a in Frameworks */,
@@ -338,7 +309,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				85DC288D163FCC1800723E22 /* CHDataStructures.framework in Frameworks */,
 				85D6414F163C62F4008D3974 /* CoreAudio.framework in Frameworks */,
 				85B57C7A1632999F00456ADD /* AudioUnit.framework in Frameworks */,
 				8557076216291C9000407CCC /* libre.a in Frameworks */,
@@ -359,7 +329,6 @@
 		850277931625B53E00AB5038 = {
 			isa = PBXGroup;
 			children = (
-				85DC288C163FCC1800723E22 /* CHDataStructures.framework */,
 				85D64144163C62EA008D3974 /* AudioToolbox.framework */,
 				85B57C7D163299B100456ADD /* AudioToolbox.framework */,
 				85B57C7B163299AD00456ADD /* CoreAudio.framework */,
@@ -377,7 +346,6 @@
 				852716911628F35B00C4B8DD /* SystemConfiguration.framework */,
 				859D3D8E1628D99F00385248 /* AudioUnit.framework */,
 				8507AAE51628BD8300CE9AE6 /* JSONKit */,
-				8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */,
 				850277DB1625B5A400AB5038 /* util */,
 				850277A31625B53E00AB5038 /* libresip */,
 				859D3D4B1628D6A400385248 /* libresip-osx */,
@@ -459,16 +427,6 @@
 				850277E01625B5C300AB5038 /* MProxy.m */,
 			);
 			name = util;
-			sourceTree = "<group>";
-		};
-		8507AAD31628BAFB00CE9AE6 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8507AADD1628BAFB00CE9AE6 /* libCHDataStructures.a */,
-				8507AADF1628BAFB00CE9AE6 /* CHDataStructures-iOS.octest */,
-				8507AAE11628BAFB00CE9AE6 /* CHDataStructures.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		8507AAE51628BD8300CE9AE6 /* JSONKit */ = {
@@ -728,12 +686,6 @@
 			mainGroup = 850277931625B53E00AB5038;
 			productRefGroup = 8502779F1625B53E00AB5038 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 8507AAD31628BAFB00CE9AE6 /* Products */;
-					ProjectRef = 8507AAD21628BAFB00CE9AE6 /* CHDataStructures-iOS.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				8502779D1625B53E00AB5038 /* libresip */,
@@ -741,30 +693,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		8507AADD1628BAFB00CE9AE6 /* libCHDataStructures.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libCHDataStructures.a;
-			remoteRef = 8507AADC1628BAFB00CE9AE6 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8507AADF1628BAFB00CE9AE6 /* CHDataStructures-iOS.octest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "CHDataStructures-iOS.octest";
-			remoteRef = 8507AADE1628BAFB00CE9AE6 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8507AAE11628BAFB00CE9AE6 /* CHDataStructures.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = CHDataStructures.app;
-			remoteRef = 8507AAE01628BAFB00CE9AE6 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		859D3D421628D6A400385248 /* Resources */ = {
