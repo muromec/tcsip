@@ -72,6 +72,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     cstate = CSTATE_IN_RING;
     msg = mem_ref((void*)pMsg);
     [self parseFrom];
+    [self acceptSession];
     cdir = CALL_IN;
 
     return self;
@@ -80,6 +81,25 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 - (void) parseFrom
 {
     dest = [TXSipUser withAddr: (struct sip_taddr*)&msg->from];
+}
+
+- (void) acceptSession
+{
+
+    int err;
+    const char *my_name = _byte(app.user.name);
+
+    err = sipsess_accept(&sess, uac->sock, msg, 180, "Ringing",
+                         my_name, "##NONE", NULL,
+                         auth_handler, ctx, false,
+                         offer_handler, answer_handler,
+                         establish_handler, NULL, NULL,
+                         close_handler, ctx, NULL);
+    NSLog(@"accept %@", err);
+    if(err)
+        cstate |= CSTATE_ERR;
+
+
 }
 
 - (void) setup
@@ -154,7 +174,6 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 
     int err;
     struct mbuf *mb;
-    const char *my_name = _byte(app.user.name);
 
     /*
      * XXX: drop bytes when confirmation received
@@ -182,12 +201,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
          * */
         sa_set_port(&msg->dst, sa_port(&uac->laddr));
 
-	err = sipsess_accept(&sess, uac->sock, msg, 200, "OK",
-			     my_name, "application/sdp", mb,
-			     auth_handler, ctx, false,
-			     offer_handler, answer_handler,
-			     establish_handler, NULL, NULL,
-			     close_handler, ctx, NULL);
+        sipsess_answer(sess, 200, "OK", mb, NULL);
 
         DROP(cstate, CSTATE_RING);
 	cstate |= CSTATE_EST;
