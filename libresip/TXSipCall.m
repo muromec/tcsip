@@ -90,7 +90,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     const char *my_name = _byte(app.user.name);
 
     err = sipsess_accept(&sess, uac->sock, msg, 180, "Ringing",
-                         my_name, "##NONE", NULL,
+                         my_name, "application/sdp", NULL,
                          auth_handler, ctx, false,
                          offer_handler, answer_handler,
                          establish_handler, NULL, NULL,
