@@ -95,7 +95,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
                          offer_handler, answer_handler,
                          establish_handler, NULL, NULL,
                          close_handler, ctx, NULL);
-    NSLog(@"accept %@", err);
+    NSLog(@"accept %d", err);
     if(err)
         cstate |= CSTATE_ERR;
 
@@ -214,6 +214,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 	    (void)sip_treply(NULL, uac->sip, msg, 486, "Busy Here");
 	    DROP(cstate, CSTATE_IN_RING);
             end_reason = CEND_HANG;
+            mem_deref(sess);
 	}
 
 	if( TEST(cstate, CSTATE_EST) ) {
