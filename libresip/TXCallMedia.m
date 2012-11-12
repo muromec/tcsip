@@ -67,11 +67,16 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     laddr = rtp_local(rtp);
 
     err = sdp_session_alloc(&sdp, laddr);
+    err = sdp_media_add(&sdp_media_s, sdp, "audio", sa_port(laddr), "RTP/SAVP");
     err = sdp_media_add(&sdp_media, sdp, "audio", sa_port(laddr), "RTP/AVP");
     /* XXX broken shit */
-    sdp_media_set_lattr(sdp_media, true, "crypto", "1 AES_CM_128_HMAC_SHA1_80 inline:Si/+CaPuPa+Wq2ByfeDG1/yWufg4OPCl6D2W9xs5");
+    sdp_media_set_lattr(sdp_media_s, true, "crypto", "1 AES_CM_128_HMAC_SHA1_80 inline:Si/+CaPuPa+Wq2ByfeDG1/yWufg4OPCl6D2W9xs5");
 
-    err = sdp_format_add(NULL, sdp_media, true, 
+    err = sdp_format_add(NULL, sdp_media, true,
+	"97", "speex", 8000, 1,
+	 NULL, NULL, NULL, false, NULL);
+
+    err = sdp_format_add(NULL, sdp_media_s, true,
 	"97", "speex", 8000, 1,
 	 NULL, NULL, NULL, false, NULL);
 
@@ -151,6 +156,8 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 	speex_encoder_destroy(enc_state);
 	enc_state = NULL;
     }
+
+    /* XXX: free sdp session and both sdp medias */
 
     speex_bits_reset(&enc_bits);
     speex_bits_reset(&dec_bits);
@@ -310,7 +317,7 @@ out:
     mbuf_write_mem(mb, mbuf_buf(offer), mbuf_get_space(offer));
     mb->pos = 0;
 
-    err = sdp_decode(sdp, mb, true);
+    err = sdp_decode(sdp, mb, false);
     if(err) {
         NSLog(@"cant decode answer");
         goto out;
@@ -325,25 +332,35 @@ out:
 
 - (void) sdpFormats {
 
-    const struct sdp_format *fmt;
+    const struct sdp_format *fmt = NULL;
+    const struct sdp_media *md;
+    const struct list *list;
+    struct le *le;
 
-    fmt = sdp_media_rformat(sdp_media, NULL);
+    list = sdp_session_medial(sdp, false);
+
+    for(le = list->head; le && !fmt; le = le->next) {
+        md = le->data;
+        fmt = sdp_media_rformat(md, NULL);
+    }
+
     if (!fmt) {
         re_printf("no common media format found\n");
         return;
     }
 
-    re_printf("SDP peer address: %J\n", sdp_media_raddr(sdp_media));
+    if(md == sdp_media_s) {
+        [self setupSRTP];
+    }
+
+    re_printf("SDP peer address: %J\n", sdp_media_raddr(md));
 
     re_printf("SDP media format: %s/%u/%u (payload type: %u)\n",
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
 
-    if(sdp_media_rattr(sdp_media, "crypto"))
-        [self setupSRTP];
+    re_printf("SDP crypt %s\n", sdp_media_rattr(md, "crypto"));
 
-    re_printf("SDP crypt %s\n", sdp_media_rattr(sdp_media, "crypto"));
-
-    dst = sdp_media_raddr(sdp_media);
+    dst = sdp_media_raddr(md);
     pt = fmt->pt;
 }
 
