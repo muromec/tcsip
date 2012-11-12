@@ -679,7 +679,7 @@
 		850277951625B53E00AB5038 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0440;
+				LastUpgradeCheck = 0450;
 				ORGANIZATIONNAME = enodev;
 			};
 			buildConfigurationList = 850277981625B53E00AB5038 /* Build configuration list for PBXProject "libresip" */;
@@ -999,7 +999,7 @@
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -1066,7 +1066,7 @@
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
