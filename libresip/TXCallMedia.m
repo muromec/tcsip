@@ -87,8 +87,44 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     re_printf("local format: %s/%u/%u (payload type: %u)\n",
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
 
+    [self setupSRTP];
 
     ts = 0;
+}
+
+- (void) setupSRTP
+{
+    int err;
+
+    srtp_policy_t in_policy, out_policy;
+
+    memset(srtp_in_key, 0xFC, 64);
+    memset(srtp_out_key, 0xFC, 64);
+
+    crypto_policy_set_rtp_default(&in_policy.rtp);
+    crypto_policy_set_rtcp_default(&in_policy.rtcp);
+
+    in_policy.key = (uint8_t*)srtp_in_key;
+    in_policy.next = NULL;
+    in_policy.ssrc.type  = ssrc_specific;
+    in_policy.rtp.sec_serv = sec_serv_conf_and_auth;
+    in_policy.rtcp.sec_serv = sec_serv_none;
+
+    err = srtp_create(&srtp_in, &in_policy);
+    printf("srtp create %d\n", err);
+
+    crypto_policy_set_rtp_default(&out_policy.rtp);
+    crypto_policy_set_rtcp_default(&out_policy.rtcp);
+
+    out_policy.key = (uint8_t*)srtp_out_key;
+    out_policy.next = NULL;
+    out_policy.ssrc.type  = ssrc_specific;
+    out_policy.rtp.sec_serv = sec_serv_conf_and_auth;
+    out_policy.rtcp.sec_serv = sec_serv_none;
+
+    err = srtp_create(&srtp_out, &out_policy);
+    printf("srtp create %d\n", err);
+
 }
 
 - (void) stop {
@@ -123,6 +159,10 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 
     speex_bits_destroy(&enc_bits);
     speex_bits_destroy(&dec_bits);
+
+    srtp_dealloc(srtp_in);
+    srtp_dealloc(srtp_out);
+
 }
 
 - (void) open {

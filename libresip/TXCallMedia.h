@@ -10,6 +10,7 @@
 
 #include "re.h"
 
+#import <srtp.h>
 #include <speex/speex.h>
 
 #include "sound.h"
@@ -32,6 +33,11 @@ typedef struct {
     int frame_size;
     SpeexBits enc_bits;
     SpeexBits dec_bits;
+
+    srtp_t srtp_in;
+    srtp_t srtp_out;
+    char srtp_in_key[64];
+    char srtp_out_key[64];
 
     int read_off;
     int write_off;
