@@ -106,7 +106,7 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 
     in_policy.key = (uint8_t*)srtp_in_key;
     in_policy.next = NULL;
-    in_policy.ssrc.type  = ssrc_specific;
+    in_policy.ssrc.type  = ssrc_any_inbound;
     in_policy.rtp.sec_serv = sec_serv_conf_and_auth;
     in_policy.rtcp.sec_serv = sec_serv_none;
 
@@ -118,7 +118,7 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 
     out_policy.key = (uint8_t*)srtp_out_key;
     out_policy.next = NULL;
-    out_policy.ssrc.type  = ssrc_specific;
+    out_policy.ssrc.type  = ssrc_any_outbound;
     out_policy.rtp.sec_serv = sec_serv_conf_and_auth;
     out_policy.rtcp.sec_serv = sec_serv_none;
 
