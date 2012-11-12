@@ -85,7 +85,8 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     re_printf("local format: %s/%u/%u (payload type: %u)\n",
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
 
-    [self setupSRTP];
+    if(0)
+        [self setupSRTP];
 
     ts = 0;
 }
@@ -158,8 +159,11 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     speex_bits_destroy(&enc_bits);
     speex_bits_destroy(&dec_bits);
 
-    srtp_dealloc(srtp_in);
-    srtp_dealloc(srtp_out);
+    if(srtp_in)
+        srtp_dealloc(srtp_in);
+
+    if(srtp_out)
+        srtp_dealloc(srtp_out);
 
 }
 
@@ -201,13 +205,16 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 
     int err, len;
     len = mbuf_get_left(mb);
-    mbuf_advance(mb, -RTP_HEADER_SIZE);
-    err = srtp_unprotect(srtp_in, mbuf_buf(mb), &len);
-    if(err) {
-        printf("srtp unprotect fail %d\n", err);
-        return;
+    if(srtp_in) {
+        mbuf_advance(mb, -RTP_HEADER_SIZE);
+        err = srtp_unprotect(srtp_in, mbuf_buf(mb), &len);
+        printf("unprotect\n");
+        if(err) {
+            printf("srtp unprotect fail %d\n", err);
+            return;
+        }
+        mbuf_advance(mb, RTP_HEADER_SIZE);
     }
-    mbuf_advance(mb, RTP_HEADER_SIZE);
 
     speex_bits_read_from(&dec_bits, mbuf_buf(mb), len);
     speex_decode_int(dec_state, &dec_bits, (spx_int16_t*)(media->render_ring + write_off));
@@ -243,9 +250,12 @@ restart:
     err = rtp_encode(rtp, 0, pt, ts, mb);
     mb->pos = 0;
 
-    err = srtp_protect(srtp_out, mbuf_buf(mb), &len);
-    if(err)
-        printf("srtp failed %d\n", err);
+    if(srtp_out) {
+        printf("protect\n");
+        err = srtp_protect(srtp_out, mbuf_buf(mb), &len);
+        if(err)
+            printf("srtp failed %d\n", err);
+    }
 
     udp_send(rtp_sock(rtp), dst, mb);
 
