@@ -68,6 +68,8 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 
     err = sdp_session_alloc(&sdp, laddr);
     err = sdp_media_add(&sdp_media, sdp, "audio", sa_port(laddr), "RTP/AVP");
+    /* XXX broken shit */
+    sdp_media_set_lattr(sdp_media, true, "crypto", "1 AES_CM_128_HMAC_SHA1_80 inline:Si/+CaPuPa+Wq2ByfeDG1/yWufg4OPCl6D2W9xs5");
 
     err = sdp_format_add(NULL, sdp_media, true, 
 	"97", "speex", 8000, 1,
@@ -84,9 +86,6 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 
     re_printf("local format: %s/%u/%u (payload type: %u)\n",
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
-
-    if(0)
-        [self setupSRTP];
 
     ts = 0;
 }
@@ -204,16 +203,18 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
         return;
 
     int err, len;
-    len = mbuf_get_left(mb);
     if(srtp_in) {
         mbuf_advance(mb, -RTP_HEADER_SIZE);
+        len = mbuf_get_left(mb);
         err = srtp_unprotect(srtp_in, mbuf_buf(mb), &len);
-        printf("unprotect\n");
         if(err) {
             printf("srtp unprotect fail %d\n", err);
             return;
         }
         mbuf_advance(mb, RTP_HEADER_SIZE);
+        len -= RTP_HEADER_SIZE;
+    } else {
+        len = mbuf_get_left(mb);
     }
 
     speex_bits_read_from(&dec_bits, mbuf_buf(mb), len);
@@ -244,14 +245,14 @@ restart:
     struct mbuf *mb = mbuf_alloc(200 + RTP_HEADER_SIZE);
     mb->pos = RTP_HEADER_SIZE;
     len = speex_bits_write(&enc_bits, mbuf_buf(mb), 200); // XXX: constant
-    mb->end = len + RTP_HEADER_SIZE;
+    len += RTP_HEADER_SIZE;
+    mb->end = len;
     mbuf_advance(mb, -RTP_HEADER_SIZE);
 
     err = rtp_encode(rtp, 0, pt, ts, mb);
     mb->pos = 0;
 
     if(srtp_out) {
-        printf("protect\n");
         err = srtp_protect(srtp_out, mbuf_buf(mb), &len);
         if(err)
             printf("srtp failed %d\n", err);
@@ -335,6 +336,11 @@ out:
 
     re_printf("SDP media format: %s/%u/%u (payload type: %u)\n",
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
+
+    if(sdp_media_rattr(sdp_media, "crypto"))
+        [self setupSRTP];
+
+    re_printf("SDP crypt %s\n", sdp_media_rattr(sdp_media, "crypto"));
 
     dst = sdp_media_raddr(sdp_media);
     pt = fmt->pt;
