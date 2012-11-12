@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "TXBaseOp.h"
 
+struct tcp_conn;
+
 typedef enum {
     REG_NONE,
     REG_START=1,
@@ -18,6 +20,8 @@ typedef enum {
 
 @interface TXSipReg : TXBaseOp {
     struct sipreg *reg;
+    struct tcp_conn *upstream;
+    CFReadStreamRef upstream_ref;
     reg_state_t rstate;
     NSString* instance_id;
 }
@@ -28,5 +32,6 @@ typedef enum {
 
 - (void) response: (int) status phrase:(const char*)phrase;
 - (void) setInstanceId: (NSString*) pUUID;
+- (void) voipDest:(struct tcp_conn *)conn;
 
 @end

@@ -13,6 +13,16 @@
 
 static const char *registrar = "sip:crap.muromec.org.ua";
 
+void impossible_cb (
+   CFSocketRef s,
+   CFSocketCallBackType callbackType,
+   CFDataRef address,
+   const void *data,
+   void *info
+) {
+    NSLog(@"impossible!\n");
+}
+
 /* called when register responses are received */
 static void register_handler(int err, const struct sip_msg *msg, void *arg)
 {
@@ -22,6 +32,8 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
             [ctx response: msg->scode  phrase:msg->reason.p];
         else
             [ctx response: 900 phrase: "Internal error"];
+
+	[ctx voipDest: sip_msg_tcpconn(msg)];
 }
 
 
@@ -86,6 +98,27 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 - (void) setInstanceId: (NSString*) pUUID
 {
     instance_id = pUUID;
+}
+
+- (void) voipDest:(struct tcp_conn *)conn
+{
+    if(conn == upstream)
+       return;
+
+    int fd = tcp_conn_fd(conn);
+    re_printf("fd %d\n", fd);
+    if(upstream_ref)
+        CFRelease(upstream_ref);
+
+    CFReadStreamRef read_stream;
+    CFStreamCreatePairWithSocket(NULL, fd, &read_stream, NULL);
+    CFReadStreamSetProperty(read_stream, kCFStreamNetworkServiceType, kCFStreamNetworkServiceTypeVoIP);
+    CFReadStreamOpen(read_stream);
+
+    NSLog(@"read stream %@", read_stream);
+
+    upstream = conn;
+    upstream_ref = read_stream;
 }
 
 @end
