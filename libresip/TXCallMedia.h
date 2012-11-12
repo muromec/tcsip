@@ -59,7 +59,7 @@ typedef struct {
 - (bool) start;
 - (void) stop;
 
-- (void) rtpData: (char *)data len:(int)len ts:(unsigned int) ts;
+- (void) rtpData: (struct mbuf*)mb header:(const struct rtp_header *)hdr;
 - (int) rtpInput: (char *)data;
 
 @end

@@ -26,9 +26,7 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
         struct mbuf *mb, void *arg)
 {
     TXCallMedia *media = (__bridge TXCallMedia*)arg;
-    [media rtpData: mbuf_buf(mb) 
-               len:mbuf_get_left(mb)
-                ts: hdr->ts];
+    [media rtpData: mb header:hdr];
 }
 
 @implementation TXCallMedia
@@ -195,26 +193,35 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     return (bool)ok;
 }
 
-- (void) rtpData: (char *)data len:(int)len ts:(unsigned int) ts
+- (void) rtpData: (struct mbuf*)mb header:(const struct rtp_header *)hdr
 {
 
     if(!media)
         return;
 
-    speex_bits_read_from(&dec_bits, data, len);
+    int err, len;
+    len = mbuf_get_left(mb);
+    mbuf_advance(mb, -RTP_HEADER_SIZE);
+    err = srtp_unprotect(srtp_in, mbuf_buf(mb), &len);
+    if(err) {
+        printf("srtp unprotect fail %d\n", err);
+        return;
+    }
+    mbuf_advance(mb, RTP_HEADER_SIZE);
+
+    speex_bits_read_from(&dec_bits, mbuf_buf(mb), len);
     speex_decode_int(dec_state, &dec_bits, (spx_int16_t*)(media->render_ring + write_off));
     write_off += frame_size;
 
     if(write_off >= O_LIM)
 	    write_off = 0;
 
-
 }
 
 - (int) rtpInput: (char *)__data
 {
 
-    int len = 0;
+    int len = 0, err=0;
 restart:
     if(media->record_ring_fill < frame_size)
         return len;
@@ -231,8 +238,17 @@ restart:
     mb->pos = RTP_HEADER_SIZE;
     len = speex_bits_write(&enc_bits, mbuf_buf(mb), 200); // XXX: constant
     mb->end = len + RTP_HEADER_SIZE;
+    mbuf_advance(mb, -RTP_HEADER_SIZE);
 
-    rtp_send(rtp, dst, 0, pt, ts, mb);
+    err = rtp_encode(rtp, 0, pt, ts, mb);
+    mb->pos = 0;
+
+    err = srtp_protect(srtp_out, mbuf_buf(mb), &len);
+    if(err)
+        printf("srtp failed %d\n", err);
+
+    udp_send(rtp_sock(rtp), dst, mb);
+
     mem_deref(mb);
 
     goto restart;
