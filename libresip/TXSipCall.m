@@ -140,6 +140,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 - (void) hangup
 {
     NSLog(@"handgup");
+    mem_deref(sess);
     if(!end_reason && (cstate & CSTATE_EST)==CSTATE_EST)
         end_reason = CEND_OK;
 
@@ -211,22 +212,20 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     case CALL_REJECT:
     case CALL_BYE:
 	if( TEST(cstate, CSTATE_IN_RING) ) {
-	    (void)sip_treply(NULL, uac->sip, msg, 486, "Busy Here");
+            sipsess_reject(sess, 486, "Reject", NULL);
 	    DROP(cstate, CSTATE_IN_RING);
             end_reason = CEND_HANG;
-            mem_deref(sess);
 	}
 
 	if( TEST(cstate, CSTATE_EST) ) {
 	    // bye sent automatically in deref
-	    mem_deref(sess);
+            sipsess_bye(sess, false);
 	    DROP(cstate, CSTATE_EST);
             end_reason = CEND_OK;
 	}
 
 	if( TEST(cstate, CSTATE_OUT_RING ) ) {
 	    // cancel
-	    mem_deref(sess);
 	    DROP(cstate, CSTATE_EST);
             end_reason = CEND_CANCEL;
 	}
