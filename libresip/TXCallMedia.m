@@ -99,7 +99,7 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     memset(srtp_in_key, 0xFC, 64);
     memset(srtp_out_key, 0xFC, 64);
 
-    crypto_policy_set_rtp_default(&in_policy.rtp);
+    crypto_policy_set_aes_cm_128_null_auth(&in_policy.rtp);
     crypto_policy_set_rtcp_default(&in_policy.rtcp);
 
     in_policy.key = (uint8_t*)srtp_in_key;
@@ -111,7 +111,7 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     err = srtp_create(&srtp_in, &in_policy);
     printf("srtp create %d\n", err);
 
-    crypto_policy_set_rtp_default(&out_policy.rtp);
+    crypto_policy_set_aes_cm_128_null_auth(&out_policy.rtp);
     crypto_policy_set_rtcp_default(&out_policy.rtcp);
 
     out_policy.key = (uint8_t*)srtp_out_key;
