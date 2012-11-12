@@ -8,17 +8,63 @@
 
 #import "TXCallMedia.h"
 
-void rtp_send_io(void *arg)
-{
-    int len;
-    timer_cb_t *cb = arg;
-    if(!cb->arg)
-        return;
-    TXCallMedia *media = (__bridge TXCallMedia*)(cb->arg);
-    [media rtpInput: NULL];
+typedef struct {
+    int magic;
+    struct pjmedia_snd_stream * media;
+    int frame_size;
+    int read_off;
+    SpeexBits *enc_bits;
+    void *enc_state;
+    struct mbuf *mb;
+    struct rtp_sock *rtp;
+    int pt;
+    int ts;
+    srtp_t srtp_out;
+    struct sa *dst;
+    struct tmr *tmr;
+} rtp_send_ctx;
 
-next:
-    tmr_start(&cb->tmr, 10, rtp_send_io, arg);
+void rtp_send_io(void *varg)
+{
+    int len = 0, err=0;
+    rtp_send_ctx * arg = varg;
+    if(arg->magic != 0x1ee1F00D)
+        return;
+    struct pjmedia_snd_stream *media = arg->media;
+    int frame_size = arg->frame_size;
+    struct mbuf *mb = arg->mb;
+
+    if(media->record_ring_fill < frame_size)
+        goto timer;
+
+    media->record_ring_fill -= frame_size;
+
+    speex_bits_reset(arg->enc_bits);
+    len = speex_encode_int(arg->enc_state, (spx_int16_t*)(media->record_ring + arg->read_off), arg->enc_bits);
+    arg->read_off += frame_size;
+    if(arg->read_off >= O_LIM)
+        arg->read_off = 0;
+
+    mb->pos = RTP_HEADER_SIZE;
+    len = speex_bits_write(arg->enc_bits, mbuf_buf(mb), 200); // XXX: constant
+    len += RTP_HEADER_SIZE;
+    mb->end = len;
+    mbuf_advance(mb, -RTP_HEADER_SIZE);
+
+    err = rtp_encode(arg->rtp, 0, arg->pt, arg->ts, mb);
+    mb->pos = 0;
+
+    if(arg->srtp_out) {
+        err = srtp_protect(arg->srtp_out, mbuf_buf(mb), &len);
+        if(err)
+            printf("srtp failed %d\n", err);
+        mb->end = len;
+    }
+
+    udp_send(rtp_sock(arg->rtp), arg->dst, mb);
+
+timer:
+    tmr_start(arg->tmr, 10, rtp_send_io, varg);
 }
 
 
@@ -142,9 +188,12 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 	rtp = NULL;
     }
 
-    if(rtp_timer.arg) {
-        rtp_timer.arg = NULL;
-        tmr_cancel(&rtp_timer.tmr);
+    tmr_cancel(&rtp_tmr);
+
+    if(send_io_ctx) {
+        ((rtp_send_ctx*)send_io_ctx)->magic = 0;
+        mem_deref(((rtp_send_ctx*)send_io_ctx)->mb);
+        free(send_io_ctx);
     }
 
     if(dec_state) {
@@ -187,16 +236,30 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 - (bool) start {
     int ok;
 
-    tmr_init(&rtp_timer.tmr);
-    rtp_timer.arg = (__bridge void*)self;
-
-    tmr_start(&rtp_timer.tmr, 10, rtp_send_io, &rtp_timer);
-
     if(!media)
         [self open];
 
     if(!media)
         return -1;
+
+    tmr_init(&rtp_tmr);
+    rtp_send_ctx *send_ctx = malloc(sizeof(rtp_send_ctx));
+    send_ctx->media = media;
+    send_ctx->frame_size = frame_size;
+    send_ctx->read_off = 0;
+    send_ctx->enc_bits = &enc_bits;
+    send_ctx->enc_state = enc_state;
+    send_ctx->mb = mbuf_alloc(200 + RTP_HEADER_SIZE);
+    send_ctx->rtp = rtp;
+    send_ctx->pt = pt;
+    send_ctx->ts = ts;
+    send_ctx->srtp_out = srtp_out;
+    send_ctx->dst = dst;
+    send_ctx->tmr = &rtp_tmr;
+    send_ctx->magic = 0x1ee1F00D;
+
+    send_io_ctx = send_ctx;
+    tmr_start(&rtp_tmr, 10, rtp_send_io, send_io_ctx);
 
     ok = media_snd_stream_start(media);
 
@@ -231,46 +294,6 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     if(write_off >= O_LIM)
 	    write_off = 0;
 
-}
-
-- (int) rtpInput: (char *)__data
-{
-
-    int len = 0, err=0;
-restart:
-    if(media->record_ring_fill < frame_size)
-        return len;
-
-    media->record_ring_fill -= frame_size;
-
-    speex_bits_reset(&enc_bits);
-    len = speex_encode_int(enc_state, (spx_int16_t*)(media->record_ring + read_off), &enc_bits);
-    read_off += frame_size;
-    if(read_off >= O_LIM)
-        read_off = 0;
-
-    struct mbuf *mb = mbuf_alloc(200 + RTP_HEADER_SIZE);
-    mb->pos = RTP_HEADER_SIZE;
-    len = speex_bits_write(&enc_bits, mbuf_buf(mb), 200); // XXX: constant
-    len += RTP_HEADER_SIZE;
-    mb->end = len;
-    mbuf_advance(mb, -RTP_HEADER_SIZE);
-
-    err = rtp_encode(rtp, 0, pt, ts, mb);
-    mb->pos = 0;
-
-    if(srtp_out) {
-        err = srtp_protect(srtp_out, mbuf_buf(mb), &len);
-        if(err)
-            printf("srtp failed %d\n", err);
-        mb->end = len;
-    }
-
-    udp_send(rtp_sock(rtp), dst, mb);
-
-    mem_deref(mb);
-
-    goto restart;
 }
 
 - (int) offer: (struct mbuf*)offer ret:(struct mbuf **)ret {
