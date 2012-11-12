@@ -28,6 +28,8 @@
 		8507AAE81628BD9400CE9AE6 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAE71628BD9400CE9AE6 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8507AAE91628BEB100CE9AE6 /* TXAccount.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; };
 		8507AAEA1628BED400CE9AE6 /* Callback.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA931628AEEF00CE9AE6 /* Callback.h */; };
+		8523A5CB1650E3220071C23F /* libsrtp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8523A5CA1650E3220071C23F /* libsrtp.a */; };
+		8523A5CD1650E3520071C23F /* libsrtp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8523A5CA1650E3220071C23F /* libsrtp.a */; };
 		852716921628F35B00C4B8DD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716911628F35B00C4B8DD /* SystemConfiguration.framework */; };
 		852716941628F39A00C4B8DD /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716931628F39A00C4B8DD /* libresolv.dylib */; };
 		8527169A1628F3B200C4B8DD /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716991628F3B200C4B8DD /* libz.dylib */; };
@@ -144,6 +146,7 @@
 		8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TXRestApi.m; path = utils/TXRestApi.m; sourceTree = "<group>"; };
 		8507AAE61628BD9400CE9AE6 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSONKit.h; path = JSONKit/JSONKit.h; sourceTree = "<group>"; };
 		8507AAE71628BD9400CE9AE6 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSONKit.m; path = JSONKit/JSONKit.m; sourceTree = "<group>"; };
+		8523A5CA1650E3220071C23F /* libsrtp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsrtp.a; path = deps/libsrtp.a; sourceTree = "<group>"; };
 		852716911628F35B00C4B8DD /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
 		852716931628F39A00C4B8DD /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/usr/lib/libresolv.dylib; sourceTree = DEVELOPER_DIR; };
 		852716951628F3A300C4B8DD /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/usr/lib/libssl.dylib; sourceTree = DEVELOPER_DIR; };
@@ -294,6 +297,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8523A5CB1650E3220071C23F /* libsrtp.a in Frameworks */,
 				85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */,
 				85B57C7C163299AD00456ADD /* CoreAudio.framework in Frameworks */,
 				855707631629201300407CCC /* libre.a in Frameworks */,
@@ -309,6 +313,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8523A5CD1650E3520071C23F /* libsrtp.a in Frameworks */,
 				85D6414F163C62F4008D3974 /* CoreAudio.framework in Frameworks */,
 				85B57C7A1632999F00456ADD /* AudioUnit.framework in Frameworks */,
 				8557076216291C9000407CCC /* libre.a in Frameworks */,
@@ -329,6 +334,7 @@
 		850277931625B53E00AB5038 = {
 			isa = PBXGroup;
 			children = (
+				8523A5CA1650E3220071C23F /* libsrtp.a */,
 				85D64144163C62EA008D3974 /* AudioToolbox.framework */,
 				85B57C7D163299B100456ADD /* AudioToolbox.framework */,
 				85B57C7B163299AD00456ADD /* CoreAudio.framework */,
