@@ -53,6 +53,8 @@
 		8557070B1629192800407CCC /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716971628F3AA00C4B8DD /* libcrypto.dylib */; };
 		8557076216291C9000407CCC /* libre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855706FF1629185700407CCC /* libre.a */; };
 		855707631629201300407CCC /* libre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855706FF1629185700407CCC /* libre.a */; };
+		8585A26816527CB000380B9C /* ajitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 8585A26716527CB000380B9C /* ajitter.c */; };
+		8585A26916527CB000380B9C /* ajitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 8585A26716527CB000380B9C /* ajitter.c */; };
 		859D3D461628D6A400385248 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D451628D6A400385248 /* Cocoa.framework */; };
 		859D3D501628D6A400385248 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 859D3D4E1628D6A400385248 /* InfoPlist.strings */; };
 		859D3D5D1628D6BC00385248 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAE71628BD9400CE9AE6 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -198,6 +200,8 @@
 		8557073616291BA200407CCC /* re_uri.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re_uri.h; sourceTree = "<group>"; };
 		8557073716291BA200407CCC /* re.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re.h; sourceTree = "<group>"; };
 		8580184A1636FEFE00E9D54B /* txsip_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = txsip_private.h; sourceTree = "<group>"; };
+		8585A26716527CB000380B9C /* ajitter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ajitter.c; sourceTree = "<group>"; };
+		8585A26B16527CBB00380B9C /* ajitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ajitter.h; sourceTree = "<group>"; };
 		859D3D441628D6A400385248 /* libresip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = libresip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		859D3D451628D6A400385248 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		859D3D481628D6A400385248 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -382,6 +386,8 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				8585A26B16527CBB00380B9C /* ajitter.h */,
+				8585A26716527CB000380B9C /* ajitter.c */,
 				8580184A1636FEFE00E9D54B /* txsip_private.h */,
 				8507AA8E1628ADF700CE9AE6 /* TXAccount.m */,
 				8507AA8F1628ADF700CE9AE6 /* TXAccount.h */,
@@ -733,6 +739,7 @@
 				8507AA941628AEEF00CE9AE6 /* Callback.m in Sources */,
 				8507AAA91628B6BC00CE9AE6 /* TXRestApi.m in Sources */,
 				8507AAE81628BD9400CE9AE6 /* JSONKit.m in Sources */,
+				8585A26816527CB000380B9C /* ajitter.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -756,6 +763,7 @@
 				859D3D791628D6BC00385248 /* TXSipMessage.m in Sources */,
 				859D3D7B1628D6BC00385248 /* TXSipReg.m in Sources */,
 				859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */,
+				8585A26916527CB000380B9C /* ajitter.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
