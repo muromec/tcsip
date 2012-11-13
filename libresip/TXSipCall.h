@@ -80,7 +80,7 @@ typedef enum {
 
 - (void) send;
 - (void) hangup;
-- (void) control:(int)action;
+- (oneway void) control:(int)action;
 
 - (void) callActivate;
 - (NSInteger) cid;
