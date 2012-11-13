@@ -254,29 +254,15 @@ static OSStatus MyInputBusInputCallback(void                       *inRefCon,
                                         UInt32                      inNumberFrames,
                                         AudioBufferList            *ioData)
 {
-	// Our job in this method is to get the data from the audio unit and pass it to the pjsip callback method.
-	
-	// According to Apple, we should avoid the following in audio unit IO callbacks:
-	// - memory allocation
-	// - semaphores/mutexes
-	// - objective-c method dispatching
 	
 	// The AudioUnit callbacks operate on a different real-time thread
-	
 	struct pjmedia_snd_stream *snd_strm = (struct pjmedia_snd_stream *)inRefCon;
-	
-	// Remember: The ioData parameter is NULL.
-	// We need to use our own AudioBufferList in combination with the AudioUnitRender method to get the audio data.
-	if(!snd_strm->inputBufferList || !snd_strm->record_ring) {
-		printf("dead callback\n");
-		return -1;
-	}
 	
 	AudioBufferList *abl = snd_strm->inputBufferList;
 	abl->mNumberBuffers = 1;
-    abl->mBuffers[0].mNumberChannels = 1;
-    abl->mBuffers[0].mData = NULL;
-    abl->mBuffers[0].mDataByteSize = inNumberFrames * 2;// XXX shame on me
+	abl->mBuffers[0].mNumberChannels = 1;
+	abl->mBuffers[0].mData = NULL;
+	abl->mBuffers[0].mDataByteSize = inNumberFrames * 2;// XXX shame on me
 	
 	OSStatus status = AudioUnitRender(snd_strm->in_unit,
 	                                  ioActionFlags,
@@ -291,17 +277,17 @@ static OSStatus MyInputBusInputCallback(void                       *inRefCon,
 	in_size = inNumberFrames;
 	out_size = 94; // ya magic!
 
-	if((snd_strm->record_ring_off + out_size) > snd_strm->record_ring_size) {
-		snd_strm->record_ring_off = 0;
-	}
-
+	ajitter_packet *ajp = ajitter_put_ptr(snd_strm->record_jitter);
 	status = speex_resampler_process_int(snd_strm->resampler, 0,
 		abl->mBuffers[0].mData, &in_size,
-		(spx_int16_t*)(snd_strm->record_ring + snd_strm->record_ring_off), &out_size);
+		(spx_int16_t*)ajp->data,
+		&out_size);
+		
+	ajp->left = out_size * 2;
+	ajp->off = 0;
 	ERR("cant do resample: %d");
+	ajitter_put_done(snd_strm->record_jitter, ajp->idx, inTimeStamp->mSampleTime);
 
-	snd_strm->record_ring_off += (out_size*2); // sample size = 2
-	snd_strm->record_ring_fill += (out_size*2);
 
 	return noErr;
 err:
@@ -554,18 +540,12 @@ int media_snd_open(media_dir_t dir,
 	if(!snd_strm->render_ring)
 		goto err_out_ring2;
 
-	snd_strm->record_ring = malloc(render_ring_size);
-	snd_strm->record_ring_size = render_ring_size;
-	snd_strm->record_ring_off = 0;
-	snd_strm->record_ring_fill = 0;
-
-	if(!snd_strm->record_ring)
+	snd_strm->record_jitter = ajitter_init(94*2);
+	if(!snd_strm->record_jitter)
 		goto err_out_ring;
 
 	memset(snd_strm->render_ring, 0x60, render_ring_size/2);
 	memset(snd_strm->render_ring + render_ring_size/2, 0x80, render_ring_size/2);
-
-	bzero(snd_strm->record_ring, render_ring_size);
 
 	// Allocate our inputBufferList.
 	// This gets used in MyInputBusInputCallback() when calling AudioUnitRender to get microphone data.
@@ -711,7 +691,7 @@ err_out:
 err_out_resampler:
 	free(snd_strm->inputBufferList);
 err_out_inbuf:
-	free(snd_strm->record_ring);
+	ajitter_destroy(snd_strm->record_jitter);
 err_out_ring:
 	free(snd_strm->render_ring);
 err_out_ring2:
@@ -805,9 +785,9 @@ int media_snd_stream_close(struct pjmedia_snd_stream *snd_strm)
 		snd_strm->render_ring = NULL;
 	}
 
-	if(snd_strm->record_ring) {
-		free(snd_strm->record_ring);
-		snd_strm->record_ring = NULL;
+	if(snd_strm->record_jitter) {
+		ajitter_destroy(snd_strm->record_jitter);
+		snd_strm->record_jitter = NULL;
 	}
 
 	if(snd_strm->inputBufferList) {

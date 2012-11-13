@@ -7,6 +7,7 @@
 //
 
 #import "TXCallMedia.h"
+#include "ajitter.h"
 
 typedef struct {
     int magic;
@@ -31,22 +32,35 @@ void rtp_send_io(void *varg)
     if(arg->magic != 0x1ee1F00D)
         return;
     struct pjmedia_snd_stream *media = arg->media;
-    int frame_size = arg->frame_size;
     struct mbuf *mb = arg->mb;
+    ajitter_packet *ajp;
+    ajitter *aj = media->record_jitter;
+    int need, get_now;
 
-    if(media->record_ring_fill < frame_size)
+    ajp = ajitter_get_ptr(aj);
+    if(!ajp)
         goto timer;
 
-    media->record_ring_fill -= frame_size;
+    need = arg->frame_size - aj->out_have;
+    get_now = min(need, ajp->left);
+    memcpy(aj->out_buffer + aj->out_have, ajp->data + ajp->off, get_now);
+    ajp->left -= get_now;
+    ajp->off += get_now;
+    if(ajp->left < 1)
+        ajitter_get_done(media->record_jitter, ajp->idx);
 
-    speex_bits_reset(arg->enc_bits);
-    len = speex_encode_int(arg->enc_state, (spx_int16_t*)(media->record_ring + arg->read_off), arg->enc_bits);
-    arg->read_off += frame_size;
-    if(arg->read_off >= O_LIM)
-        arg->read_off = 0;
+    aj->out_have += get_now;
+    printf("now have %d this time got %d from idx %d\n",
+            aj->out_have, get_now, ajp->idx);
+    if(aj->out_have < arg->frame_size)
+        goto timer;
+
+    len = speex_encode_int(arg->enc_state, (spx_int16_t*)&aj->out_buffer, arg->enc_bits);
+    printf("encode len %d bits %d\n", len, speex_bits_remaining(arg->enc_bits));
 
     mb->pos = RTP_HEADER_SIZE;
     len = speex_bits_write(arg->enc_bits, mbuf_buf(mb), 200); // XXX: constant
+    printf("write bits %d\n", len);
     len += RTP_HEADER_SIZE;
     mb->end = len;
     mbuf_advance(mb, -RTP_HEADER_SIZE);
@@ -63,6 +77,8 @@ void rtp_send_io(void *varg)
 
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 
+    speex_bits_reset(arg->enc_bits);
+    aj->out_have = 0;
 timer:
     tmr_start(arg->tmr, 10, rtp_send_io, varg);
 }
@@ -97,6 +113,8 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     dec_state = speex_decoder_init(&speex_nb_mode);
     speex_bits_init(&enc_bits);
     speex_bits_init(&dec_bits);
+
+    speex_bits_reset(&enc_bits);
 
     read_off = 0;
     write_off = 0;
@@ -177,24 +195,25 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 }
 
 - (void) stop {
-    if(media) {
-        media_snd_stream_stop(media);
-	media_snd_stream_close(media);
-	media = NULL;
-    }
+    tmr_cancel(&rtp_tmr);
 
     if(rtp) {
         mem_deref(rtp);
 	rtp = NULL;
     }
 
-    tmr_cancel(&rtp_tmr);
-
     if(send_io_ctx) {
         ((rtp_send_ctx*)send_io_ctx)->magic = 0;
         mem_deref(((rtp_send_ctx*)send_io_ctx)->mb);
         free(send_io_ctx);
     }
+
+    if(media) {
+        media_snd_stream_stop(media);
+	media_snd_stream_close(media);
+	media = NULL;
+    }
+
 
     if(dec_state) {
 	speex_decoder_destroy(dec_state);

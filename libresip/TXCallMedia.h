@@ -16,7 +16,7 @@
 #include "sound.h"
 
 // ring buffer limit
-#define O_LIM (320*20)
+#define O_LIM (320*12)
 
 @interface TXCallMedia : NSObject {
     struct pjmedia_snd_stream *media;

@@ -11,6 +11,7 @@ typedef void (*media_cb_t)(void *userdata, char *buffer, UInt32 *got, UInt32 wan
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/AudioServices.h>
 #include <speex/speex_resampler.h>
+#include "ajitter.h"
 
 typedef enum {
 	DIR_CAP=1,
@@ -40,11 +41,8 @@ struct pjmedia_snd_stream
 	char *render_ring;
 	int render_ring_size;
 	int render_ring_off;
-	
-	char *record_ring;
-	int record_ring_size;
-	int record_ring_off;
-	int record_ring_fill;
+
+	ajitter *record_jitter;
 
 	Boolean isActive;
 };
