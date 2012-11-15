@@ -35,7 +35,7 @@ void rtp_send_io(void *varg)
     struct mbuf *mb = arg->mb;
     char *obuf;
 restart:
-    obuf = ajitter_get_chunk(arg->media->record_jitter, arg->frame_size);
+    obuf = ajitter_get_chunk(arg->media->record_jitter, arg->frame_size, &arg->ts);
     if(!obuf)
         goto timer;
 
@@ -290,11 +290,14 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     }
 
     speex_bits_read_from(&dec_bits, mbuf_buf(mb), len);
-    speex_decode_int(dec_state, &dec_bits, (spx_int16_t*)(media->render_ring + write_off));
-    write_off += frame_size;
 
-    if(write_off >= O_LIM)
-	    write_off = 0;
+    ajitter_packet * ajp;
+    ajp = ajitter_put_ptr(media->play_jitter);
+    speex_decode_int(dec_state, &dec_bits, (spx_int16_t*)ajp->data);
+    ajp->left = frame_size;
+    ajp->off = 0;
+
+    ajitter_put_done(media->play_jitter, ajp->idx, (double)hdr->seq);
 
 }
 

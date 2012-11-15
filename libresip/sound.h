@@ -38,11 +38,8 @@ struct pjmedia_snd_stream
 
 	AudioBufferList *inputBufferList;
 
-	char *render_ring;
-	int render_ring_size;
-	int render_ring_off;
-
 	ajitter *record_jitter;
+	ajitter *play_jitter;
 
 	Boolean isActive;
 };

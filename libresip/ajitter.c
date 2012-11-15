@@ -114,7 +114,7 @@ ajitter_packet *ajitter_get_ptr(ajitter *aj) {
 		if((aj->used & (1<<idx))==0) {
 			continue;
 		}
-		if(aj->time[idx] < min_time) {
+		if(aj->time[idx] <= min_time) {
 			min_time = aj->time[idx];
 			min_idx = idx;
 		}
@@ -128,30 +128,42 @@ ajitter_packet *ajitter_get_ptr(ajitter *aj) {
 	return ret;
 }
 
-char *ajitter_get_chunk(ajitter *aj, int size)
+int ajitter_copy_chunk(ajitter *aj, int size, char* ob, int *ts)
 {
 	int need, get_now;
 	ajitter_packet *ajp;
 
+retry:
 	ajp = ajitter_get_ptr(aj);
 	if(!ajp)
 		return 0;
 
 	need = size - aj->out_have;
 	get_now = min(need, ajp->left);
-	memcpy(aj->out_buffer + aj->out_have, ajp->data + ajp->off, get_now);
+	memcpy(ob + aj->out_have, ajp->data + ajp->off, get_now);
 	ajp->left -= get_now;
 	ajp->off += get_now;
-	if(ajp->left < 1)
+	*ts = (int)aj->time[ajp->idx];
+	if(ajp->left < 1) {
 		ajitter_get_done(aj, ajp->idx);
+	}
 
 	aj->out_have += get_now;
 	DBG(("now have %d this time got %d from idx %d\n",
 	    aj->out_have, get_now, ajp->idx));
 	if(aj->out_have < size)
-		return 0;
+		goto retry;
 
 	aj->out_have = 0;
+
+	return 1;
+}
+char * ajitter_get_chunk(ajitter *aj, int size, int *ts) {
+	int ret;
+	ret = ajitter_copy_chunk(aj, size, aj->out_buffer, ts);
+	if(!ret)
+		return 0;
+
 	return aj->out_buffer;
 }
 

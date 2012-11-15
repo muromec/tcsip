@@ -158,23 +158,6 @@ void session_int_cb(void *userData, uint32_t interruptionState)
 #endif
 }
 
-int fetch_ring(struct pjmedia_snd_stream *snd_strm, char *buffer, UInt32 want) {
-
-
-    int have = snd_strm->render_ring_size - snd_strm->render_ring_off;
-
-    if(want > have)
-        want = have;
-
-    memcpy(buffer, snd_strm->render_ring + snd_strm->render_ring_off, want);
-
-    snd_strm->render_ring_off += want;
-    if(snd_strm->render_ring_off >= snd_strm->render_ring_size)
-        snd_strm->render_ring_off = 0;
-
-    return want;
-}
-
 /**
  * Voice Unit Callback.
  * Called when the voice unit output needs us to input the data that it should play through the speakers.
@@ -201,32 +184,20 @@ static OSStatus MyOutputBusRenderCallack(void                       *inRefCon,
                                          AudioBufferList            *ioData)
 {
 	struct pjmedia_snd_stream *snd_strm = (struct pjmedia_snd_stream *)inRefCon;
-	if(!snd_strm->render_ring) {
-		printf("dead render\n");
-		return -1;
-	}
-	
-	char *audioBuffer = (char *)(ioData->mBuffers[0].mData);
 
 	UInt32 audioBufferSize = ioData->mBuffers[0].mDataByteSize;
-	UInt32 chunkSize = 0;
-	UInt32 audioBufferOffset = 0;
+	char *audioBuffer = (char *)(ioData->mBuffers[0].mData);
+	int ts, ret = 0;
 
-#define fetch() ({\
-        chunkSize = fetch_ring(snd_strm, audioBuffer + audioBufferOffset,\
-		audioBufferSize\
-	);\
-	audioBufferOffset += chunkSize;\
-	audioBufferSize -= chunkSize;\
-})
+	snd_strm->play_jitter->out_have = 0;
 
-	fetch();
-
-	if(audioBufferOffset < audioBufferSize) {
-		fetch();
+	ret = ajitter_copy_chunk(snd_strm->play_jitter, audioBufferSize, audioBuffer, &ts);
+	if (!ret) {
+		memset(audioBuffer, 0x00, audioBufferSize);
+		return 0;
 	}
 
-	return noErr;
+	return 0;
 }
 
 
@@ -573,18 +544,13 @@ int media_snd_open(media_dir_t dir,
 	snd_strm->isActive          = false;
 	snd_strm->resampler	    = NULL;
 
-	snd_strm->render_ring = malloc(render_ring_size);
-	snd_strm->render_ring_size = render_ring_size;
-	snd_strm->render_ring_off = 0;
-	if(!snd_strm->render_ring)
-		goto err_out_ring2;
-
 	snd_strm->record_jitter = ajitter_init(REC_CH*2);
 	if(!snd_strm->record_jitter)
 		goto err_out_ring;
 
-	memset(snd_strm->render_ring, 0x60, render_ring_size/2);
-	memset(snd_strm->render_ring + render_ring_size/2, 0x80, render_ring_size/2);
+	snd_strm->play_jitter = ajitter_init(320); // speex frame
+	if(!snd_strm->play_jitter)
+		goto err_out_ring;
 
 	// Allocate our inputBufferList.
 	// This gets used in MyInputBusInputCallback() when calling AudioUnitRender to get microphone data.
@@ -741,7 +707,6 @@ err_out_resampler:
 err_out_inbuf:
 	ajitter_destroy(snd_strm->record_jitter);
 err_out_ring:
-	free(snd_strm->render_ring);
 err_out_ring2:
 	free(snd_strm);
 	return -1;
@@ -828,9 +793,9 @@ int media_snd_stream_close(struct pjmedia_snd_stream *snd_strm)
 	// Clear our static reference to the stream instance (used in the audio session interruption callback)
 	snd_strm_instance = NULL;
 
-	if(snd_strm->render_ring) {
-		free(snd_strm->render_ring);
-		snd_strm->render_ring = NULL;
+	if(snd_strm->play_jitter) {
+		ajitter_destroy(snd_strm->play_jitter);
+		snd_strm->play_jitter = NULL;
 	}
 
 	if(snd_strm->record_jitter) {

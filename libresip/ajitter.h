@@ -29,6 +29,7 @@ void ajitter_put_done(ajitter *aj, int idx, double time);
 void ajitter_get_done(ajitter *aj, int idx);
 
 void ajitter_destroy(ajitter *aj);
-char *ajitter_get_chunk(ajitter *aj, int size);
+char *ajitter_get_chunk(ajitter *aj, int size, int *ts);
+int ajitter_copy_chunk(ajitter *aj, int size, char* ob, int *ts);
 
 #endif
