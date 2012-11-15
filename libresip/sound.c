@@ -41,6 +41,8 @@
 
 #define MANAGE_AUDIO_SESSION  IPHONE
 
+#define REC_CH 94
+
 #define PJ_LOG(x, y) ({})
 
 static AudioComponent component = NULL;
@@ -259,6 +261,45 @@ static OSStatus MyInputBusInputCallback(void                       *inRefCon,
 	struct pjmedia_snd_stream *snd_strm = (struct pjmedia_snd_stream *)inRefCon;
 	
 	AudioBufferList *abl = snd_strm->inputBufferList;
+
+	ajitter_packet *ajp = ajitter_put_ptr(snd_strm->record_jitter);
+	abl->mNumberBuffers = 1;
+	abl->mBuffers[0].mNumberChannels = 1;
+	abl->mBuffers[0].mData = ajp->data;
+	abl->mBuffers[0].mDataByteSize = inNumberFrames * 2;// XXX shame on me
+
+	OSStatus status = AudioUnitRender(snd_strm->in_unit,
+	                                  ioActionFlags,
+	                                  inTimeStamp,
+	                                  inBusNumber,
+	                                  inNumberFrames,
+	                                  abl);
+
+	ERR("cant render input: %d");
+
+	ajp->left = inNumberFrames * 2;
+	ajp->off = 0;
+
+	ajitter_put_done(snd_strm->record_jitter, ajp->idx, inTimeStamp->mSampleTime);
+
+	return noErr;
+err:
+	return -1;
+}
+
+static OSStatus MyInputBusInputCallbackRS(void                       *inRefCon,
+                                        AudioUnitRenderActionFlags *ioActionFlags,
+                                        const AudioTimeStamp       *inTimeStamp,
+                                        UInt32                      inBusNumber,
+                                        UInt32                      inNumberFrames,
+                                        AudioBufferList            *ioData)
+{
+
+	// The AudioUnit callbacks operate on a different real-time thread
+	struct pjmedia_snd_stream *snd_strm = (struct pjmedia_snd_stream *)inRefCon;
+
+	AudioBufferList *abl = snd_strm->inputBufferList;
+
 	abl->mNumberBuffers = 1;
 	abl->mBuffers[0].mNumberChannels = 1;
 	abl->mBuffers[0].mData = NULL;
@@ -275,19 +316,17 @@ static OSStatus MyInputBusInputCallback(void                       *inRefCon,
 
 	UInt32 in_size, out_size;
 	in_size = inNumberFrames;
-	out_size = 94; // ya magic!
+	out_size = REC_CH;
 
 	ajitter_packet *ajp = ajitter_put_ptr(snd_strm->record_jitter);
 	status = speex_resampler_process_int(snd_strm->resampler, 0,
 		abl->mBuffers[0].mData, &in_size,
-		(spx_int16_t*)ajp->data,
-		&out_size);
+		ajp->data, &out_size);
 		
 	ajp->left = out_size * 2;
 	ajp->off = 0;
-	ERR("cant do resample: %d");
-	ajitter_put_done(snd_strm->record_jitter, ajp->idx, inTimeStamp->mSampleTime);
 
+	ajitter_put_done(snd_strm->record_jitter, ajp->idx, inTimeStamp->mSampleTime);
 
 	return noErr;
 err:
@@ -540,7 +579,7 @@ int media_snd_open(media_dir_t dir,
 	if(!snd_strm->render_ring)
 		goto err_out_ring2;
 
-	snd_strm->record_jitter = ajitter_init(94*2);
+	snd_strm->record_jitter = ajitter_init(REC_CH*2);
 	if(!snd_strm->record_jitter)
 		goto err_out_ring;
 
@@ -628,6 +667,10 @@ int media_snd_open(media_dir_t dir,
 
 	if(snd_strm->dir & DIR_CAP)
 	{
+#if IPHONE
+		status = set_format(snd_strm->in_unit, inputBus, 8000);
+		snd_strm->resampler = = NULL;
+#else
 		status = set_format(snd_strm->in_unit, inputBus, 44100);
 		ERR("cant set input format. err %d");
 		MSG("input format ok");
@@ -637,6 +680,7 @@ int media_snd_open(media_dir_t dir,
 		if(!snd_strm->resampler) {
 			goto err_out_resampler;
 		}
+#endif
 	}
 	
 	
@@ -672,7 +716,11 @@ int media_snd_open(media_dir_t dir,
 	}
 
 	IF_CAP(dir) {
+#if IPHONE
 		status = set_cb(snd_strm->in_unit, inputBus, MyInputBusInputCallback, snd_strm);
+#else
+		status = set_cb(snd_strm->in_unit, inputBus, MyInputBusInputCallbackRS, snd_strm);
+#endif
 		ERR("Failed to set input callback: %d");
 		MSG("input cb ok");
 	}

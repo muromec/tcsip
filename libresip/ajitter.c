@@ -14,6 +14,13 @@
     _a_temp_ = _a_temp_ < _b_temp_ ? _a_temp_ : _b_temp_; \
     })
 
+#if 0
+#define bset(val, bn) (val |= (1<<bn))
+#define bdrop(val, bn) (val &= val ^ (1<<bn))
+#else
+#define bset(val, bn) OSAtomicXor32Barrier(1<<bn, &val)
+#define bdrop(val, bn) OSAtomicXor32Barrier(1<<bn, &val)
+#endif
 
 ajitter * ajitter_init(int chunk_size)
 {
@@ -71,6 +78,7 @@ ajitter_packet * ajitter_put_ptr(ajitter *aj) {
 		idx = 0;
 		aj->used = 1;
 		aj->last = 0;
+		printf("clear!\n");
 	}
 
 	ret = (ajitter_packet*)(aj->buffer + (idx * sizeof(ajitter_packet)));
@@ -83,14 +91,14 @@ ajitter_packet * ajitter_put_ptr(ajitter *aj) {
 void ajitter_put_done(ajitter *aj, int idx, double time) {
 	aj->time[idx] = time;
 	aj->last = time;
-	aj->used |= (1<<idx);
-	DBG(("jitter put done %d %f\n", idx, time));
+	bset(aj->used, idx);
+	DBG(("jitter put done %d %f used %x\n", idx, time, aj->used));
 
 }
 
 void ajitter_get_done(ajitter *aj, int idx) {
-	aj->used &= aj->used ^ (1<<idx);
-	DBG(("jitter gett done %d\n", idx));
+	bdrop(aj->used, idx);
+	DBG(("jitter gett done %d used: %x\n", idx, aj->used));
 }
 
 ajitter_packet *ajitter_get_ptr(ajitter *aj) {

@@ -33,7 +33,9 @@ void rtp_send_io(void *varg)
         return;
 
     struct mbuf *mb = arg->mb;
-    char *obuf = ajitter_get_chunk(arg->media->record_jitter, arg->frame_size);
+    char *obuf;
+restart:
+    obuf = ajitter_get_chunk(arg->media->record_jitter, arg->frame_size);
     if(!obuf)
         goto timer;
 
@@ -58,8 +60,10 @@ void rtp_send_io(void *varg)
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 
     speex_bits_reset(arg->enc_bits);
+    goto restart;
+
 timer:
-    tmr_start(arg->tmr, 10, rtp_send_io, varg);
+    tmr_start(arg->tmr, 4, rtp_send_io, varg);
 }
 
 

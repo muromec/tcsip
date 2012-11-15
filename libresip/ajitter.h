@@ -8,7 +8,7 @@ typedef struct
 	int used;
 	char *buffer;
 	double time[AJD];
-	int last;
+	double last;
 	int csize;
 	char *out_buffer;
 	int out_have;
