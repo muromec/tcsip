@@ -635,7 +635,7 @@ int media_snd_open(media_dir_t dir,
 	{
 #if IPHONE
 		status = set_format(snd_strm->in_unit, inputBus, 8000);
-		snd_strm->resampler = = NULL;
+		snd_strm->resampler = NULL;
 #else
 		status = set_format(snd_strm->in_unit, inputBus, 44100);
 		ERR("cant set input format. err %d");
