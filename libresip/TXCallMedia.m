@@ -117,7 +117,11 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     err = sdp_media_add(&sdp_media_s, sdp, "audio", sa_port(laddr), "RTP/SAVP");
     err = sdp_media_add(&sdp_media, sdp, "audio", sa_port(laddr), "RTP/AVP");
     /* XXX broken shit */
-    sdp_media_set_lattr(sdp_media_s, true, "crypto", "1 AES_CM_128_HMAC_SHA1_80 inline:Si/+CaPuPa+Wq2ByfeDG1/yWufg4OPCl6D2W9xs5");
+
+    char crypto_line[] = "1 AES_CM_128_HMAC_SHA1_80 inline:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX      ";
+    size_t klen = 40;
+    base64_encode(srtp_out_key, 30, &crypto_line[33], &klen);
+    sdp_media_set_lattr(sdp_media_s, true, "crypto", crypto_line);
 
     err = sdp_format_add(NULL, sdp_media, true,
 	"97", "speex", 8000, 1,
@@ -147,8 +151,6 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     re_printf("local format: %s/%u/%u (payload type: %u)\n",
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
 
-    memset(srtp_in_key, 0xFC, 64);
-    memset(srtp_out_key, 0xFC, 64);
 
     ts = 0;
 }
@@ -395,15 +397,19 @@ out:
             printf("SAVP without crypto param? wtf\n");
             return;
         }
-        re_regex(crypt, strlen(crypt), "[0-9]+ [a-zA-Z0-9_]+ [a-zA-Z]+:[^]*[|]*[^]*",
+        re_regex(crypt, strlen(crypt), "[0-9]+ [a-zA-Z0-9_]+ [a-zA-Z]+:[A-Za-z0-9+/]*|*[^]*",
                 &crypt_n, &crypt_s, &key_m, &key, &key_param);
 
-        if(!key.l)
+        if(key.l!=40) {
+            printf("invalid base64 key len %d\n", key.l);
             return;
+        }
 
-        re_printf("n:%r s:%r m:%r key:%r\n", &crypt_n, &crypt_s, &key_m, &key);
         base64_decode(key.p, key.l, srtp_in_key, &klen);
-        printf("key len %d\n", klen);
+        if(klen!=30) {
+            printf("invalid key len %d\n", klen);
+            return;
+        }
 
         [self setupSRTP];
     }
