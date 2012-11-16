@@ -1007,7 +1007,7 @@
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.7;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -1074,7 +1074,7 @@
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.7;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
