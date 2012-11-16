@@ -53,6 +53,8 @@
 		8557070B1629192800407CCC /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716971628F3AA00C4B8DD /* libcrypto.dylib */; };
 		8557076216291C9000407CCC /* libre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855706FF1629185700407CCC /* libre.a */; };
 		855707631629201300407CCC /* libre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855706FF1629185700407CCC /* libre.a */; };
+		858406881656933000BE8EB6 /* rtp_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 858406871656933000BE8EB6 /* rtp_io.c */; };
+		8584068A1656934C00BE8EB6 /* rtp_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 858406871656933000BE8EB6 /* rtp_io.c */; };
 		8585A26816527CB000380B9C /* ajitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 8585A26716527CB000380B9C /* ajitter.c */; };
 		8585A26916527CB000380B9C /* ajitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 8585A26716527CB000380B9C /* ajitter.c */; };
 		859D3D461628D6A400385248 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D451628D6A400385248 /* Cocoa.framework */; };
@@ -200,6 +202,8 @@
 		8557073616291BA200407CCC /* re_uri.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re_uri.h; sourceTree = "<group>"; };
 		8557073716291BA200407CCC /* re.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re.h; sourceTree = "<group>"; };
 		8580184A1636FEFE00E9D54B /* txsip_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = txsip_private.h; sourceTree = "<group>"; };
+		858406861656933000BE8EB6 /* rtp_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtp_io.h; sourceTree = "<group>"; };
+		858406871656933000BE8EB6 /* rtp_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtp_io.c; sourceTree = "<group>"; };
 		8585A26716527CB000380B9C /* ajitter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ajitter.c; sourceTree = "<group>"; };
 		8585A26B16527CBB00380B9C /* ajitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ajitter.h; sourceTree = "<group>"; };
 		859D3D441628D6A400385248 /* libresip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = libresip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -399,6 +403,8 @@
 				850277BE1625B59700AB5038 /* TXBaseOp.m */,
 				850277BF1625B59700AB5038 /* TXCallMedia.h */,
 				850277C01625B59700AB5038 /* TXCallMedia.m */,
+				858406861656933000BE8EB6 /* rtp_io.h */,
+				858406871656933000BE8EB6 /* rtp_io.c */,
 				850277C31625B59700AB5038 /* TXSip.h */,
 				850277C41625B59700AB5038 /* TXSip.m */,
 				850277C51625B59700AB5038 /* TXSipAuth.h */,
@@ -740,6 +746,7 @@
 				8507AAA91628B6BC00CE9AE6 /* TXRestApi.m in Sources */,
 				8507AAE81628BD9400CE9AE6 /* JSONKit.m in Sources */,
 				8585A26816527CB000380B9C /* ajitter.c in Sources */,
+				858406881656933000BE8EB6 /* rtp_io.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -764,6 +771,7 @@
 				859D3D7B1628D6BC00385248 /* TXSipReg.m in Sources */,
 				859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */,
 				8585A26916527CB000380B9C /* ajitter.c in Sources */,
+				8584068A1656934C00BE8EB6 /* rtp_io.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
