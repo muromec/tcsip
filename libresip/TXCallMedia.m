@@ -147,6 +147,9 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     re_printf("local format: %s/%u/%u (payload type: %u)\n",
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
 
+    memset(srtp_in_key, 0xFC, 64);
+    memset(srtp_out_key, 0xFC, 64);
+
     ts = 0;
 }
 
@@ -155,9 +158,6 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     int err;
 
     srtp_policy_t in_policy, out_policy;
-
-    memset(srtp_in_key, 0xFC, 64);
-    memset(srtp_out_key, 0xFC, 64);
 
     crypto_policy_set_rtp_default(&in_policy.rtp);
     crypto_policy_set_rtcp_default(&in_policy.rtcp);
@@ -385,7 +385,26 @@ out:
         return;
     }
 
+    struct pl key, crypt_n, crypt_s, key_m, key_param;
+    char *crypt;
+    size_t klen = 64;
+
     if(md == sdp_media_s) {
+        crypt = sdp_media_rattr(md, "crypto");
+        if(!crypt) {
+            printf("SAVP without crypto param? wtf\n");
+            return;
+        }
+        re_regex(crypt, strlen(crypt), "[0-9]+ [a-zA-Z0-9_]+ [a-zA-Z]+:[^]*[|]*[^]*",
+                &crypt_n, &crypt_s, &key_m, &key, &key_param);
+
+        if(!key.l)
+            return;
+
+        re_printf("n:%r s:%r m:%r key:%r\n", &crypt_n, &crypt_s, &key_m, &key);
+        base64_decode(key.p, key.l, srtp_in_key, &klen);
+        printf("key len %d\n", klen);
+
         [self setupSRTP];
     }
 
