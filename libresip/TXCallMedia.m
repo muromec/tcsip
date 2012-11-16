@@ -8,64 +8,7 @@
 
 #import "TXCallMedia.h"
 #include "ajitter.h"
-
-typedef struct {
-    int magic;
-    struct pjmedia_snd_stream * media;
-    int frame_size;
-    int read_off;
-    SpeexBits *enc_bits;
-    void *enc_state;
-    struct mbuf *mb;
-    struct rtp_sock *rtp;
-    int pt;
-    int ts;
-    srtp_t srtp_out;
-    struct sa *dst;
-    struct tmr *tmr;
-} rtp_send_ctx;
-
-void rtp_send_io(void *varg)
-{
-    int len = 0, err=0;
-    rtp_send_ctx * arg = varg;
-    if(arg->magic != 0x1ee1F00D)
-        return;
-
-    struct mbuf *mb = arg->mb;
-    char *obuf;
-restart:
-    obuf = ajitter_get_chunk(arg->media->record_jitter, arg->frame_size, &arg->ts);
-    if(!obuf)
-        goto timer;
-
-    len = speex_encode_int(arg->enc_state, (spx_int16_t*)obuf, arg->enc_bits);
-
-    mb->pos = RTP_HEADER_SIZE;
-    len = speex_bits_write(arg->enc_bits, mbuf_buf(mb), 200); // XXX: constant
-    len += RTP_HEADER_SIZE;
-    mb->end = len;
-    mbuf_advance(mb, -RTP_HEADER_SIZE);
-
-    err = rtp_encode(arg->rtp, 0, arg->pt, arg->ts, mb);
-    mb->pos = 0;
-
-    if(arg->srtp_out) {
-        err = srtp_protect(arg->srtp_out, mbuf_buf(mb), &len);
-        if(err)
-            printf("srtp failed %d\n", err);
-        mb->end = len;
-    }
-
-    udp_send(rtp_sock(arg->rtp), arg->dst, mb);
-
-    speex_bits_reset(arg->enc_bits);
-    goto restart;
-
-timer:
-    tmr_start(arg->tmr, 4, rtp_send_io, varg);
-}
-
+#include "rtp_io.h"
 
 void rtp_io (const struct sa *src, const struct rtp_header *hdr,
         struct mbuf *mb, void *arg)
@@ -92,18 +35,10 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     int err, port;
     media = NULL;
 
-    enc_state = speex_encoder_init(&speex_nb_mode);
     dec_state = speex_decoder_init(&speex_nb_mode);
-    speex_bits_init(&enc_bits);
     speex_bits_init(&dec_bits);
 
-    speex_bits_reset(&enc_bits);
-
-    read_off = 0;
-    write_off = 0;
-
     speex_decoder_ctl(dec_state, SPEEX_GET_FRAME_SIZE, &frame_size); 
-    //speex_jitter_init(&jitter, dec_state, 800);
     frame_size *= 2;
 
     /* create SDP session */
@@ -127,9 +62,11 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 	"97", "speex", 8000, 1,
 	 NULL, NULL, NULL, false, NULL);
 
+    /*
     err = sdp_format_add(NULL, sdp_media_s, true,
 	"97", "speex", 8000, 1,
 	 NULL, NULL, NULL, false, NULL);
+         */
 
     err = sdp_format_add(NULL, sdp_media, false,
 	"0", "PCMU", 8000, 1,
@@ -188,7 +125,6 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 }
 
 - (void) stop {
-    tmr_cancel(&rtp_tmr);
 
     if(rtp) {
         mem_deref(rtp);
@@ -196,9 +132,8 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     }
 
     if(send_io_ctx) {
-        ((rtp_send_ctx*)send_io_ctx)->magic = 0;
-        mem_deref(((rtp_send_ctx*)send_io_ctx)->mb);
-        free(send_io_ctx);
+        rtp_send_stop(send_io_ctx);
+        send_io_ctx = NULL;
     }
 
     if(media) {
@@ -213,17 +148,10 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 	dec_state = NULL;
     }
 
-    if(enc_state) {
-	speex_encoder_destroy(enc_state);
-	enc_state = NULL;
-    }
-
     /* XXX: free sdp session and both sdp medias */
 
-    speex_bits_reset(&enc_bits);
     speex_bits_reset(&dec_bits);
 
-    speex_bits_destroy(&enc_bits);
     speex_bits_destroy(&dec_bits);
 
     if(srtp_in)
@@ -254,26 +182,18 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     if(!media)
         return -1;
 
-    tmr_init(&rtp_tmr);
-    rtp_send_ctx *send_ctx = malloc(sizeof(rtp_send_ctx));
-    send_ctx->media = media;
-    send_ctx->frame_size = frame_size;
-    send_ctx->read_off = 0;
-    send_ctx->enc_bits = &enc_bits;
-    send_ctx->enc_state = enc_state;
-    send_ctx->mb = mbuf_alloc(200 + RTP_HEADER_SIZE);
+    rtp_send_ctx *send_ctx = rtp_send_init();
+    send_ctx->record_jitter = media->record_jitter;
     send_ctx->rtp = rtp;
     send_ctx->pt = pt;
     send_ctx->ts = ts;
     send_ctx->srtp_out = srtp_out;
     send_ctx->dst = dst;
-    send_ctx->tmr = &rtp_tmr;
-    send_ctx->magic = 0x1ee1F00D;
 
     send_io_ctx = send_ctx;
-    tmr_start(&rtp_tmr, 10, rtp_send_io, send_io_ctx);
 
     ok = media_snd_stream_start(media);
+    rtp_send_start(send_ctx);
 
     return (bool)ok;
 }
@@ -422,7 +342,18 @@ out:
     re_printf("SDP crypt %s\n", sdp_media_rattr(md, "crypto"));
 
     dst = sdp_media_raddr(md);
+
+    [self set_format: fmt->name];
     pt = fmt->pt;
+}
+
+- (void) set_format:(char*)fmt_name
+{
+    fmt = FMT_NONE;
+    if(!strcmp(fmt_name, "speex"))
+        fmt = FMT_SPEEX;
+    if(!strcmp(fmt_name, "PCMU"))
+        fmt = FMT_PCMU;
 }
 
 @end

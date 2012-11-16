@@ -18,6 +18,12 @@
 // ring buffer limit
 #define O_LIM (320*12)
 
+typedef enum {
+	FMT_NONE,
+	FMT_SPEEX,
+	FMT_PCMU,
+} fmt_t;
+
 @interface TXCallMedia : NSObject {
     struct pjmedia_snd_stream *media;
     struct rtp_sock *rtp;
@@ -25,19 +31,14 @@
 
     void *send_io_ctx;
 
-    void *enc_state;
     void *dec_state;
     int frame_size;
-    SpeexBits enc_bits;
     SpeexBits dec_bits;
 
     srtp_t srtp_in;
     srtp_t srtp_out;
     char srtp_in_key[64];
     char srtp_out_key[64];
-
-    int read_off;
-    int write_off;
 
     struct sdp_session *sdp;
     struct sdp_media *sdp_media;
@@ -47,6 +48,7 @@
     struct sa *dst;
     int pt;
     int ts;
+    fmt_t fmt;
 }
 
 - (id) initWithLaddr: (struct sa*)pLaddr;
