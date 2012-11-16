@@ -116,8 +116,8 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     err = sdp_session_alloc(&sdp, laddr);
     err = sdp_media_add(&sdp_media_s, sdp, "audio", sa_port(laddr), "RTP/SAVP");
     err = sdp_media_add(&sdp_media, sdp, "audio", sa_port(laddr), "RTP/AVP");
-    /* XXX broken shit */
 
+    rand_bytes(srtp_out_key, 30);
     char crypto_line[] = "1 AES_CM_128_HMAC_SHA1_80 inline:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX      ";
     size_t klen = 40;
     base64_encode(srtp_out_key, 30, &crypto_line[33], &klen);
