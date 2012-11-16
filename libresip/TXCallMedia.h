@@ -18,11 +18,6 @@
 // ring buffer limit
 #define O_LIM (320*12)
 
-typedef enum {
-	FMT_NONE,
-	FMT_SPEEX,
-	FMT_PCMU,
-} fmt_t;
 
 @interface TXCallMedia : NSObject {
     struct pjmedia_snd_stream *media;

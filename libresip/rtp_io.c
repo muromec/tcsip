@@ -41,7 +41,7 @@ timer:
     tmr_start(&arg->tmr, 4, rtp_send_io, varg);
 }
 
-rtp_send_ctx* rtp_send_init() {
+rtp_send_ctx* rtp_send_init(fmt_t fmt) {
     rtp_send_ctx *send_ctx = malloc(sizeof(rtp_send_ctx));
     tmr_init(&send_ctx->tmr);
     speex_bits_init(&send_ctx->enc_bits);
@@ -50,6 +50,7 @@ rtp_send_ctx* rtp_send_init() {
     speex_decoder_ctl(send_ctx->enc_state, SPEEX_GET_FRAME_SIZE, &send_ctx->frame_size); 
     send_ctx->frame_size *= 2;
     send_ctx->mb = mbuf_alloc(200 + RTP_HEADER_SIZE);
+    send_ctx->fmt = fmt;
 
     send_ctx->magic = 0x1ee1F00D;
     return send_ctx;
