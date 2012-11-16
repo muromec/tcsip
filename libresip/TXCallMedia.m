@@ -127,6 +127,14 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
 	"97", "speex", 8000, 1,
 	 NULL, NULL, NULL, false, NULL);
 
+    err = sdp_format_add(NULL, sdp_media, true,
+	"0", "PCMU", 8000, 1,
+	 NULL, NULL, NULL, false, NULL);
+
+    err = sdp_format_add(NULL, sdp_media_s, true,
+	"0", "PCMU", 8000, 1,
+	 NULL, NULL, NULL, false, NULL);
+
     // dump local
     const struct sdp_format *fmt;
 
