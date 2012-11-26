@@ -1,12 +1,14 @@
 #include "rtp_io.h"
 
-void rtp_p(rtp_send_ctx * arg)
+void rtp_p(rtp_send_ctx * arg, struct mbuf *mb)
 {
+    int err, len;
     if(arg->srtp_out) {
         err = srtp_protect(arg->srtp_out, mbuf_buf(mb), &len);
         if(err)
             printf("srtp failed %d\n", err);
         mb->end = len;
+
     }
 }
 
@@ -31,7 +33,7 @@ restart:
     err = rtp_encode(arg->rtp, 0, arg->pt, arg->ts, mb);
     mb->pos = 0;
 
-    rtp_p(arg);
+    rtp_p(arg, mb);
 
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 
@@ -66,7 +68,7 @@ restart:
     err = rtp_encode(arg->rtp, 0, arg->pt, arg->ts, mb);
     mb->pos = 0;
 
-    rtp_p(arg);
+    rtp_p(arg, mb);
 
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 
