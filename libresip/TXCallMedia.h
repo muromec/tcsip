@@ -43,7 +43,7 @@
     struct sa *dst;
     int pt;
     int ts;
-    fmt_t fmt;
+    int fmt;
 }
 
 - (id) initWithLaddr: (struct sa*)pLaddr;

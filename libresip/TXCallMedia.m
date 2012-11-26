@@ -182,7 +182,7 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     if(!media)
         return -1;
 
-    rtp_send_ctx *send_ctx = rtp_send_init();
+    rtp_send_ctx *send_ctx = rtp_send_init(fmt);
     send_ctx->record_jitter = media->record_jitter;
     send_ctx->rtp = rtp;
     send_ctx->pt = pt;
