@@ -1,5 +1,46 @@
 #include "rtp_io.h"
 
+void rtp_p(rtp_send_ctx * arg)
+{
+    if(arg->srtp_out) {
+        err = srtp_protect(arg->srtp_out, mbuf_buf(mb), &len);
+        if(err)
+            printf("srtp failed %d\n", err);
+        mb->end = len;
+    }
+}
+
+void rtp_send_pcmu(void *varg)
+{
+    int len = 0, err=0;
+    rtp_send_ctx * arg = varg;
+    if(arg->magic != 0x1ee1F00D)
+        return;
+
+    struct mbuf *mb = arg->mb;
+restart:
+    mb->pos = RTP_HEADER_SIZE;
+    len = ajitter_copy_chunk(arg->record_jitter, arg->frame_size,
+		    mbuf_buf(mb), &arg->ts);
+    if(!len)
+        goto timer;
+
+    mb->pos = 0;
+    mb->end = len + RTP_HEADER_SIZE;
+
+    err = rtp_encode(arg->rtp, 0, arg->pt, arg->ts, mb);
+    mb->pos = 0;
+
+    rtp_p(arg);
+
+    udp_send(rtp_sock(arg->rtp), arg->dst, mb);
+
+    goto restart;
+
+timer:
+    tmr_start(&arg->tmr, 4, rtp_send_io, varg);
+}
+
 void rtp_send_io(void *varg)
 {
     int len = 0, err=0;
@@ -25,12 +66,7 @@ restart:
     err = rtp_encode(arg->rtp, 0, arg->pt, arg->ts, mb);
     mb->pos = 0;
 
-    if(arg->srtp_out) {
-        err = srtp_protect(arg->srtp_out, mbuf_buf(mb), &len);
-        if(err)
-            printf("srtp failed %d\n", err);
-        mb->end = len;
-    }
+    rtp_p(arg);
 
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 
@@ -46,15 +82,12 @@ void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
 {
 
     rtp_recv_arg * _arg = varg;
-    rtp_recv_ctx * arg = _arg->ctx;
 
     _arg->handler(src, hdr, mb, _arg->ctx);
 }
 
-void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg)
+int rtp_un(rtp_recv_ctx* arg, struct mbuf *mb)
 {
-    rtp_recv_ctx * arg = varg;
-
     int err, len;
     if(arg->srtp_in) {
         mbuf_advance(mb, -RTP_HEADER_SIZE);
@@ -62,13 +95,24 @@ void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct m
         err = srtp_unprotect(arg->srtp_in, mbuf_buf(mb), &len);
         if(err) {
             printf("srtp unprotect fail %d\n", err);
-            return;
+            return -1;
         }
         mbuf_advance(mb, RTP_HEADER_SIZE);
         len -= RTP_HEADER_SIZE;
     } else {
         len = mbuf_get_left(mb);
     }
+    return len;
+}
+
+void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg)
+{
+    rtp_recv_ctx * arg = varg;
+
+    int err, len;
+    len = rtp_un(arg, mb);
+    if(len<0)
+	    return;
 
     speex_bits_read_from(&arg->dec_bits, mbuf_buf(mb), len);
 
@@ -79,6 +123,36 @@ void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct m
     ajp->off = 0;
 
     ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+}
+
+void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg)
+{
+    rtp_recv_ctx * arg = varg;
+
+    int err, len;
+    len = rtp_un(arg, mb);
+    if(len<0)
+	    return;
+
+    ajitter_packet * ajp;
+    ajp = ajitter_put_ptr(arg->play_jitter);
+    memcpy(ajp->data, mbuf_buf(mb), len);
+    ajp->left = len;
+    ajp->off = 0;
+
+    ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+}
+
+rtp_recv_h * rtp_recv_func(fmt_t fmt)
+{
+    switch(fmt) {
+    case FMT_SPEEX:
+	    return rtp_recv_speex;
+    case FMT_PCMU:
+	    return rtp_recv_pcmu;
+    case FMT_NONE:
+	    return -1;
+    }
 }
 
 rtp_send_ctx* rtp_send_init(fmt_t fmt) {

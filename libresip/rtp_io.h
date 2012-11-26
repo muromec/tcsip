@@ -55,3 +55,7 @@ void rtp_recv_stop(rtp_recv_ctx* ctx);
 
 void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
 
+void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
+
+rtp_recv_h * rtp_recv_func(fmt_t fmt);
+

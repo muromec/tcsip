@@ -179,7 +179,7 @@
     recv_ctx->play_jitter = media->play_jitter;
 
     recv_io_arg.ctx = recv_ctx;
-    recv_io_arg.handler = rtp_recv_speex;
+    recv_io_arg.handler = rtp_recv_func(fmt);
 
     return (bool)ok;
 }
