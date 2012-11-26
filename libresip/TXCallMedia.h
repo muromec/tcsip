@@ -14,10 +14,10 @@
 #include <speex/speex.h>
 
 #include "sound.h"
+#include "rtp_io.h"
 
 // ring buffer limit
 #define O_LIM (320*12)
-
 
 @interface TXCallMedia : NSObject {
     struct pjmedia_snd_stream *media;
@@ -25,7 +25,7 @@
     struct tmr rtp_tmr;
 
     void *send_io_ctx;
-    void *recv_io_ctx;
+    rtp_recv_arg recv_io_arg;
 
     srtp_t srtp_in;
     srtp_t srtp_out;

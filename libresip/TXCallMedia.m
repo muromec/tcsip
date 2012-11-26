@@ -8,7 +8,6 @@
 
 #import "TXCallMedia.h"
 #include "ajitter.h"
-#include "rtp_io.h"
 
 @implementation TXCallMedia
 - (id) initWithLaddr: (struct sa*)pLaddr {
@@ -28,9 +27,8 @@
     int err, port;
     media = NULL;
 
-    recv_io_ctx = rtp_recv_init();
     rtp_listen(&rtp, IPPROTO_UDP, laddr, 6000, 7000, false,
-            rtp_recv_io, NULL, recv_io_ctx);
+            rtp_recv_io, NULL, &recv_io_arg);
 
     laddr = rtp_local(rtp);
 
@@ -128,9 +126,9 @@
     }
 
 
-    if(recv_io_ctx) {
-	rtp_recv_stop(recv_io_ctx);
-	recv_io_ctx = NULL;
+    if(recv_io_arg.ctx) {
+	rtp_recv_stop(recv_io_arg.ctx);
+	recv_io_arg.ctx = NULL;
     }
 
     /* XXX: free sdp session and both sdp medias */
@@ -176,10 +174,11 @@
     rtp_send_start(send_ctx);
 
     // set recv side
-    rtp_recv_ctx * recv_ctx = recv_io_ctx;
+    rtp_recv_ctx * recv_ctx = rtp_recv_init(fmt);
     recv_ctx->srtp_in = srtp_in;
-    recv_ctx->fmt = fmt;
     recv_ctx->play_jitter = media->play_jitter;
+
+    recv_io_arg.ctx = recv_ctx;
 
     return (bool)ok;
 }

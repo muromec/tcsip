@@ -44,7 +44,9 @@ timer:
 void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
         struct mbuf *mb, void *varg)
 {
-    rtp_recv_ctx * arg = varg;
+
+    rtp_recv_arg * _arg = varg;
+    rtp_recv_ctx * arg = _arg->ctx;
 
     int err, len;
     if(arg->srtp_in) {
@@ -88,7 +90,8 @@ rtp_send_ctx* rtp_send_init(fmt_t fmt) {
     return send_ctx;
 }
 
-rtp_recv_ctx* rtp_recv_init() {
+rtp_recv_ctx* rtp_recv_init(fmt_t fmt)
+{
     rtp_recv_ctx *ctx = malloc(sizeof(rtp_recv_ctx));
 
     ctx->dec_state = speex_decoder_init(&speex_nb_mode);
