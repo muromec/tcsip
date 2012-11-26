@@ -4,6 +4,7 @@ void rtp_p(rtp_send_ctx * arg, struct mbuf *mb)
 {
     int err, len;
     if(arg->srtp_out) {
+	len = mbuf_get_left(mb);
         err = srtp_protect(arg->srtp_out, mbuf_buf(mb), &len);
         if(err)
             printf("srtp failed %d\n", err);
