@@ -41,6 +41,37 @@ timer:
     tmr_start(&arg->tmr, 4, rtp_send_io, varg);
 }
 
+void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
+        struct mbuf *mb, void *varg)
+{
+    rtp_recv_ctx * arg = varg;
+
+    int err, len;
+    if(arg->srtp_in) {
+        mbuf_advance(mb, -RTP_HEADER_SIZE);
+        len = mbuf_get_left(mb);
+        err = srtp_unprotect(arg->srtp_in, mbuf_buf(mb), &len);
+        if(err) {
+            printf("srtp unprotect fail %d\n", err);
+            return;
+        }
+        mbuf_advance(mb, RTP_HEADER_SIZE);
+        len -= RTP_HEADER_SIZE;
+    } else {
+        len = mbuf_get_left(mb);
+    }
+
+    speex_bits_read_from(&arg->dec_bits, mbuf_buf(mb), len);
+
+    ajitter_packet * ajp;
+    ajp = ajitter_put_ptr(arg->play_jitter);
+    speex_decode_int(arg->dec_state, &arg->dec_bits, (spx_int16_t*)ajp->data);
+    ajp->left = arg->frame_size;
+    ajp->off = 0;
+
+    ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+}
+
 rtp_send_ctx* rtp_send_init(fmt_t fmt) {
     rtp_send_ctx *send_ctx = malloc(sizeof(rtp_send_ctx));
     tmr_init(&send_ctx->tmr);
@@ -51,9 +82,23 @@ rtp_send_ctx* rtp_send_init(fmt_t fmt) {
     send_ctx->frame_size *= 2;
     send_ctx->mb = mbuf_alloc(200 + RTP_HEADER_SIZE);
     send_ctx->fmt = fmt;
+    send_ctx->ts = 0;
 
     send_ctx->magic = 0x1ee1F00D;
     return send_ctx;
+}
+
+rtp_recv_ctx* rtp_recv_init() {
+    rtp_recv_ctx *ctx = malloc(sizeof(rtp_recv_ctx));
+
+    ctx->dec_state = speex_decoder_init(&speex_nb_mode);
+    speex_bits_init(&ctx->dec_bits);
+
+    speex_decoder_ctl(ctx->dec_state, SPEEX_GET_FRAME_SIZE, &ctx->frame_size); 
+    ctx->frame_size *= 2;
+
+    ctx->magic = 0x1ab1D00F;
+    return ctx;
 }
 
 void rtp_send_start(rtp_send_ctx* ctx) {
@@ -69,5 +114,14 @@ void rtp_send_stop(rtp_send_ctx* ctx) {
     speex_encoder_destroy(ctx->enc_state);
 
     mem_deref(ctx->mb);
+    free(ctx);
+}
+
+void rtp_recv_stop(rtp_recv_ctx* ctx) {
+    speex_bits_reset(&ctx->dec_bits);
+    speex_bits_destroy(&ctx->dec_bits);
+
+    speex_decoder_destroy(ctx->dec_state);
+
     free(ctx);
 }

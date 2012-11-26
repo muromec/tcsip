@@ -10,13 +10,6 @@
 #include "ajitter.h"
 #include "rtp_io.h"
 
-void rtp_io (const struct sa *src, const struct rtp_header *hdr,
-        struct mbuf *mb, void *arg)
-{
-    TXCallMedia *media = (__bridge TXCallMedia*)arg;
-    [media rtpData: mb header:hdr];
-}
-
 @implementation TXCallMedia
 - (id) initWithLaddr: (struct sa*)pLaddr {
 
@@ -35,19 +28,13 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     int err, port;
     media = NULL;
 
-    dec_state = speex_decoder_init(&speex_nb_mode);
-    speex_bits_init(&dec_bits);
-
-    speex_decoder_ctl(dec_state, SPEEX_GET_FRAME_SIZE, &frame_size); 
-    frame_size *= 2;
-
-    /* create SDP session */
-
+    recv_io_ctx = rtp_recv_init();
     rtp_listen(&rtp, IPPROTO_UDP, laddr, 6000, 7000, false,
-            rtp_io, NULL, (__bridge void*)self);
+            rtp_recv_io, NULL, recv_io_ctx);
 
     laddr = rtp_local(rtp);
 
+    /* create SDP session */
     err = sdp_session_alloc(&sdp, laddr);
     err = sdp_media_add(&sdp_media_s, sdp, "audio", sa_port(laddr), "RTP/SAVP");
     err = sdp_media_add(&sdp_media, sdp, "audio", sa_port(laddr), "RTP/AVP");
@@ -88,8 +75,6 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     re_printf("local format: %s/%u/%u (payload type: %u)\n",
 		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
 
-
-    ts = 0;
 }
 
 - (void) setupSRTP
@@ -143,17 +128,13 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     }
 
 
-    if(dec_state) {
-	speex_decoder_destroy(dec_state);
-	dec_state = NULL;
+    if(recv_io_ctx) {
+	rtp_recv_stop(recv_io_ctx);
+	recv_io_ctx = NULL;
     }
 
     /* XXX: free sdp session and both sdp medias */
-
-    speex_bits_reset(&dec_bits);
-
-    speex_bits_destroy(&dec_bits);
-
+ 
     if(srtp_in)
         srtp_dealloc(srtp_in);
 
@@ -186,7 +167,6 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     send_ctx->record_jitter = media->record_jitter;
     send_ctx->rtp = rtp;
     send_ctx->pt = pt;
-    send_ctx->ts = ts;
     send_ctx->srtp_out = srtp_out;
     send_ctx->dst = dst;
 
@@ -195,39 +175,19 @@ void rtp_io (const struct sa *src, const struct rtp_header *hdr,
     ok = media_snd_stream_start(media);
     rtp_send_start(send_ctx);
 
+    // set recv side
+    rtp_recv_ctx * recv_ctx = recv_io_ctx;
+    recv_ctx->srtp_in = srtp_in;
+    recv_ctx->fmt = fmt;
+    recv_ctx->play_jitter = media->play_jitter;
+
     return (bool)ok;
 }
 
 - (void) rtpData: (struct mbuf*)mb header:(const struct rtp_header *)hdr
 {
 
-    if(!media)
-        return;
 
-    int err, len;
-    if(srtp_in) {
-        mbuf_advance(mb, -RTP_HEADER_SIZE);
-        len = mbuf_get_left(mb);
-        err = srtp_unprotect(srtp_in, mbuf_buf(mb), &len);
-        if(err) {
-            printf("srtp unprotect fail %d\n", err);
-            return;
-        }
-        mbuf_advance(mb, RTP_HEADER_SIZE);
-        len -= RTP_HEADER_SIZE;
-    } else {
-        len = mbuf_get_left(mb);
-    }
-
-    speex_bits_read_from(&dec_bits, mbuf_buf(mb), len);
-
-    ajitter_packet * ajp;
-    ajp = ajitter_put_ptr(media->play_jitter);
-    speex_decode_int(dec_state, &dec_bits, (spx_int16_t*)ajp->data);
-    ajp->left = frame_size;
-    ajp->off = 0;
-
-    ajitter_put_done(media->play_jitter, ajp->idx, (double)hdr->seq);
 
 }
 

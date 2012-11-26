@@ -25,10 +25,7 @@
     struct tmr rtp_tmr;
 
     void *send_io_ctx;
-
-    void *dec_state;
-    int frame_size;
-    SpeexBits dec_bits;
+    void *recv_io_ctx;
 
     srtp_t srtp_in;
     srtp_t srtp_out;
@@ -42,7 +39,6 @@
     struct sa *laddr;
     struct sa *dst;
     int pt;
-    int ts;
     int fmt;
 }
 
