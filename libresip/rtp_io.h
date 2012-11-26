@@ -38,6 +38,8 @@ typedef struct {
 
 typedef struct {
     void *ctx;
+    rtp_recv_h *handler;
+
 } rtp_recv_arg;
 
 void rtp_send_io(void *varg);
@@ -50,4 +52,6 @@ void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
 
 rtp_recv_ctx* rtp_recv_init(fmt_t fmt);
 void rtp_recv_stop(rtp_recv_ctx* ctx);
+
+void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
 

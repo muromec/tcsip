@@ -48,6 +48,13 @@ void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
     rtp_recv_arg * _arg = varg;
     rtp_recv_ctx * arg = _arg->ctx;
 
+    _arg->handler(src, hdr, mb, _arg->ctx);
+}
+
+void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg)
+{
+    rtp_recv_ctx * arg = varg;
+
     int err, len;
     if(arg->srtp_in) {
         mbuf_advance(mb, -RTP_HEADER_SIZE);

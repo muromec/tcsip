@@ -179,16 +179,11 @@
     recv_ctx->play_jitter = media->play_jitter;
 
     recv_io_arg.ctx = recv_ctx;
+    recv_io_arg.handler = rtp_recv_speex;
 
     return (bool)ok;
 }
 
-- (void) rtpData: (struct mbuf*)mb header:(const struct rtp_header *)hdr
-{
-
-
-
-}
 
 - (int) offer: (struct mbuf*)offer ret:(struct mbuf **)ret {
 
