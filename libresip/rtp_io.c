@@ -1,4 +1,5 @@
 #include "rtp_io.h"
+#include "g711.h"
 
 void rtp_p(rtp_send_ctx * arg, struct mbuf *mb)
 {
@@ -21,16 +22,28 @@ void rtp_send_pcmu(void *varg)
         return;
 
     struct mbuf *mb = arg->mb;
+    short *ibuf;
+    char *obuf;
 restart:
-    mb->pos = RTP_HEADER_SIZE;
-    len = ajitter_copy_chunk(arg->record_jitter, arg->frame_size,
-		    (char*)mbuf_buf(mb), &arg->ts);
-    if(!len)
+    ibuf = ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
+
+    if(!ibuf)
         goto timer;
 
-    len = arg->frame_size;
+    mb->pos = RTP_HEADER_SIZE;
+    obuf = (char*)mbuf_buf(mb);
+
+    len = arg->frame_size / 2;
     mb->pos = 0;
     mb->end = len + RTP_HEADER_SIZE;
+
+    int i;
+    for(i=0;i<len;i++) {
+	*obuf = MuLaw_Encode(*ibuf);
+
+	obuf++;
+	ibuf++;
+    }
 
     err = rtp_encode(arg->rtp, 0, arg->pt, arg->ts, mb);
     mb->pos = 0;
@@ -141,9 +154,18 @@ void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mb
     if(len > arg->play_jitter->csize)
 	    return;
 
+    int i;
     ajitter_packet * ajp;
     ajp = ajitter_put_ptr(arg->play_jitter);
-    memcpy(ajp->data, mbuf_buf(mb), len);
+    len = len / 2;
+    short *obuf = ajp->data;
+    char *ibuf = mbuf_buf(mb);
+    for(i=0; i< len; i++) {
+	*obuf = MuLaw_Decode(*ibuf);
+	obuf++;
+	ibuf++;
+    }
+
     ajp->left = len;
     ajp->off = 0;
 
