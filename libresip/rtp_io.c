@@ -157,7 +157,6 @@ void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mb
     int i;
     ajitter_packet * ajp;
     ajp = ajitter_put_ptr(arg->play_jitter);
-    len = len / 2;
     short *obuf = ajp->data;
     char *ibuf = mbuf_buf(mb);
     for(i=0; i< len; i++) {
@@ -166,7 +165,7 @@ void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mb
 	ibuf++;
     }
 
-    ajp->left = len;
+    ajp->left = len * 2;
     ajp->off = 0;
 
     ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
