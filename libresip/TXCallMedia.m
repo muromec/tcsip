@@ -47,11 +47,9 @@
 	"97", "speex", 8000, 1,
 	 NULL, NULL, NULL, false, NULL);
 
-    /*
     err = sdp_format_add(NULL, sdp_media_s, true,
 	"97", "speex", 8000, 1,
 	 NULL, NULL, NULL, false, NULL);
-         */
 
     err = sdp_format_add(NULL, sdp_media, false,
 	"0", "PCMU", 8000, 1,
