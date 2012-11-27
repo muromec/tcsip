@@ -47,6 +47,9 @@ rtp_send_ctx* rtp_send_init(fmt_t fmt);
 void rtp_send_start(rtp_send_ctx* ctx);
 void rtp_send_stop(rtp_send_ctx* ctx);
 
+
+typedef void (rtp_send_h)(void *varg);
+
 void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
         struct mbuf *mb, void *varg);
 
@@ -58,4 +61,5 @@ void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct m
 void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
 
 rtp_recv_h * rtp_recv_func(fmt_t fmt);
+rtp_send_h * rtp_send_func(fmt_t fmt);
 
