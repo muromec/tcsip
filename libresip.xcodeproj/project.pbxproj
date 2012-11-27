@@ -53,6 +53,9 @@
 		8557070B1629192800407CCC /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716971628F3AA00C4B8DD /* libcrypto.dylib */; };
 		8557076216291C9000407CCC /* libre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855706FF1629185700407CCC /* libre.a */; };
 		855707631629201300407CCC /* libre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855706FF1629185700407CCC /* libre.a */; };
+		856150421664B5AC00DBCFD5 /* g711.c in Sources */ = {isa = PBXBuildFile; fileRef = 856150401664B5AC00DBCFD5 /* g711.c */; };
+		856150431664B5AC00DBCFD5 /* g711.c in Sources */ = {isa = PBXBuildFile; fileRef = 856150401664B5AC00DBCFD5 /* g711.c */; };
+		856150441664B5AC00DBCFD5 /* g711.h in Headers */ = {isa = PBXBuildFile; fileRef = 856150411664B5AC00DBCFD5 /* g711.h */; };
 		858406881656933000BE8EB6 /* rtp_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 858406871656933000BE8EB6 /* rtp_io.c */; };
 		8584068A1656934C00BE8EB6 /* rtp_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 858406871656933000BE8EB6 /* rtp_io.c */; };
 		8585A26816527CB000380B9C /* ajitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 8585A26716527CB000380B9C /* ajitter.c */; };
@@ -201,6 +204,8 @@
 		8557073516291BA200407CCC /* re_udp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re_udp.h; sourceTree = "<group>"; };
 		8557073616291BA200407CCC /* re_uri.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re_uri.h; sourceTree = "<group>"; };
 		8557073716291BA200407CCC /* re.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re.h; sourceTree = "<group>"; };
+		856150401664B5AC00DBCFD5 /* g711.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = g711.c; sourceTree = "<group>"; };
+		856150411664B5AC00DBCFD5 /* g711.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = g711.h; sourceTree = "<group>"; };
 		8580184A1636FEFE00E9D54B /* txsip_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = txsip_private.h; sourceTree = "<group>"; };
 		858406861656933000BE8EB6 /* rtp_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtp_io.h; sourceTree = "<group>"; };
 		858406871656933000BE8EB6 /* rtp_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtp_io.c; sourceTree = "<group>"; };
@@ -342,6 +347,7 @@
 		850277931625B53E00AB5038 = {
 			isa = PBXGroup;
 			children = (
+				8561503F1664B5AC00DBCFD5 /* g711 */,
 				8523A5CA1650E3220071C23F /* libsrtp.a */,
 				85D64144163C62EA008D3974 /* AudioToolbox.framework */,
 				85B57C7D163299B100456ADD /* AudioToolbox.framework */,
@@ -454,6 +460,15 @@
 				8507AAE71628BD9400CE9AE6 /* JSONKit.m */,
 			);
 			name = JSONKit;
+			sourceTree = "<group>";
+		};
+		8561503F1664B5AC00DBCFD5 /* g711 */ = {
+			isa = PBXGroup;
+			children = (
+				856150401664B5AC00DBCFD5 /* g711.c */,
+				856150411664B5AC00DBCFD5 /* g711.h */,
+			);
+			path = g711;
 			sourceTree = "<group>";
 		};
 		859D3D471628D6A400385248 /* Other Frameworks */ = {
@@ -644,6 +659,7 @@
 				8536A0A21634D807007543B4 /* TXBaseOp.h in Headers */,
 				8536A06B1634D6A2007543B4 /* TXSipCall.h in Headers */,
 				8545D51F164447E400DD7533 /* JSONKit.h in Headers */,
+				856150441664B5AC00DBCFD5 /* g711.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -747,6 +763,7 @@
 				8507AAE81628BD9400CE9AE6 /* JSONKit.m in Sources */,
 				8585A26816527CB000380B9C /* ajitter.c in Sources */,
 				858406881656933000BE8EB6 /* rtp_io.c in Sources */,
+				856150421664B5AC00DBCFD5 /* g711.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -772,6 +789,7 @@
 				859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */,
 				8585A26916527CB000380B9C /* ajitter.c in Sources */,
 				8584068A1656934C00BE8EB6 /* rtp_io.c in Sources */,
+				856150431664B5AC00DBCFD5 /* g711.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
