@@ -51,6 +51,10 @@
 	"97", "speex", 8000, 1,
 	 NULL, NULL, NULL, false, NULL);
 
+    err = sdp_format_add(NULL, sdp_media_s, false,
+	"101", "opus", 48000, 2,
+	 NULL, NULL, NULL, false, NULL);
+
     err = sdp_format_add(NULL, sdp_media, false,
 	"0", "PCMU", 8000, 1,
 	 NULL, NULL, NULL, false, NULL);
@@ -301,11 +305,12 @@ out:
 
 - (void) set_format:(char*)fmt_name
 {
-    fmt = FMT_NONE;
     if(!strcmp(fmt_name, "speex"))
         fmt = FMT_SPEEX;
     if(!strcmp(fmt_name, "PCMU"))
         fmt = FMT_PCMU;
+    if(!strcmp(fmt_name, "opus"))
+	fmt = FMT_OPUS;
 }
 
 @end

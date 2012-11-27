@@ -5,36 +5,10 @@
 #include "ajitter.h"
 
 typedef enum {
-	FMT_NONE,
 	FMT_SPEEX,
 	FMT_PCMU,
+	FMT_OPUS,
 } fmt_t;
-
-typedef struct {
-    int magic;
-    ajitter *record_jitter;
-    int frame_size;
-    SpeexBits enc_bits;
-    void *enc_state;
-    struct mbuf *mb;
-    struct rtp_sock *rtp;
-    int pt;
-    int ts;
-    srtp_t srtp_out;
-    struct sa *dst;
-    struct tmr tmr;
-    fmt_t fmt;
-} rtp_send_ctx;
-
-typedef struct {
-    int magic;
-    srtp_t srtp_in;
-    SpeexBits dec_bits;
-    ajitter *play_jitter;
-    void *dec_state;
-    int frame_size;
-    fmt_t fmt;
-} rtp_recv_ctx;
 
 typedef struct {
     void *ctx;
@@ -42,7 +16,25 @@ typedef struct {
 
 } rtp_recv_arg;
 
-void rtp_send_io(void *varg);
+typedef struct {
+    int magic;
+    srtp_t srtp_out;
+    ajitter *record_jitter;
+    struct rtp_sock *rtp;
+    struct sa *dst;
+    int pt;
+    struct tmr tmr;
+    fmt_t fmt;
+    struct mbuf *mb;
+} rtp_send_ctx;
+
+typedef struct {
+    int magic;
+    srtp_t srtp_in;
+    ajitter *play_jitter;
+    fmt_t fmt;
+} rtp_recv_ctx;
+
 rtp_send_ctx* rtp_send_init(fmt_t fmt);
 void rtp_send_start(rtp_send_ctx* ctx);
 void rtp_send_stop(rtp_send_ctx* ctx);
@@ -62,4 +54,30 @@ void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mb
 
 rtp_recv_h * rtp_recv_func(fmt_t fmt);
 rtp_send_h * rtp_send_func(fmt_t fmt);
+
+
+void rtp_p(srtp_t srtp, struct mbuf *mb);
+int rtp_un(srtp_t srtp, struct mbuf *mb);
+
+// implementations
+struct _rtp_send_speex_ctx;
+struct _rtp_recv_speex_ctx;
+typedef struct _rtp_send_speex_ctx rtp_send_speex_ctx;
+typedef struct _rtp_recv_speex_ctx rtp_recv_speex_ctx;
+
+void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
+void rtp_send_io(void *varg);
+void rtp_send_speex_stop(rtp_send_speex_ctx *ctx);
+void rtp_recv_speex_stop(rtp_recv_speex_ctx *ctx);
+rtp_send_ctx* rtp_send_speex_init();
+rtp_recv_ctx * rtp_recv_speex_init();
+
+void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
+void rtp_send_pcmu(void *varg);
+rtp_send_ctx* rtp_send_pcmu_init();
+rtp_recv_ctx * rtp_recv_pcmu_init();
+
+void rtp_recv_opus(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
+rtp_send_ctx* rtp_send_opus_init();
+rtp_recv_ctx * rtp_recv_opus_init();
 
