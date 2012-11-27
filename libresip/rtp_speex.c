@@ -34,7 +34,7 @@ void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct m
     rtp_recv_speex_ctx * arg = varg;
 
     int len;
-    len = rtp_un(arg, mb);
+    len = rtp_un(arg->srtp_in, mb);
     if(len<0)
 	    return;
 
@@ -74,7 +74,7 @@ restart:
     err = rtp_encode(arg->rtp, 0, arg->pt, arg->ts, mb);
     mb->pos = 0;
 
-    rtp_p(arg, mb);
+    rtp_p(arg->srtp_out, mb);
 
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 
