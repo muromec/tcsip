@@ -80,4 +80,5 @@ rtp_recv_ctx * rtp_recv_pcmu_init();
 void rtp_recv_opus(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
 rtp_send_ctx* rtp_send_opus_init();
 rtp_recv_ctx * rtp_recv_opus_init();
+void rtp_send_opus(void *varg);
 

@@ -60,6 +60,8 @@ rtp_send_h * rtp_send_func(fmt_t fmt)
 	    return rtp_send_io;
     case FMT_PCMU:
 	    return rtp_send_pcmu;
+    case FMT_OPUS:
+	    return rtp_send_opus;
     }
 }
 

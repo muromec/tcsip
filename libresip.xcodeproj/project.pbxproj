@@ -62,6 +62,13 @@
 		8561504C1664C70B00DBCFD5 /* rtp_pcmu.c in Sources */ = {isa = PBXBuildFile; fileRef = 856150471664C70B00DBCFD5 /* rtp_pcmu.c */; };
 		8561504D1664C70B00DBCFD5 /* rtp_speex.c in Sources */ = {isa = PBXBuildFile; fileRef = 856150481664C70B00DBCFD5 /* rtp_speex.c */; };
 		8561504E1664C70B00DBCFD5 /* rtp_speex.c in Sources */ = {isa = PBXBuildFile; fileRef = 856150481664C70B00DBCFD5 /* rtp_speex.c */; };
+		856150551664D20200DBCFD5 /* opus.h in Headers */ = {isa = PBXBuildFile; fileRef = 856150501664D20200DBCFD5 /* opus.h */; };
+		856150561664D20200DBCFD5 /* opus_custom.h in Headers */ = {isa = PBXBuildFile; fileRef = 856150511664D20200DBCFD5 /* opus_custom.h */; };
+		856150571664D20200DBCFD5 /* opus_defines.h in Headers */ = {isa = PBXBuildFile; fileRef = 856150521664D20200DBCFD5 /* opus_defines.h */; };
+		856150581664D20200DBCFD5 /* opus_multistream.h in Headers */ = {isa = PBXBuildFile; fileRef = 856150531664D20200DBCFD5 /* opus_multistream.h */; };
+		856150591664D20200DBCFD5 /* opus_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 856150541664D20200DBCFD5 /* opus_types.h */; };
+		8561505B1664D34100DBCFD5 /* libopus.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8561505A1664D34000DBCFD5 /* libopus.a */; };
+		8561505C1664D3A600DBCFD5 /* libopus.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8561505A1664D34000DBCFD5 /* libopus.a */; };
 		858406881656933000BE8EB6 /* rtp_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 858406871656933000BE8EB6 /* rtp_io.c */; };
 		8584068A1656934C00BE8EB6 /* rtp_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 858406871656933000BE8EB6 /* rtp_io.c */; };
 		8585A26816527CB000380B9C /* ajitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 8585A26716527CB000380B9C /* ajitter.c */; };
@@ -215,6 +222,12 @@
 		856150461664C70A00DBCFD5 /* rtp_opus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_opus.c; path = libresip/rtp_opus.c; sourceTree = "<group>"; };
 		856150471664C70B00DBCFD5 /* rtp_pcmu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_pcmu.c; path = libresip/rtp_pcmu.c; sourceTree = "<group>"; };
 		856150481664C70B00DBCFD5 /* rtp_speex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_speex.c; path = libresip/rtp_speex.c; sourceTree = "<group>"; };
+		856150501664D20200DBCFD5 /* opus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opus.h; sourceTree = "<group>"; };
+		856150511664D20200DBCFD5 /* opus_custom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opus_custom.h; sourceTree = "<group>"; };
+		856150521664D20200DBCFD5 /* opus_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opus_defines.h; sourceTree = "<group>"; };
+		856150531664D20200DBCFD5 /* opus_multistream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opus_multistream.h; sourceTree = "<group>"; };
+		856150541664D20200DBCFD5 /* opus_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opus_types.h; sourceTree = "<group>"; };
+		8561505A1664D34000DBCFD5 /* libopus.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libopus.a; path = deps/libopus.a; sourceTree = "<group>"; };
 		8580184A1636FEFE00E9D54B /* txsip_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = txsip_private.h; sourceTree = "<group>"; };
 		858406861656933000BE8EB6 /* rtp_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtp_io.h; sourceTree = "<group>"; };
 		858406871656933000BE8EB6 /* rtp_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtp_io.c; sourceTree = "<group>"; };
@@ -319,6 +332,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8561505C1664D3A600DBCFD5 /* libopus.a in Frameworks */,
 				8523A5CB1650E3220071C23F /* libsrtp.a in Frameworks */,
 				85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */,
 				85B57C7C163299AD00456ADD /* CoreAudio.framework in Frameworks */,
@@ -335,6 +349,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8561505B1664D34100DBCFD5 /* libopus.a in Frameworks */,
 				8523A5CD1650E3520071C23F /* libsrtp.a in Frameworks */,
 				85D6414F163C62F4008D3974 /* CoreAudio.framework in Frameworks */,
 				85B57C7A1632999F00456ADD /* AudioUnit.framework in Frameworks */,
@@ -356,6 +371,8 @@
 		850277931625B53E00AB5038 = {
 			isa = PBXGroup;
 			children = (
+				8561505A1664D34000DBCFD5 /* libopus.a */,
+				8561504F1664D20200DBCFD5 /* opus */,
 				856150461664C70A00DBCFD5 /* rtp_opus.c */,
 				856150471664C70B00DBCFD5 /* rtp_pcmu.c */,
 				856150481664C70B00DBCFD5 /* rtp_speex.c */,
@@ -481,6 +498,19 @@
 				856150411664B5AC00DBCFD5 /* g711.h */,
 			);
 			path = g711;
+			sourceTree = "<group>";
+		};
+		8561504F1664D20200DBCFD5 /* opus */ = {
+			isa = PBXGroup;
+			children = (
+				856150501664D20200DBCFD5 /* opus.h */,
+				856150511664D20200DBCFD5 /* opus_custom.h */,
+				856150521664D20200DBCFD5 /* opus_defines.h */,
+				856150531664D20200DBCFD5 /* opus_multistream.h */,
+				856150541664D20200DBCFD5 /* opus_types.h */,
+			);
+			name = opus;
+			path = deps/include/opus;
 			sourceTree = "<group>";
 		};
 		859D3D471628D6A400385248 /* Other Frameworks */ = {
@@ -672,6 +702,11 @@
 				8536A06B1634D6A2007543B4 /* TXSipCall.h in Headers */,
 				8545D51F164447E400DD7533 /* JSONKit.h in Headers */,
 				856150441664B5AC00DBCFD5 /* g711.h in Headers */,
+				856150551664D20200DBCFD5 /* opus.h in Headers */,
+				856150561664D20200DBCFD5 /* opus_custom.h in Headers */,
+				856150571664D20200DBCFD5 /* opus_defines.h in Headers */,
+				856150581664D20200DBCFD5 /* opus_multistream.h in Headers */,
+				856150591664D20200DBCFD5 /* opus_types.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
