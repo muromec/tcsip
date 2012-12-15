@@ -231,20 +231,15 @@ out:
     int err;
     NSLog(@"processing answer");
 
-    struct mbuf *mb = mbuf_alloc(0);
-    mbuf_write_mem(mb, mbuf_buf(offer), mbuf_get_space(offer));
-    mb->pos = 0;
-
-    err = sdp_decode(sdp, mb, false);
+    err = sdp_decode(sdp, offer, false);
     if(err) {
-        NSLog(@"cant decode answer");
+        NSLog(@"cant decode answer %d", err);
         goto out;
     }
 
     [self sdpFormats];
 
 out:
-    mem_deref(mb);
     return err;
 }
 

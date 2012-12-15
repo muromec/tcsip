@@ -37,6 +37,7 @@ static void progress_handler(const struct sip_msg *msg, void *arg)
         if((msg->scode == 183) && mbuf_get_left(msg->mb)) {
             re_printf("early media");
             [call.media answer: msg->mb];
+            [call callActivate];
         }
 }
 
