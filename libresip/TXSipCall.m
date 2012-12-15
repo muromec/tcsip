@@ -32,9 +32,12 @@ static int answer_handler(const struct sip_msg *msg, void *arg)
 /* called when SIP progress (like 180 Ringing) responses are received */
 static void progress_handler(const struct sip_msg *msg, void *arg)
 {
-	(void)arg;
-
+        TXSipCall *call = (__bridge TXSipCall*)arg;
 	re_printf("session progress: %u %r\n", msg->scode, &msg->reason);
+        if((msg->scode == 183) && mbuf_get_left(msg->mb)) {
+            re_printf("early media");
+            [call.media answer: msg->mb];
+        }
 }
 
 
