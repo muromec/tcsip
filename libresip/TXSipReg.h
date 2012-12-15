@@ -24,6 +24,7 @@ typedef enum {
     CFReadStreamRef upstream_ref;
     reg_state_t rstate;
     NSString* instance_id;
+    NSString* apns_token;
 }
 
 - (void) setup;
@@ -33,5 +34,7 @@ typedef enum {
 - (void) response: (int) status phrase:(const char*)phrase;
 - (void) setInstanceId: (NSString*) pUUID;
 - (void) voipDest:(struct tcp_conn *)conn;
+
+@property NSString* apns_token;
 
 @end

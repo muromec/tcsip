@@ -38,6 +38,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 
 @implementation TXSipReg
+@synthesize apns_token;
 
 - (void) setup
 {
@@ -66,6 +67,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     } else {
         rstate |= REG_START;
     }
+    NSLog(@"sreg apns token %@", apns_token);
 }
 
 - (void) response: (int) status phrase:(const char*)phrase

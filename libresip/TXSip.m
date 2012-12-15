@@ -170,6 +170,11 @@ static void exit_handler(void *arg)
     media_snd_deinit();
 }
 
+- (oneway void) apns_token:(NSString*)token
+{
+    sreg.apns_token = token;
+}
+
 - (oneway void) register:(NSString*)pUser
 {
     NSLog(@"register ...");
