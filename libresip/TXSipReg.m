@@ -38,11 +38,15 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 
 @implementation TXSipReg
-@synthesize apns_token;
-
 - (void) setup
 {
     rstate = REG_NONE;
+}
+
+- (void)resend
+{
+    mem_deref(reg);
+    [self send];
 }
 
 - (void) send
@@ -56,10 +60,17 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
         instance_id
     ];
     const char *params = _byte(np);
+    const char *fmt = NULL;
+    NSString* nfmt;
+    if(apns_token) {
+	nfmt = [NSString stringWithFormat:@"Push-Token: %@\r\n", apns_token];
+	fmt = _byte(nfmt);
+	NSLog(@"token fmt: %s", fmt);
+    }
 
     err = sipreg_register(&reg, uac->sip, registrar, uri, uri, 60, name,
                           NULL, 0, 1, auth_handler, ctx, false,
-                          register_handler, ctx, params, NULL);
+                          register_handler, ctx, params, fmt);
 
     NSLog(@"send register %d %@", err, cb);
     if(err) {
@@ -100,6 +111,20 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 - (void) setInstanceId: (NSString*) pUUID
 {
     instance_id = pUUID;
+}
+
+- (void)setApns_token:(NSData*)token
+{
+    char enc_token[50];
+    int elen = sizeof(enc_token);
+    memset(enc_token, 0, elen);
+
+    base64_encode([token bytes], [token length], enc_token, &elen);
+
+    apns_token = [NSString stringWithFormat:@"%s", enc_token];
+
+    NSLog(@"set token: %@ token %s", token, enc_token);
+    [self resend];
 }
 
 - (void) voipDest:(struct tcp_conn *)conn

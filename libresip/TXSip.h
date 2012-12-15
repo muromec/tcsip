@@ -59,7 +59,7 @@ typedef struct uac_serv uac_serv_t;
 - (oneway void) worker;
 - (oneway void) stop;
 - (oneway void) setRegObserver: (id)obs;
-- (oneway void) apns_token:(NSString*)token;
+- (oneway void) apns_token:(NSData*)token;
 
 @property id auth;
 @property (readonly) TXSipUser* user;

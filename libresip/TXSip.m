@@ -170,7 +170,7 @@ static void exit_handler(void *arg)
     media_snd_deinit();
 }
 
-- (oneway void) apns_token:(NSString*)token
+- (oneway void) apns_token:(NSData*)token
 {
     sreg.apns_token = token;
 }

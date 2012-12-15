@@ -32,9 +32,9 @@ typedef enum {
 - (void) send;
 
 - (void) response: (int) status phrase:(const char*)phrase;
-- (void) setInstanceId: (NSString*) pUUID;
+- (void) setInstanceId: (NSData*) pUUID;
 - (void) voipDest:(struct tcp_conn *)conn;
 
-@property NSString* apns_token;
+@property NSData* apns_token;
 
 @end
