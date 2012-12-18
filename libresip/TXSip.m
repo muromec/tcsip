@@ -20,6 +20,11 @@
 #define delegate( ) (self->delegate)
 #define here(obj) ([MProxy withTargetBox: obj box:proxy.mbox])
 
+#if TARGET_OS_IPHONE
+#define USER_AGENT "TexR/iOS libre"
+#else
+#define USER_AGENT "TexR/OSX libre"
+#endif
 
 char* byte(NSString * input){
       int len = (int)[input lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
@@ -110,9 +115,7 @@ static void exit_handler(void *arg)
 
 	/* create SIP stack instance */
 	err = sip_alloc(&uac->sip, uac_serv->dns, 32, 32, 32,
-			"TexR/OSX libre",
-			exit_handler, NULL);
-
+                USER_AGENT, exit_handler, NULL);
 
         NSBundle *b = [NSBundle mainBundle];
         NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
