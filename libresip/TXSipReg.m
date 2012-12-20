@@ -23,6 +23,38 @@ void impossible_cb (
     NSLog(@"impossible!\n");
 }
 
+static bool find_uplink(const struct sip_hdr *hdr, const struct sip_msg *msg,
+			  void *arg)
+{
+    id ctx = (__bridge id)arg;
+
+    struct sip_addr addr;
+    struct pl _non;
+    int err;
+
+    err = sip_addr_decode(&addr, &hdr->val);
+    if(err) {
+        return false;
+    }
+    err = sip_param_exists(&addr.params, "uplink", &_non);
+    if(err == ENOENT) {
+        return false;
+    }
+    if(err) {
+        return false;
+    }
+
+    NSString *str = [[NSString alloc] 
+        initWithBytes: addr.auri.p
+               length: addr.auri.l
+             encoding: NSASCIIStringEncoding
+    ];
+    [ctx uplink: str];
+
+    return false;
+}
+
+
 /* called when register responses are received */
 static void register_handler(int err, const struct sip_msg *msg, void *arg)
 {
@@ -33,6 +65,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
         else
             [ctx response: 900 phrase: "Internal error"];
 
+        [ctx contacts: msg];
 	[ctx voipDest: sip_msg_tcpconn(msg)];
 }
 
@@ -146,6 +179,16 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
     upstream = conn;
     upstream_ref = read_stream;
+}
+
+- (void) contacts: (const struct sip_msg*)msg
+{
+    sip_msg_hdr_apply(msg, true, SIP_HDR_CONTACT, find_uplink, (__bridge void*)self);
+}
+
+- (void) uplink: (NSString*) up
+{
+    NSLog(@"report uplink %@", up);
 }
 
 @end
