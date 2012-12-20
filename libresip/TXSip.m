@@ -246,7 +246,7 @@ static void exit_handler(void *arg)
 }
 
 - (oneway void) setRegObserver: (id)obs {
-    sreg.cb = CB(obs, onlineState:);
+    sreg.obs = obs;
 }
 
 @end

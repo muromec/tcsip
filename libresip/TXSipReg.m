@@ -71,6 +71,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 
 @implementation TXSipReg
+@synthesize obs;
 - (void) setup
 {
     rstate = REG_NONE;
@@ -105,9 +106,9 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
                           NULL, 0, 1, auth_handler, ctx, false,
                           register_handler, ctx, params, fmt);
 
-    NSLog(@"send register %d %@", err, cb);
+    NSLog(@"send register %d %@", err, obs);
     if(err) {
-        [cb response: @"off"];
+        [obs onlineState: @"off"];
     } else {
         rstate |= REG_START;
     }
@@ -120,19 +121,19 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
     switch(status) {
     case 200:
-	[cb response: @"ok"];
+        [obs onlineState: @"ok"];
 
 	rstate |= REG_AUTH;
 	rstate |= REG_ONLINE;
 	break;
     case 401:
-	if(cb && (rstate & REG_AUTH)==0) {
+	if((rstate & REG_AUTH)==0) {
             NSLog(@"auth fail. how this can be?");
 	}
 	// fallthrough!
     default:
 	rstate &= rstate^REG_ONLINE;
-	[cb response: @"lost"];
+        [obs onlineState: @"lost"];
     }
 }
 
@@ -188,7 +189,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void) uplink: (NSString*) up
 {
-    NSLog(@"report uplink %@", up);
+    [obs uplink: up alive:YES];
 }
 
 @end
