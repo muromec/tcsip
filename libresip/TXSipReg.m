@@ -11,7 +11,7 @@
 
 #include "txsip_private.h"
 
-static const char *registrar = "sip:crap.muromec.org.ua";
+static const char *registrar = "sip:texr.enodev.org";
 
 void impossible_cb (
    CFSocketRef s,
@@ -69,17 +69,37 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 	[ctx voipDest: sip_msg_tcpconn(msg)];
 }
 
-
 @implementation TXSipReg
 @synthesize obs;
 - (void) setup
 {
     rstate = REG_NONE;
+    reg_time = 60;
+}
+
+- (void) setState: (reg_state) state
+{
+    tmr_cancel(&reg_tmr);
+    if(reg) reg = mem_deref(reg);
+
+    switch(state) {
+    case REG_OFF:
+        return;
+    case REG_FG:
+        reg_time = 60;
+        break;
+    case REG_BG:
+        reg_time = 610;
+        break;
+    }
+ 
+    NSLog(@"set state %d time %d", state, reg_time);
+    [self send];
 }
 
 - (void)resend
 {
-    mem_deref(reg);
+    reg = mem_deref(reg);
     [self send];
 }
 
@@ -99,14 +119,13 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     if(apns_token) {
 	nfmt = [NSString stringWithFormat:@"Push-Token: %@\r\n", apns_token];
 	fmt = _byte(nfmt);
-	NSLog(@"token fmt: %s", fmt);
     }
 
-    err = sipreg_register(&reg, uac->sip, registrar, uri, uri, 60, name,
+    err = sipreg_register(&reg, uac->sip, registrar, uri, uri, reg_time, name,
                           NULL, 0, 1, auth_handler, ctx, false,
                           register_handler, ctx, params, fmt);
 
-    NSLog(@"send register %d %@", err, obs);
+    NSLog(@"send register %d %d %s", err, reg_time, name);
     if(err) {
         [obs onlineState: @"off"];
     } else {

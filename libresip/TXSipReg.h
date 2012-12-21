@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "TXBaseOp.h"
+#include <re.h>
 
 struct tcp_conn;
 
@@ -31,6 +32,8 @@ typedef enum {
     NSString* instance_id;
     NSString* apns_token;
     id<RegObserver> obs;
+    int reg_time;
+    struct tmr reg_tmr;
 }
 
 - (void) setup;
@@ -42,6 +45,7 @@ typedef enum {
 - (void) voipDest:(struct tcp_conn *)conn;
 - (void) contacts: (const struct sip_msg*)msg;
 - (void) uplink: (NSString*) up;
+- (void) setState: (reg_state) state;
 
 @property NSData* apns_token;
 @property id<RegObserver> obs;

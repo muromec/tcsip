@@ -186,9 +186,14 @@ static void exit_handler(void *arg)
     //[auth setCreds: user password:pPassword];
 
     [sreg setDest: user];
-    [sreg send];
 
 }
+
+- (oneway void) setOnline: (reg_state)state
+{
+    [sreg setState: state];
+}
+
 - (oneway void) worker
 {
     NSLog(@"start worker %d", proxy.mbox.readFd);

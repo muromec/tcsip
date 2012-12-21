@@ -20,6 +20,12 @@ typedef struct uac uac_t;
 struct uac_serv;
 typedef struct uac_serv uac_serv_t;
 
+typedef enum {
+    REG_OFF,
+    REG_BG,
+    REG_FG
+} reg_state;
+
 @protocol SipDelegate <NSObject>
 
 - (void) addCall: (id)call;
@@ -60,6 +66,7 @@ typedef struct uac_serv uac_serv_t;
 - (oneway void) stop;
 - (oneway void) setRegObserver: (id)obs;
 - (oneway void) apns_token:(NSData*)token;
+- (oneway void) setOnline: (reg_state)state;
 
 @property id auth;
 @property (readonly) TXSipUser* user;
