@@ -14,6 +14,7 @@
 
 @interface TXAccount : NSObject {
     NSString* user;
+    NSString* name;
     Callback *auth_cb;
 }
 - (id) initWithUser: (NSString*) pUser;
@@ -25,5 +26,6 @@
 
 @property (readonly) NSString* user;
 @property (readonly) NSString* uuid;
+@property NSString* name;
 
 @end

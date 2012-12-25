@@ -11,6 +11,7 @@
 
 @implementation TXAccount
 @synthesize user;
+@synthesize name;
 
 - (id) initWithUser: (NSString*) pUser
 {
