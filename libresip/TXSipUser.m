@@ -61,6 +61,7 @@
 
     user = [data objectForKey:@"login"];
     name = [data objectForKey:@"name"];
+    addr = [self netaddr]; // XXX wrong, use full addr
 
     return self;
 }
