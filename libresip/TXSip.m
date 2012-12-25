@@ -205,9 +205,13 @@ static void exit_handler(void *arg)
 }
 
 - (oneway void) startCall: (NSString*)dest {
-    id out_call = [[TXSipCall alloc] initWithApp:self];
 
-    id udest  = [TXSipUser withName: dest];
+    [self startCallUser: [TXSipUser withName: dest]];
+}
+
+- (oneway void) startCallUser: (TXSipUser*)udest
+{
+    id out_call = [[TXSipCall alloc] initWithApp:self];
     [out_call setDest: udest];
     [out_call setCb: CB(self, callChange:)];
     [out_call send];

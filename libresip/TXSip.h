@@ -58,6 +58,7 @@ typedef enum {
 - (void) register:(NSString*)user;
 
 - (void) startCall: (NSString*)dest;
+- (void) startCallUser: (TXSipUser*)dest;
 - (void) callIncoming: (id)in_call;
 - (void) startChat: (NSString*)dest;
 
