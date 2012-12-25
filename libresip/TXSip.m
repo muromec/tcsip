@@ -178,12 +178,12 @@ static void exit_handler(void *arg)
     sreg.apns_token = token;
 }
 
-- (oneway void) register:(NSString*)pUser
+- (oneway void) register
 {
     NSLog(@"register ...");
 
-    user = [TXSipUser withName: pUser];
-    //[auth setCreds: user password:pPassword];
+    user = [TXSipUser withName: account.user];
+    user.name = account.name;
 
     [sreg setDest: user];
 

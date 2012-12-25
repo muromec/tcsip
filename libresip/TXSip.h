@@ -46,7 +46,7 @@ typedef enum {
 
     TXSipReg *sreg;
     id auth;
-    id user;
+    TXSipUser *user;
 
     NSMutableArray * calls;
     NSMutableArray * chats;
@@ -55,7 +55,7 @@ typedef enum {
     id<SipDelegate> delegate;
 }
 - (TXSip*) initWithAccount: (id) account;
-- (void) register:(NSString*)user;
+- (void) register;
 
 - (void) startCall: (NSString*)dest;
 - (void) startCallUser: (TXSipUser*)dest;
