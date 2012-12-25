@@ -186,8 +186,14 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
     int fd = tcp_conn_fd(conn);
     re_printf("fd %d\n", fd);
-    if(upstream_ref)
+    if(upstream_ref) {
         CFRelease(upstream_ref);
+        upstream_ref = NULL;
+    }
+
+    if(fd==-1) {
+        return;
+    }
 
     CFReadStreamRef read_stream;
     CFStreamCreatePairWithSocket(NULL, fd, &read_stream, NULL);
