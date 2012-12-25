@@ -22,6 +22,9 @@ struct sip_taddr;
 + (id) withAddr: (struct sip_taddr*)addr;
 - (id) initWithAddr: (struct sip_taddr*)addr;
 
++ (id) withData: (NSDictionary*) data;
+- (id) initWithData: (NSDictionary*) data;
+
 @property NSString* user;
 @property NSString* name;
 @property NSString* host;

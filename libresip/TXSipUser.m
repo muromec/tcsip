@@ -50,6 +50,22 @@
     return self;
 }
 
++ (id) withData: (NSDictionary*) data
+{
+    return [[TXSipUser alloc] initWithData: data];
+}
+
+- (id) initWithData: (NSDictionary*) data
+{
+    self = [super self];
+
+    user = [data objectForKey:@"login"];
+    name = [data objectForKey:@"name"];
+
+    return self;
+}
+
+
 - (NSString*) netaddr
 {
     NSRange range = [user rangeOfString: @"@"];
