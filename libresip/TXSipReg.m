@@ -107,7 +107,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 {
     int err;
     const char *uri = _byte(dest.addr);
-    const char *name = _byte(dest.name);
+    const char *user = _byte(dest.user);
 
     NSString* np = [NSString
         stringWithFormat:@"+sip.instance=\"<urn:uuid:%@>\"",
@@ -121,11 +121,11 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 	fmt = _byte(nfmt);
     }
 
-    err = sipreg_register(&reg, uac->sip, registrar, uri, uri, reg_time, name,
+    err = sipreg_register(&reg, uac->sip, registrar, uri, uri, reg_time, user,
                           NULL, 0, 1, auth_handler, ctx, false,
                           register_handler, ctx, params, fmt);
 
-    NSLog(@"send register %d %d %s", err, reg_time, name);
+    NSLog(@"send register %d %d %s", err, reg_time, user);
     if(err) {
         [obs onlineState: @"off"];
     } else {
@@ -177,7 +177,6 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     apns_token = [NSString stringWithFormat:@"%s", enc_token];
 
     NSLog(@"set token: %@ token %s", token, enc_token);
-    [self resend];
 }
 
 - (void) voipDest:(struct tcp_conn *)conn

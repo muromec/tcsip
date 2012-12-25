@@ -91,10 +91,10 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 {
 
     int err;
-    const char *my_name = _byte(app.user.name);
+    const char *my_user = _byte(app.user.user);
 
     err = sipsess_accept(&sess, uac->sock, msg, 180, "Ringing",
-                         my_name, "application/sdp", NULL,
+                         my_user, "application/sdp", NULL,
                          auth_handler, ctx, false,
                          offer_handler, answer_handler,
                          establish_handler, NULL, NULL,
@@ -120,14 +120,14 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     int err;
 
     const char *to_uri = _byte(dest.addr);
-    const char *to_name = _byte(dest.name);
+    const char *to_user = _byte(dest.user);
     const char *from_uri = _byte(app.user.addr);
     const char *from_name = _byte(app.user.name);
     
     [media offer: &mb];
 
     err = sipsess_connect(&sess, uac->sock, to_uri, from_name,
-                          from_uri, to_name,
+                          from_uri, to_user,
                           NULL, 0, "application/sdp", mb,
                           auth_handler, ctx, false,
                           offer_handler, answer_handler,

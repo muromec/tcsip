@@ -79,6 +79,8 @@ static void exit_handler(void *arg)
     }
 
     account = pAccount;
+    user = [TXSipUser withName: account.user];
+    user.name = account.name;
 
     [self create_ua];
     calls = [[NSMutableArray alloc] init];
@@ -87,6 +89,7 @@ static void exit_handler(void *arg)
     auth = [[TXSipAuth alloc] initWithApp: self];
     sreg = [[TXSipReg alloc] initWithApp:self];
     [sreg setInstanceId: account.uuid];
+    [sreg setDest: user];
 
     proxy = [MProxy withTarget: self];
 
@@ -181,12 +184,6 @@ static void exit_handler(void *arg)
 - (oneway void) register
 {
     NSLog(@"register ...");
-
-    user = [TXSipUser withName: account.user];
-    user.name = account.name;
-
-    [sreg setDest: user];
-
 }
 
 - (oneway void) setOnline: (reg_state)state
