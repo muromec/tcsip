@@ -17,6 +17,8 @@
     NSString *username;
     NSString *password;
 
+    NSURLCredential *credential;
+
 }
 
 - (void)rload: (NSString*)path cb:(id)cb;

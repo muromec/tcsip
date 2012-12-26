@@ -9,6 +9,7 @@
 #import "TXRestApi.h"
 #import "JSONKit.h"
 #import "Callback.h"
+#import "ASIHTTPRequest.h"
 
 @implementation TXRestApi
 + (void)r: (NSString*)path cb:(id)cb
@@ -18,60 +19,105 @@
 }
 
 - (void)rload: (NSString*)path cb:(id)pCb {
-    NSURL *myURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://texr.enodev.org/api/%@",path]];
+    NSURL *myURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://texr.enodev.org/api/%@",path]];
+NSLog(@"api %@ url %@", path, myURL);
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:myURL
-                                             cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-                                         timeoutInterval:60];
-    
+    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:myURL];
+
     self->cb = pCb;
 
-    url_con = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    [self importCA: @"/Users/muromec/Library/Texr/neko.cert"];
+
+    SecCertificateRef cert = [self findCert];
+    SecIdentityRef ident;
+
+    int ok = SecIdentityCreateWithCertificate(nil, cert, &ident);
+    if(ok != 0) {
+        NSLog(@"ident not found %d", ok);
+	goto ident_err;
+    }
+
+
+[request setValidatesSecureCertificate:NO];
+    [request setClientCertificateIdentity:ident];
+
+    [request setDelegate:self];
+    [request startAsynchronous];
+
+out:
+    CFRelease(ident);
+ident_err:
+    CFRelease(cert);
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    responseData = [[NSMutableData alloc] init];
-    NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
-    status_code = (int)[httpResponse statusCode];
-}
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [responseData appendData:data];
-}
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    // Show error message
-    [cb response: nil];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+- (void)requestFinished:(ASIHTTPRequest *)request
+{
     // Use responseData
 
     JSONDecoder* decoder = [JSONDecoder decoder];
-    id ret = [decoder objectWithData: responseData];
+    id ret = [decoder objectWithData: [request responseData]];
     //NSString *status = [ret objectForKey:@"status"];
     NSArray *payload = [ret objectForKey:@"data"];
 
+NSLog(@"https ok payload");
     [cb response: payload];
 }
-
-- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+- (void)requestFailed:(ASIHTTPRequest *)request
 {
-    NSLog(@"http auth challenge %@", challenge);
-
-    if (!username || [challenge previousFailureCount] > 0) {
-        [[challenge sender] cancelAuthenticationChallenge:challenge];
-        NSLog(@"Bad Username Or Password");
-        return;
-    }
-
-    NSURLCredential *newCredential = [NSURLCredential credentialWithUser:username password:password persistence:NSURLCredentialPersistenceNone];
-    [[challenge sender] useCredential:newCredential forAuthenticationChallenge:challenge];
+   NSError *error = [request error];
+   NSLog(@"req failed %@", error);
 }
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW
 {
     username = pU;
     password = pW;
+}
+
+- (void) importCA: (NSString*)thePath;
+{
+
+    NSData *PKCS12Data = [[NSData alloc] initWithContentsOfFile:thePath];
+    CFDataRef inPKCS12Data = (__bridge CFDataRef)PKCS12Data;
+    CFDictionaryRef opts = CFDictionaryCreate(NULL, NULL, NULL, 0, NULL, NULL); 
+    CFArrayRef items = NULL;
+
+    int ok = SecPKCS12Import(inPKCS12Data, opts, &items);
+    switch(ok){
+    case 0:
+        NSLog(@"items %@", items);
+        CFRelease(items);
+    case errSecDuplicateItem:
+	NSLog(@"import ok!");
+	break;
+    default:
+        NSLog(@"import fail %d", ok);
+    }
+}
+
+- (SecCertificateRef) findCert
+{
+    OSStatus status = errSecSuccess;
+    CFTypeRef   certificateRef     = NULL;                      // 1
+    const char *certLabelString = "sip:neko@texr.enodev.org";
+    CFStringRef certLabel = CFStringCreateWithCString(
+                                NULL, certLabelString,
+                                kCFStringEncodingUTF8);
+
+    const void *keys[] =   { kSecClass, kSecAttrLabel, kSecReturnRef };
+    const void *values[] = { kSecClassCertificate, certLabel, kCFBooleanTrue };
+    CFDictionaryRef dict = CFDictionaryCreate(NULL, keys,
+                                               values, 3,
+                                             NULL, NULL);
+    status = SecItemCopyMatching(dict, &certificateRef);
+    CFRelease(dict);
+    CFRelease(certLabel);
+
+    if (status != errSecSuccess)
+	return nil;
+
+    return certificateRef;
 }
 
 @end
