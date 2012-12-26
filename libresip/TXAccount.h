@@ -15,6 +15,7 @@
 @interface TXAccount : NSObject {
     NSString* user;
     NSString* name;
+    SecIdentityRef _ssl_ident;
     Callback *auth_cb;
 }
 - (id) initWithUser: (NSString*) pUser;
@@ -27,5 +28,6 @@
 @property (readonly) NSString* user;
 @property (readonly) NSString* uuid;
 @property NSString* name;
+@property (readonly) SecIdentityRef ssl;
 
 @end

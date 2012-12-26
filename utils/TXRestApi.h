@@ -23,6 +23,9 @@
 
 - (void)rload: (NSString*)path cb:(id)cb;
 + (void)r: (NSString*)path cb:(id)cb;
++ (void)r: (NSString*)path cb:(id)cb ident:(SecIdentityRef)ident;
++ (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p;
+
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW;
 

@@ -79,9 +79,10 @@
 
     auth_cb = CB;
     user = pUser;
-    TXRestApi *api = [[TXRestApi alloc] init];
-    [api setAuth: pUser password:pPassw];
-    [api rload: @"cert" cb: CB(self, certLoaded:)];
+    [TXRestApi r: @"cert"
+               cb: CB(self, certLoaded:)
+             user: pUser
+         password: pPassw];
 }
 
 - (void) certLoaded:(NSString*)payload
@@ -127,6 +128,68 @@
     [defaults synchronize];
 
     return ret;
+}
+
+- (SecIdentityRef) ssl
+{
+    if(_ssl_ident) return _ssl_ident;
+    SecIdentityRef ident = nil;
+
+    [self importCert: [self cert]];
+    SecCertificateRef cert = [self findCert];
+
+    int ok = SecIdentityCreateWithCertificate(nil, cert, &ident);
+    if(ok != 0) {
+        NSLog(@"ident not found. somebody tampered with keychain");
+        return nil;
+    }
+
+    _ssl_ident = ident;
+    return ident;
+}
+
+- (void) importCert: (NSString*)thePath;
+{
+
+    NSData *PKCS12Data = [[NSData alloc] initWithContentsOfFile:thePath];
+    CFDataRef inPKCS12Data = (__bridge CFDataRef)PKCS12Data;
+    CFDictionaryRef opts = CFDictionaryCreate(NULL, NULL, NULL, 0, NULL, NULL); 
+    CFArrayRef items = NULL;
+
+    int ok = SecPKCS12Import(inPKCS12Data, opts, &items);
+    switch(ok){
+    case 0:
+        NSLog(@"items %@", items);
+        CFRelease(items);
+    case errSecDuplicateItem:
+	NSLog(@"import ok!");
+	break;
+    default:
+        NSLog(@"import fail %d", ok);
+    }
+}
+
+- (SecCertificateRef) findCert
+{
+    OSStatus status = errSecSuccess;
+    CFTypeRef   certificateRef     = NULL;                      // 1
+    NSString *label = [NSString
+        stringWithFormat: @"sip:%@@texr.enodev.org",
+        user
+    ];
+
+    const void *keys[] =   { kSecClass, kSecAttrLabel, kSecReturnRef };
+    const void *values[] = { kSecClassCertificate, (__bridge void*)label, kCFBooleanTrue };
+    CFDictionaryRef dict = CFDictionaryCreate(NULL, keys,
+                                               values, 3,
+                                             NULL, NULL);
+    status = SecItemCopyMatching(dict, &certificateRef);
+    CFRelease(dict);
+
+    if (status != errSecSuccess)
+	return nil;
+
+    return certificateRef;
 }
 
 @end
