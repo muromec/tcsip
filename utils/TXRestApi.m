@@ -59,7 +59,7 @@
     // Use responseData
 
     JSONDecoder* decoder = [JSONDecoder decoder];
-    id ret = [decoder objectWithData: [request responseData]];
+    NSDictionary *ret = [decoder objectWithData: [request responseData]];
     //NSString *status = [ret objectForKey:@"status"];
     NSArray *payload = [ret objectForKey:@"data"];
 
