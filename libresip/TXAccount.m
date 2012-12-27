@@ -9,6 +9,8 @@
 #import "TXAccount.h"
 #import "TXRestApi.h"
 
+static NSString *kUserCertPassword = @"Gahghad6tah4Oophahg2tohSAeCithe1Shae8ahkeik9eoYo";
+
 @implementation TXAccount
 @synthesize user;
 @synthesize name;
@@ -34,11 +36,16 @@
     return ok;
 }
 
-+ (NSString*) userCert: (NSString*)user
++ (NSString*) userCert: (NSString*)user ext:(NSString*)ext
 {
     return [[NSString alloc]
-            initWithFormat:@"%@/Library/Texr/%@.cert",
-            NSHomeDirectory(), user];
+            initWithFormat:@"%@/Library/Texr/%@.%@",
+            NSHomeDirectory(), user, ext];
+}
+
++ (NSString*) userCert: (NSString*)user
+{
+    return [self userCert:user ext:@"cert"];
 }
 
 + (NSString*) certDir
@@ -85,15 +92,28 @@
          password: pPassw];
 }
 
-- (void) certLoaded:(NSString*)payload
+- (void) certLoaded:(NSDictionary*)payload
 {
-    NSLog(@"cert loaded: %d", payload != nil);
+    NSLog(@"cert loaded: %d", payload);
     if(!payload) {
         [auth_cb response: nil];
         auth_cb = nil;
         return;
     }
+    NSString *pem = [payload objectForKey:@"pem"];
+    NSString *p12 = [payload objectForKey:@"p12"];
+    NSData *b64 = [p12 dataUsingEncoding:NSASCIIStringEncoding];
 
+    int p12_len = 4096, ok;
+    char raw_p12[4096];
+
+    ok = base64_decode([b64 bytes], (int)[b64 length], raw_p12, &p12_len);
+    if(ok!=0) {
+        NSLog(@"cant b63 decode p12");
+        return;
+    }
+    NSLog(@"decoded %d bytes of p12-base64", p12_len);
+    NSData *raw = [NSData dataWithBytes:raw_p12 length:p12_len];
     [self saveUser];
     NSFileManager *fm = [[NSFileManager alloc] init];
     [fm
@@ -104,7 +124,13 @@
     ];
     [fm
         createFileAtPath: [TXAccount userCert: user]
-        contents: [payload dataUsingEncoding:NSASCIIStringEncoding]
+        contents: [pem dataUsingEncoding:NSASCIIStringEncoding]
+        attributes: nil
+    ];
+
+    [fm
+        createFileAtPath: [TXAccount userCert: user ext:@"p12"]
+        contents: raw
         attributes: nil
     ];
 
@@ -135,38 +161,54 @@
     if(_ssl_ident) return _ssl_ident;
     SecIdentityRef ident = nil;
 
-    [self importCert: [self cert]];
-    SecCertificateRef cert = [self findCert];
-
-    int ok = SecIdentityCreateWithCertificate(nil, cert, &ident);
-    if(ok != 0) {
-        NSLog(@"ident not found. somebody tampered with keychain");
-        return nil;
+    ident = [self importIdent: [TXAccount userCert: user ext: @"p12"]];
+    if(!ident) {
+        NSLog(@"cant load p12 ident for %@", user);
     }
 
     _ssl_ident = ident;
     return ident;
 }
 
-- (void) importCert: (NSString*)thePath;
+- (SecIdentityRef) importIdent: (NSString*)thePath;
 {
 
     NSData *PKCS12Data = [[NSData alloc] initWithContentsOfFile:thePath];
+    if(!PKCS12Data) {
+        NSLog(@"p12 file not found %@", thePath);
+        return nil;
+    }
     CFDataRef inPKCS12Data = (__bridge CFDataRef)PKCS12Data;
-    CFDictionaryRef opts = CFDictionaryCreate(NULL, NULL, NULL, 0, NULL, NULL); 
-    CFArrayRef items = NULL;
+    NSMutableDictionary * opts = [NSDictionary
+        dictionaryWithObjectsAndKeys:
+        kUserCertPassword,
+        kSecImportExportPassphrase,
+        nil
+    ];
 
-    int ok = SecPKCS12Import(inPKCS12Data, opts, &items);
+    CFArrayRef items = NULL;
+    NSLog(@"import %@ %@ len %d", opts, thePath, CFDataGetLength(inPKCS12Data));
+
+    int ok = SecPKCS12Import(inPKCS12Data, (__bridge CFDictionaryRef)opts, &items);
     switch(ok){
     case 0:
         NSLog(@"items %@", items);
-        CFRelease(items);
+        break;
     case errSecDuplicateItem:
-	NSLog(@"import ok!");
-	break;
+	NSLog(@"already impoerted");
+        return nil;
     default:
         NSLog(@"import fail %d", ok);
+        return nil;
     }
+
+    CFDictionaryRef identityDict = CFArrayGetValueAtIndex(items, 0);
+    SecIdentityRef identityApp = (SecIdentityRef)CFDictionaryGetValue(identityDict, kSecImportItemIdentity);
+    NSLog(@"identity %@", identityApp);
+    return identityApp;
+
+out:
+    CFRelease(items);
 }
 
 - (SecCertificateRef) findCert
