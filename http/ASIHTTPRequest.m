@@ -13,8 +13,6 @@
 #import "ASIHTTPRequest.h"
 
 #if TARGET_OS_IPHONE
-#import "Reachability.h"
-#import "ASIAuthenticationDialog.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #else
 #import <SystemConfiguration/SystemConfiguration.h>
@@ -182,13 +180,6 @@ static NSOperationQueue *sharedQueue = nil;
 
 // Called to update the size of a partial download when starting a request, or retrying after a timeout
 - (void)updatePartialDownloadSize;
-
-#if TARGET_OS_IPHONE
-+ (void)registerForNetworkReachabilityNotifications;
-+ (void)unsubscribeFromNetworkReachabilityNotifications;
-// Called when the status of the network changes
-+ (void)reachabilityChanged:(NSNotification *)note;
-#endif
 
 #if NS_BLOCKS_AVAILABLE
 - (void)performBlockOnMainThread:(ASIBasicBlock)block;
@@ -2636,16 +2627,7 @@ static NSOperationQueue *sharedQueue = nil;
 		return NO;
 	}
 
-	// Mac authentication dialog coming soon!
-	#if TARGET_OS_IPHONE
-	if ([self shouldPresentProxyAuthenticationDialog]) {
-		[ASIAuthenticationDialog performSelectorOnMainThread:@selector(presentAuthenticationDialogForRequest:) withObject:self waitUntilDone:[NSThread isMainThread]];
-		return YES;
-	}
 	return NO;
-	#else
-	return NO;
-	#endif
 }
 
 
@@ -2911,16 +2893,7 @@ static NSOperationQueue *sharedQueue = nil;
 	if ([self isSynchronous]) {
 		return NO;
 	}
-	// Mac authentication dialog coming soon!
-	#if TARGET_OS_IPHONE
-	if ([self shouldPresentAuthenticationDialog]) {
-		[ASIAuthenticationDialog performSelectorOnMainThread:@selector(presentAuthenticationDialogForRequest:) withObject:self waitUntilDone:[NSThread isMainThread]];
-		return YES;
-	}
 	return NO;
-	#else
-	return NO;
-	#endif
 }
 
 - (void)attemptToApplyCredentialsAndResume
@@ -4635,7 +4608,6 @@ static NSOperationQueue *sharedQueue = nil;
 	if (throttle) {
 		[ASIHTTPRequest throttleBandwidthForWWANUsingLimit:ASIWWANBandwidthThrottleAmount];
 	} else {
-		[ASIHTTPRequest unsubscribeFromNetworkReachabilityNotifications];
 		[ASIHTTPRequest setMaxBandwidthPerSecond:0];
 		[bandwidthThrottlingLock lock];
 		isBandwidthThrottled = NO;
@@ -4649,34 +4621,6 @@ static NSOperationQueue *sharedQueue = nil;
 	[bandwidthThrottlingLock lock];
 	shouldThrottleBandwidthForWWANOnly = YES;
 	maxBandwidthPerSecond = limit;
-	[ASIHTTPRequest registerForNetworkReachabilityNotifications];	
-	[bandwidthThrottlingLock unlock];
-	[ASIHTTPRequest reachabilityChanged:nil];
-}
-
-#pragma mark reachability
-
-+ (void)registerForNetworkReachabilityNotifications
-{
-	[[Reachability reachabilityForInternetConnection] startNotifier];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
-}
-
-
-+ (void)unsubscribeFromNetworkReachabilityNotifications
-{
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:kReachabilityChangedNotification object:nil];
-}
-
-+ (BOOL)isNetworkReachableViaWWAN
-{
-	return ([[Reachability reachabilityForInternetConnection] currentReachabilityStatus] == ReachableViaWWAN);	
-}
-
-+ (void)reachabilityChanged:(NSNotification *)note
-{
-	[bandwidthThrottlingLock lock];
-	isBandwidthThrottled = [ASIHTTPRequest isNetworkReachableViaWWAN];
 	[bandwidthThrottlingLock unlock];
 }
 #endif
