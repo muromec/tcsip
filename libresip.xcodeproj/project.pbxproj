@@ -102,6 +102,9 @@
 		8584068A1656934C00BE8EB6 /* rtp_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 858406871656933000BE8EB6 /* rtp_io.c */; };
 		8585A26816527CB000380B9C /* ajitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 8585A26716527CB000380B9C /* ajitter.c */; };
 		8585A26916527CB000380B9C /* ajitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 8585A26716527CB000380B9C /* ajitter.c */; };
+		858AC77C168DEABF00BA64C9 /* TXKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 858AC77A168DEABF00BA64C9 /* TXKey.h */; };
+		858AC77D168DEABF00BA64C9 /* TXKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 858AC77B168DEABF00BA64C9 /* TXKey.m */; };
+		858AC77E168DEABF00BA64C9 /* TXKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 858AC77B168DEABF00BA64C9 /* TXKey.m */; };
 		859D3D461628D6A400385248 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D451628D6A400385248 /* Cocoa.framework */; };
 		859D3D501628D6A400385248 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 859D3D4E1628D6A400385248 /* InfoPlist.strings */; };
 		859D3D5D1628D6BC00385248 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAE71628BD9400CE9AE6 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -284,6 +287,8 @@
 		858406871656933000BE8EB6 /* rtp_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtp_io.c; sourceTree = "<group>"; };
 		8585A26716527CB000380B9C /* ajitter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ajitter.c; sourceTree = "<group>"; };
 		8585A26B16527CBB00380B9C /* ajitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ajitter.h; sourceTree = "<group>"; };
+		858AC77A168DEABF00BA64C9 /* TXKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXKey.h; sourceTree = "<group>"; };
+		858AC77B168DEABF00BA64C9 /* TXKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXKey.m; sourceTree = "<group>"; };
 		859D3D441628D6A400385248 /* libresip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = libresip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		859D3D451628D6A400385248 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		859D3D481628D6A400385248 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -515,6 +520,8 @@
 				850277A61625B53E00AB5038 /* libresip.h */,
 				850277A81625B53E00AB5038 /* libresip.m */,
 				850277A41625B53E00AB5038 /* Supporting Files */,
+				858AC77A168DEABF00BA64C9 /* TXKey.h */,
+				858AC77B168DEABF00BA64C9 /* TXKey.m */,
 			);
 			path = libresip;
 			sourceTree = "<group>";
@@ -803,6 +810,7 @@
 				8517ADF2168B6D3300EEFE37 /* ASIInputStream.h in Headers */,
 				8517ADF5168B6D3300EEFE37 /* ASINetworkQueue.h in Headers */,
 				8517ADF8168B6D3300EEFE37 /* ASIProgressDelegate.h in Headers */,
+				858AC77C168DEABF00BA64C9 /* TXKey.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -917,6 +925,7 @@
 				8517ADEE168B6D3300EEFE37 /* ASIHTTPRequest.m in Sources */,
 				8517ADF3168B6D3300EEFE37 /* ASIInputStream.m in Sources */,
 				8517ADF6168B6D3300EEFE37 /* ASINetworkQueue.m in Sources */,
+				858AC77D168DEABF00BA64C9 /* TXKey.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -953,6 +962,7 @@
 				8517ADEF168B6D3300EEFE37 /* ASIHTTPRequest.m in Sources */,
 				8517ADF4168B6D3300EEFE37 /* ASIInputStream.m in Sources */,
 				8517ADF7168B6D3300EEFE37 /* ASINetworkQueue.m in Sources */,
+				858AC77E168DEABF00BA64C9 /* TXKey.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1032,7 +1042,7 @@
 					/Users/muromec/sources/CHDataStructures/source,
 					deps/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
@@ -1091,7 +1101,7 @@
 					/Users/muromec/sources/CHDataStructures/source,
 					deps/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
