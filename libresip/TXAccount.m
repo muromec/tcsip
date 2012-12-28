@@ -82,6 +82,27 @@ static NSString *kUserCertPassword = @"Gahghad6tah4Oophahg2tohSAeCithe1Shae8ahke
     [defaults synchronize];
 }
 
+- (void) saveCert:(NSString*)pem_pub
+{
+    NSData *priv = [self findKey: NO];
+    NSString *pem = [NSString stringWithFormat:
+        @"%@\n%s", pem_pub, priv.bytes];
+
+    NSFileManager *fm = [[NSFileManager alloc] init];
+    [fm
+        createDirectoryAtPath: [TXAccount certDir]
+        withIntermediateDirectories: YES
+        attributes: nil
+        error: nil
+    ];
+    [fm
+        createFileAtPath: [TXAccount userCert: user]
+        contents: [pem dataUsingEncoding:NSASCIIStringEncoding]
+        attributes: nil
+    ];
+
+}
+
 - (void)keyClean
 {
     user = @"neko";
@@ -120,7 +141,7 @@ static NSString *kUserCertPassword = @"Gahghad6tah4Oophahg2tohSAeCithe1Shae8ahke
     NSLog(@"generate keys %d", sanityCheck);
 }
 
-- (NSData*) findKey:(NSString*)name
+- (NSData*) findKey:(bool)pub
 {
     SecKeyRef peerKeyRef;
 
@@ -129,7 +150,7 @@ static NSString *kUserCertPassword = @"Gahghad6tah4Oophahg2tohSAeCithe1Shae8ahke
 
     publicKeyAttr = [NSMutableDictionary dictionaryWithObjectsAndKeys:
         kSecClassKey, kSecClass,
-        kSecAttrKeyClassPublic, kSecAttrKeyClass,
+        pub ? kSecAttrKeyClassPublic : kSecAttrKeyClassPrivate, kSecAttrKeyClass,
         publicTag, kSecAttrApplicationTag,
         kSecAttrKeyTypeRSA, kSecAttrKeyType,
         [NSNumber numberWithInt:2048], kSecAttrKeySizeInBits,
@@ -165,13 +186,11 @@ out:
     NSLog(@"try auth");
     user = pUser;
 
-    NSData *pubkey = [self findKey:user];
+    NSData *pubkey = [self findKey:YES];
     if(!pubkey) {
         [self keygen];
-        pubkey = [self findKey:user];
+        pubkey = [self findKey:YES];
     }
-
-    NSLog(@"rsa\n %s\n", pubkey.bytes);
 
     auth_cb = CB;
     id api = [[TXRestApi alloc] init];
@@ -193,20 +212,9 @@ out:
         auth_cb = nil;
         return;
     }
-    NSString *pem = [payload objectForKey:@"pem"];
+    NSString *pem_pub = [payload objectForKey:@"pem"];
     [self saveUser];
-    NSFileManager *fm = [[NSFileManager alloc] init];
-    [fm
-        createDirectoryAtPath: [TXAccount certDir]
-        withIntermediateDirectories: YES
-        attributes: nil
-        error: nil
-    ];
-    [fm
-        createFileAtPath: [TXAccount userCert: user]
-        contents: [pem dataUsingEncoding:NSASCIIStringEncoding]
-        attributes: nil
-    ];
+    [self saveCert: pem_pub];
 
     [auth_cb response: @"ok"];
 
