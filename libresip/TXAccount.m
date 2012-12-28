@@ -8,6 +8,7 @@
 
 #import "TXAccount.h"
 #import "TXRestApi.h"
+#import "TXKey.h"
 
 #import <Security/Security.h>
 
@@ -103,82 +104,21 @@ static NSString *kUserCertPassword = @"Gahghad6tah4Oophahg2tohSAeCithe1Shae8ahke
 
 }
 
-- (void)keyClean
-{
-    user = @"neko";
-
-    NSData *publicTag = [[NSString stringWithFormat: @"pub %@", user] dataUsingEncoding:NSASCIIStringEncoding];
-
-    NSMutableDictionary * peerPublicKeyAttr = [[NSMutableDictionary alloc] init];
-
-    [peerPublicKeyAttr setObject:(id)kSecAttrKeyTypeRSA forKey:(id)kSecAttrKeyType];
-    [peerPublicKeyAttr setObject:publicTag forKey:(id)kSecAttrApplicationTag];
-
-}
-
 - (void)keygen
 {
-    int sanityCheck;
-    int keySize = 2048;
-
-    SecKeyRef publicKeyRef;
-    SecKeyRef privateKeyRef;
-
-    NSData *publicTag = [[NSString stringWithFormat: @"pub %@", user] dataUsingEncoding:NSASCIIStringEncoding];
-
-    NSMutableDictionary * publicKeyAttr = [NSDictionary
-        dictionaryWithObjectsAndKeys:
-        kSecAttrKeyTypeRSA, kSecAttrKeyType,
-        [NSNumber numberWithUnsignedInteger:keySize], kSecAttrKeySizeInBits,
-        user, kSecAttrLabel,
-        kCFBooleanTrue, kSecAttrIsPermanent,
-        publicTag, kSecAttrApplicationTag,
-        nil
-    ];
-
-    // Set attributes to top level dictionary.
-    sanityCheck = SecKeyGeneratePair((__bridge CFDictionaryRef)publicKeyAttr, &publicKeyRef, &privateKeyRef);
-    NSLog(@"generate keys %d", sanityCheck);
+    key = [[TXKey alloc] init];
 }
 
 - (NSData*) findKey:(bool)pub
 {
-    SecKeyRef peerKeyRef;
-
-    NSMutableDictionary * publicKeyAttr;
-    NSData *publicTag = [[NSString stringWithFormat: @"pub %@", user] dataUsingEncoding:NSASCIIStringEncoding];
-
-    publicKeyAttr = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-        kSecClassKey, kSecClass,
-        pub ? kSecAttrKeyClassPublic : kSecAttrKeyClassPrivate, kSecAttrKeyClass,
-        publicTag, kSecAttrApplicationTag,
-        kSecAttrKeyTypeRSA, kSecAttrKeyType,
-        [NSNumber numberWithInt:2048], kSecAttrKeySizeInBits,
-        nil
-    ];
-
-    int ok;
-    ok = SecItemCopyMatching((__bridge CFDictionaryRef) publicKeyAttr, &peerKeyRef);
-
-    if(ok==errSecItemNotFound)
-        return nil;
-
-    if(ok!=0) {
-        NSLog(@"failed to retrieve pubkey %d", ok);
-        return nil;
+    if(key) {
+        return pub ? key.pub_key : key.priv_key;
     }
+    if(!pub)
+        return nil;
 
-    CFDataRef data;
-    id ret = nil;
-    ok = SecItemExport(peerKeyRef, kSecFormatPEMSequence, kSecItemPemArmour, nil, &data);
-    if(ok!=0)
-        goto out;
-
-    ret= [NSData dataWithData:(__bridge NSData*)data];
-out:
-    CFRelease(data);
-
-    return ret;
+    NSString *path = [TXAccount userCert:user ext:@"pub"];
+    return [[NSData alloc] initWithContentsOfFile:path];
 }
 
 - (void) auth:(NSString*)pUser password:(NSString*)pPassw cb:(Callback*)CB
