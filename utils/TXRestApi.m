@@ -10,31 +10,39 @@
 #import "JSONKit.h"
 #import "Callback.h"
 #import "ASIHTTPRequest.h"
+#import "ASIFormDataRequest.h"
 
 @implementation TXRestApi
 + (void)r: (NSString*)path cb:(id)cb ident:(SecIdentityRef)ident
 {
     TXRestApi *api = [[TXRestApi alloc] init];
-    [api rload: path cb: cb ident:ident user:nil password:nil];
+    [api rload: path cb: cb ident:ident post:NO];
+    [api start];
 }
 
 + (void)r: (NSString*)path cb:(id)cb
 {
     TXRestApi *api = [[TXRestApi alloc] init];
-    [api rload: path cb: cb ident:nil user:nil password:nil];
+    [api rload: path cb: cb ident:nil post:NO];
+    [api start];
 }
 
 + (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p
 {
     TXRestApi *api = [[TXRestApi alloc] init];
-    [api rload: path cb: cb ident:nil user:u password:p];
+    [api rload: path cb: cb ident:nil post:NO];
+    [api setAuth: u password:p];
+    [api start];
 }
 
-- (void)rload: (NSString*)path cb:(id)pCb ident:(SecIdentityRef)ident user:(NSString*)pUser password:(NSString*)pPassword
+- (void)rload: (NSString*)path cb:(id)pCb ident:(SecIdentityRef)ident post:(bool)post
 {
     NSURL *myURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://texr.enodev.org/api/%@",path]];
     
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:myURL];
+    if(post)
+        request = [ASIFormDataRequest requestWithURL:myURL];
+    else
+        request = [ASIHTTPRequest requestWithURL:myURL];
 
     self->cb = pCb;
 
@@ -44,14 +52,17 @@
     if(ident)
         [request setClientCertificateIdentity:ident];
 
-    if(pUser && pPassword) {
-        [request setUsername:pUser];
-        [request setPassword:pPassword];
-    }
-
     [request setDelegate:self];
-    [request startAsynchronous];
+}
 
+- (void)post:(NSString*)key val:(NSString*)val
+{
+    [request addPostValue:val forKey:key];
+}
+
+- (void)start
+{
+    [request startAsynchronous];
 }
 
 - (void)requestFinished:(ASIHTTPRequest *)request
@@ -74,8 +85,8 @@
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW
 {
-    username = pU;
-    password = pW;
+    [request setUsername:pU];
+    [request setPassword:pW];
 }
 
 

@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class ASIHTTPRequest;
+
 @interface TXRestApi : NSObject <NSURLConnectionDelegate> {
     NSMutableData *responseData;
     int status_code;
@@ -17,11 +19,13 @@
     NSString *username;
     NSString *password;
 
-    NSURLCredential *credential;
-
+    id request;
 }
 
-- (void)rload: (NSString*)path cb:(id)cb;
+- (void)rload: (NSString*)path cb:(id)pCb ident:(SecIdentityRef)ident post:(bool)post;
+- (void)start;
+- (void)post:(NSString*)key val:(NSString*)val;
+
 + (void)r: (NSString*)path cb:(id)cb;
 + (void)r: (NSString*)path cb:(id)cb ident:(SecIdentityRef)ident;
 + (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p;

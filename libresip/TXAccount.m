@@ -174,10 +174,15 @@ out:
     NSLog(@"rsa\n %s\n", pubkey.bytes);
 
     auth_cb = CB;
-    [TXRestApi r: @"cert"
+    id api = [[TXRestApi alloc] init];
+    [api rload: @"cert"
                cb: CB(self, certLoaded:)
-             user: pUser
-         password: pPassw];
+	    ident: nil
+	     post: YES];
+    [api setAuth:pUser password:pPassw];
+    [api post:@"pub_key" val:[NSString stringWithFormat:
+	    @"%s", pubkey.bytes]];
+    [api start];
 }
 
 - (void) certLoaded:(NSDictionary*)payload
@@ -189,19 +194,6 @@ out:
         return;
     }
     NSString *pem = [payload objectForKey:@"pem"];
-    NSString *p12 = [payload objectForKey:@"p12"];
-    NSData *b64 = [p12 dataUsingEncoding:NSASCIIStringEncoding];
-
-    int p12_len = 4096, ok;
-    char raw_p12[4096];
-
-    ok = base64_decode([b64 bytes], (int)[b64 length], raw_p12, &p12_len);
-    if(ok!=0) {
-        NSLog(@"cant b63 decode p12");
-        return;
-    }
-    NSLog(@"decoded %d bytes of p12-base64", p12_len);
-    NSData *raw = [NSData dataWithBytes:raw_p12 length:p12_len];
     [self saveUser];
     NSFileManager *fm = [[NSFileManager alloc] init];
     [fm
@@ -213,12 +205,6 @@ out:
     [fm
         createFileAtPath: [TXAccount userCert: user]
         contents: [pem dataUsingEncoding:NSASCIIStringEncoding]
-        attributes: nil
-    ];
-
-    [fm
-        createFileAtPath: [TXAccount userCert: user ext:@"p12"]
-        contents: raw
         attributes: nil
     ];
 
