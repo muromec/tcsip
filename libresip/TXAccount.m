@@ -107,13 +107,7 @@ static NSString *kUserCertPassword = @"nop";
 - (void) saveIdent:(NSString*)pem_cert
 {
     NSData *p12 = [key pkcs12:[pem_cert dataUsingEncoding:NSASCIIStringEncoding]];
-    NSFileManager *fm = [[NSFileManager alloc] init];
-    [fm
-        createFileAtPath: [TXAccount userCert: user ext:@"p12"]
-        contents: p12
-        attributes: nil
-    ];
-
+    [self importIdent:p12];
 }
 
 - (void)keygen
@@ -194,24 +188,19 @@ static NSString *kUserCertPassword = @"nop";
 {
     if(_ssl_ident) return _ssl_ident;
     SecIdentityRef ident = nil;
+    ident = [self findIdent];
 
-    ident = [self importIdent: [TXAccount userCert: user ext: @"p12"]];
     if(!ident) {
-        NSLog(@"cant load p12 ident for %@", user);
+        NSLog(@"not ident in keychain");
     }
 
     _ssl_ident = ident;
     return ident;
 }
 
-- (SecIdentityRef) importIdent: (NSString*)thePath;
+- (void) importIdent: (NSData*)PKCS12Data
 {
 
-    NSData *PKCS12Data = [[NSData alloc] initWithContentsOfFile:thePath];
-    if(!PKCS12Data) {
-        NSLog(@"p12 file not found %@", thePath);
-        return nil;
-    }
     CFDataRef inPKCS12Data = (__bridge CFDataRef)PKCS12Data;
     NSMutableDictionary * opts = [NSDictionary
         dictionaryWithObjectsAndKeys:
@@ -221,51 +210,32 @@ static NSString *kUserCertPassword = @"nop";
     ];
 
     CFArrayRef items = NULL;
-    NSLog(@"import %@ %@ len %d", opts, thePath, CFDataGetLength(inPKCS12Data));
-
-    int ok = SecPKCS12Import(inPKCS12Data, (__bridge CFDictionaryRef)opts, &items);
-    switch(ok){
-    case 0:
-        NSLog(@"items %@", items);
-        break;
-    case errSecDuplicateItem:
-	NSLog(@"already impoerted");
-        return nil;
-    default:
-        NSLog(@"import fail %d", ok);
-        return nil;
-    }
-
-    CFDictionaryRef identityDict = CFArrayGetValueAtIndex(items, 0);
-    SecIdentityRef identityApp = (SecIdentityRef)CFDictionaryGetValue(identityDict, kSecImportItemIdentity);
-    NSLog(@"identity %@", identityApp);
-    return identityApp;
-
-out:
-    CFRelease(items);
+    NSLog(@"import %@ len %d", opts, CFDataGetLength(inPKCS12Data));
+    if(items)
+        CFRelease(items);
+    
 }
 
-- (SecCertificateRef) findCert
+- (SecIdentityRef) findIdent
 {
     OSStatus status = errSecSuccess;
-    CFTypeRef   certificateRef     = NULL;                      // 1
+    SecIdentityRef ident = NULL;
     NSString *label = [NSString
         stringWithFormat: @"sip:%@@texr.enodev.org",
         user
     ];
 
-    const void *keys[] =   { kSecClass, kSecAttrLabel, kSecReturnRef };
-    const void *values[] = { kSecClassCertificate, (__bridge void*)label, kCFBooleanTrue };
-    CFDictionaryRef dict = CFDictionaryCreate(NULL, keys,
-                                               values, 3,
-                                             NULL, NULL);
-    status = SecItemCopyMatching(dict, &certificateRef);
-    CFRelease(dict);
+    NSMutableDictionary * opts = [NSDictionary
+        dictionaryWithObjectsAndKeys:
+        kSecClassIdentity, kSecClass,
+        kCFBooleanTrue, kSecReturnRef,
+        label, kSecMatchSubjectWholeString,
+        nil
+    ];
+    status = SecItemCopyMatching((__bridge CFDictionaryRef)(opts), &ident);
+    NSLog(@"find: %d %@ %@", status, opts, ident);
 
-    if (status != errSecSuccess)
-	return nil;
-
-    return certificateRef;
+    return ident;
 }
 
 @end
