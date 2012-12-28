@@ -12,7 +12,7 @@
 
 #import <Security/Security.h>
 
-static NSString *kUserCertPassword = @"Gahghad6tah4Oophahg2tohSAeCithe1Shae8ahkeik9eoYo";
+static NSString *kUserCertPassword = @"nop";
 
 @implementation TXAccount
 @synthesize user;
@@ -83,11 +83,11 @@ static NSString *kUserCertPassword = @"Gahghad6tah4Oophahg2tohSAeCithe1Shae8ahke
     [defaults synchronize];
 }
 
-- (void) saveCert:(NSString*)pem_pub
+- (void) saveCert:(NSString*)pem_cert
 {
     NSData *priv = [self findKey: NO];
     NSString *pem = [NSString stringWithFormat:
-        @"%@\n%s", pem_pub, priv.bytes];
+        @"%@\n%s", pem_cert, priv.bytes];
 
     NSFileManager *fm = [[NSFileManager alloc] init];
     [fm
@@ -99,6 +99,18 @@ static NSString *kUserCertPassword = @"Gahghad6tah4Oophahg2tohSAeCithe1Shae8ahke
     [fm
         createFileAtPath: [TXAccount userCert: user]
         contents: [pem dataUsingEncoding:NSASCIIStringEncoding]
+        attributes: nil
+    ];
+
+}
+
+- (void) saveIdent:(NSString*)pem_cert
+{
+    NSData *p12 = [key pkcs12:[pem_cert dataUsingEncoding:NSASCIIStringEncoding]];
+    NSFileManager *fm = [[NSFileManager alloc] init];
+    [fm
+        createFileAtPath: [TXAccount userCert: user ext:@"p12"]
+        contents: p12
         attributes: nil
     ];
 
@@ -146,15 +158,15 @@ static NSString *kUserCertPassword = @"Gahghad6tah4Oophahg2tohSAeCithe1Shae8ahke
 
 - (void) certLoaded:(NSDictionary*)payload
 {
-    NSLog(@"cert loaded: %d", payload);
     if(!payload) {
         [auth_cb response: nil];
         auth_cb = nil;
         return;
     }
-    NSString *pem_pub = [payload objectForKey:@"pem"];
+    NSString *pem_cert = [payload objectForKey:@"pem"];
     [self saveUser];
-    [self saveCert: pem_pub];
+    [self saveCert: pem_cert];
+    [self saveIdent: pem_cert];
 
     [auth_cb response: @"ok"];
 
