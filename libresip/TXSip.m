@@ -15,6 +15,7 @@
 
 #include <re.h>
 #include "txsip_private.h"
+#include "http.h"
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 #define delegate( ) (self->delegate)
@@ -83,6 +84,7 @@ static void exit_handler(void *arg)
     user.name = account.name;
 
     [self create_ua];
+    [self https_ua];
     calls = [[NSMutableArray alloc] init];
     chats = [[NSMutableArray alloc] init];
     
@@ -144,6 +146,21 @@ static void exit_handler(void *arg)
 
 }
 
+- (void)https_ua
+{
+    https = malloc(sizeof(struct httpc));
+    https->dnsc = uac_serv->dns;
+    https->tls = uac_serv->tls;
+
+}
+
+- (oneway void) http:(NSString*)path
+{
+    struct request *request;
+    http_init(https, &request, "https://texr.enodev.org/api/contacts");
+    http_send(request);
+}
+
 - (oneway void) stop
 {
     sreg = nil;
@@ -166,6 +183,7 @@ static void exit_handler(void *arg)
 
     free(uac);
     free(uac_serv);
+    free(https);
 
     /* free librar state */
     libre_close();

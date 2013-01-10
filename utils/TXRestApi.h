@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class ASIHTTPRequest;
-
 @interface TXRestApi : NSObject <NSURLConnectionDelegate> {
     NSMutableData *responseData;
     int status_code;

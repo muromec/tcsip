@@ -107,7 +107,6 @@ static NSString *kUserCertPassword = @"nop";
 - (void) saveIdent:(NSString*)pem_cert
 {
     NSData *p12 = [key pkcs12:[pem_cert dataUsingEncoding:NSASCIIStringEncoding]];
-    [self importIdent:p12];
 }
 
 - (void)keygen
@@ -182,60 +181,6 @@ static NSString *kUserCertPassword = @"nop";
     [defaults synchronize];
 
     return ret;
-}
-
-- (SecIdentityRef) ssl
-{
-    if(_ssl_ident) return _ssl_ident;
-    SecIdentityRef ident = nil;
-    ident = [self findIdent];
-
-    if(!ident) {
-        NSLog(@"not ident in keychain");
-    }
-
-    _ssl_ident = ident;
-    return ident;
-}
-
-- (void) importIdent: (NSData*)PKCS12Data
-{
-
-    CFDataRef inPKCS12Data = (__bridge CFDataRef)PKCS12Data;
-    NSMutableDictionary * opts = [NSDictionary
-        dictionaryWithObjectsAndKeys:
-        kUserCertPassword,
-        kSecImportExportPassphrase,
-        nil
-    ];
-
-    CFArrayRef items = NULL;
-    NSLog(@"import %@ len %d", opts, CFDataGetLength(inPKCS12Data));
-    if(items)
-        CFRelease(items);
-    
-}
-
-- (SecIdentityRef) findIdent
-{
-    OSStatus status = errSecSuccess;
-    SecIdentityRef ident = NULL;
-    NSString *label = [NSString
-        stringWithFormat: @"sip:%@@texr.enodev.org",
-        user
-    ];
-
-    NSMutableDictionary * opts = [NSDictionary
-        dictionaryWithObjectsAndKeys:
-        kSecClassIdentity, kSecClass,
-        kCFBooleanTrue, kSecReturnRef,
-        label, kSecMatchSubjectWholeString,
-        nil
-    ];
-    status = SecItemCopyMatching((__bridge CFDictionaryRef)(opts), &ident);
-    NSLog(@"find: %d %@ %@", status, opts, ident);
-
-    return ident;
 }
 
 @end

@@ -40,6 +40,7 @@ typedef enum {
     // sip core and sip services
     uac_t *uac;
     uac_serv_t *uac_serv;
+    struct httpc *https;
 
     // move invite listener to separate class
     TXAccount *account;
@@ -68,6 +69,7 @@ typedef enum {
 - (oneway void) setRegObserver: (id)obs;
 - (oneway void) apns_token:(NSData*)token;
 - (oneway void) setOnline: (reg_state)state;
+- (oneway void) http:(NSString*)path;
 
 @property id auth;
 @property (readonly) TXSipUser* user;

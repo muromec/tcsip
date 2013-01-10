@@ -9,8 +9,6 @@
 #import "TXRestApi.h"
 #import "JSONKit.h"
 #import "Callback.h"
-#import "ASIHTTPRequest.h"
-#import "ASIFormDataRequest.h"
 
 @implementation TXRestApi
 + (void)r: (NSString*)path cb:(id)cb ident:(SecIdentityRef)ident
@@ -38,55 +36,36 @@
 - (void)rload: (NSString*)path cb:(id)pCb ident:(SecIdentityRef)ident post:(bool)post
 {
     NSURL *myURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://texr.enodev.org/api/%@",path]];
-    
-    if(post)
-        request = [ASIFormDataRequest requestWithURL:myURL];
-    else
-        request = [ASIHTTPRequest requestWithURL:myURL];
-
-    self->cb = pCb;
-
-    // XXX: check root CA after connect
-    [request setValidatesSecureCertificate:NO];
-
-    if(ident)
-        [request setClientCertificateIdentity:ident];
-
-    [request setDelegate:self];
+    // XXX: use rehttp
 }
 
 - (void)post:(NSString*)key val:(NSString*)val
 {
-    [request addPostValue:val forKey:key];
 }
 
 - (void)start
 {
-    [request startAsynchronous];
 }
 
-- (void)requestFinished:(ASIHTTPRequest *)request
+- (void)requestFinished:(id)request
 {
     // Use responseData
 
     JSONDecoder* decoder = [JSONDecoder decoder];
-    NSDictionary *ret = [decoder objectWithData: [request responseData]];
-    //NSString *status = [ret objectForKey:@"status"];
+    NSDictionary *ret = [decoder objectWithData: nil];
     NSArray *payload = [ret objectForKey:@"data"];
 
     [cb response: payload];
 }
-- (void)requestFailed:(ASIHTTPRequest *)request
+- (void)requestFailed:(id)rp
 {
-   NSError *error = [request error];
+   NSError *error = [rp error];
    NSLog(@"req failed %@", error);
    [cb response: nil];
 }
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW
 {
-    [request setUsername:pU];
-    [request setPassword:pW];
 }
 
 
