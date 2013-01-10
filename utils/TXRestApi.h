@@ -17,16 +17,19 @@
     NSString *username;
     NSString *password;
 
-    id request;
+    struct request *request;
 }
 
 - (void)rload: (NSString*)path cb:(id)pCb ident:(SecIdentityRef)ident post:(bool)post;
 - (void)start;
 - (void)post:(NSString*)key val:(NSString*)val;
+- (void)data:(NSData*)data;
+- (void)fail;
 
 + (void)r: (NSString*)path cb:(id)cb;
 + (void)r: (NSString*)path cb:(id)cb ident:(SecIdentityRef)ident;
 + (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p;
++ (void)https: (struct httpc*)_app;
 
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW;

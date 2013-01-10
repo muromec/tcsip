@@ -12,6 +12,7 @@
 #import "TXSipCall.h"
 #import "TXSipMessage.h"
 #import "TXSipAuth.h"
+#import "TXRestApi.h"
 
 #include <re.h>
 #include "txsip_private.h"
@@ -151,14 +152,8 @@ static void exit_handler(void *arg)
     https = malloc(sizeof(struct httpc));
     https->dnsc = uac_serv->dns;
     https->tls = uac_serv->tls;
+    [TXRestApi https: https];
 
-}
-
-- (oneway void) http:(NSString*)path
-{
-    struct request *request;
-    http_init(https, &request, "https://texr.enodev.org/api/contacts");
-    http_send(request);
 }
 
 - (oneway void) stop

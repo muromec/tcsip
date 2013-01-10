@@ -9,6 +9,24 @@
 #import "TXRestApi.h"
 #import "JSONKit.h"
 #import "Callback.h"
+#import "TXSip.h"
+
+#include "http.h"
+
+static struct httpc* app;
+
+static void http_done(struct request *req, int code, void *arg) {
+    TXRestApi *r = (__bridge_transfer TXRestApi*)arg;
+    struct pl *data = http_data(req);
+    NSData *nd = [NSData dataWithBytes:data->p length:data->l];
+    [r data:nd];
+}
+
+static void http_err(int err, void *arg) {
+    TXRestApi *r = (__bridge_transfer TXRestApi*)arg;
+    [r fail];
+}
+
 
 @implementation TXRestApi
 + (void)r: (NSString*)path cb:(id)cb ident:(SecIdentityRef)ident
@@ -35,8 +53,10 @@
 
 - (void)rload: (NSString*)path cb:(id)pCb ident:(SecIdentityRef)ident post:(bool)post
 {
-    NSURL *myURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://texr.enodev.org/api/%@",path]];
-    // XXX: use rehttp
+    NSString *url = [NSString stringWithFormat:@"https://texr.enodev.org/api/%@",path];
+    http_init(app, &request, _byte(url));
+    http_cb(request, (__bridge_retained void*)self, http_done, http_err);
+    http_send(request);
 }
 
 - (void)post:(NSString*)key val:(NSString*)val
@@ -47,25 +67,34 @@
 {
 }
 
-- (void)requestFinished:(id)request
+- (void)data:(NSData*)data
 {
     // Use responseData
 
     JSONDecoder* decoder = [JSONDecoder decoder];
-    NSDictionary *ret = [decoder objectWithData: nil];
+    NSDictionary *ret = [decoder objectWithData: data];
     NSArray *payload = [ret objectForKey:@"data"];
+    NSLog(@"payload %@", payload);
 
     [cb response: payload];
 }
-- (void)requestFailed:(id)rp
+- (void)fail
 {
-   NSError *error = [rp error];
-   NSLog(@"req failed %@", error);
    [cb response: nil];
 }
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW
 {
+}
+
++ (void) https:(struct httpc*)_app
+{
+    app = _app;
+}
+
+- (void) dealloc
+{
+    mem_deref(request);
 }
 
 
