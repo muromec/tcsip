@@ -27,6 +27,7 @@ struct httpc;
 - (void)rload: (NSString*)path cb:(id)pCb;
 - (void)start;
 - (void)post:(NSString*)key val:(NSString*)val;
+- (void)post:(NSString*)val;
 - (void)code:(int) code data:(NSData*)data;
 
 - (void)fail;
@@ -36,7 +37,9 @@ struct httpc;
 + (void)https: (struct httpc*)_app;
 + (void)wrapper: (id)wrapper;
 + (void)retbox: (MailBox*)box;
++ (id)api;
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW;
+- (void) getAuth:(char**)_user password:(char**)_passw;
 
 @end

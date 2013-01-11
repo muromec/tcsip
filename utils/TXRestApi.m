@@ -18,11 +18,35 @@ static struct httpc app;
 static MailBox* root_box;
 static ReWrap* wrapper;
 
-static void http_done(struct request *req, int code, void *arg) {
+static void http_ret(struct request *req, int code, void *arg) {
+
     TXRestApi *r = (__bridge_transfer TXRestApi*)arg;
     struct pl *data = http_data(req);
     NSData *nd = [NSData dataWithBytes:data->p length:data->l];
     [r code: code data:nd];
+}
+
+static void http_done(struct request *req, int code, void *arg) {
+    char *user=NULL, *pass=NULL;
+    int ok = -EINVAL;
+    TXRestApi *r = (__bridge TXRestApi*)arg;
+
+    if(code==401) {
+	[r getAuth: &user password: &pass];
+
+	if(user && pass)
+	    ok = http_auth(req, user, pass);
+
+	if(user)
+	    free(user);
+	if(pass)
+            free(pass);
+
+	if(ok!=0)
+	    http_ret(req, code, arg); 
+	return;
+    }
+    http_ret(req, code, arg);
 }
 
 static void http_err(int err, void *arg) {
@@ -49,6 +73,12 @@ static void http_err(int err, void *arg) {
     [api start];
 }
 
++ (id)api
+{
+    TXRestApi *api = [[TXRestApi alloc] init];
+    return [wrapper wrap:api];
+}
+
 - (void)rload: (NSString*)path cb:(id)pCb
 {
     NSString *url = [NSString stringWithFormat:@"https://texr.enodev.org/api/%@",path];
@@ -59,6 +89,12 @@ static void http_err(int err, void *arg) {
 
 - (void)post:(NSString*)key val:(NSString*)val
 {
+    http_post(request, (char*)_byte(key), (char*)_byte(val));
+}
+
+- (void)post:(NSString*)val
+{
+    http_post(request, NULL, (char*)_byte(val));
 }
 
 - (oneway void)start
@@ -88,7 +124,16 @@ static void http_err(int err, void *arg) {
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW
 {
+    username = pU;
+    password = pW;
 }
+
+- (void) getAuth:(char**)_user password:(char**)_passw
+{
+    *_user = byte(username);
+    *_passw = byte(password);
+}
+
 
 + (void) https:(struct httpc*)_app
 {
