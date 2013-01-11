@@ -104,11 +104,6 @@ static NSString *kUserCertPassword = @"nop";
 
 }
 
-- (void) saveIdent:(NSString*)pem_cert
-{
-    NSData *p12 = [key pkcs12:[pem_cert dataUsingEncoding:NSASCIIStringEncoding]];
-}
-
 - (void)keygen
 {
     key = [[TXKey alloc] init];
@@ -140,9 +135,7 @@ static NSString *kUserCertPassword = @"nop";
     auth_cb = CB;
     id api = [[TXRestApi alloc] init];
     [api rload: @"cert"
-               cb: CB(self, certLoaded:)
-	    ident: nil
-	     post: YES];
+               cb: CB(self, certLoaded:)];
     [api setAuth:pUser password:pPassw];
     [api post:@"pub_key" val:[NSString stringWithFormat:
 	    @"%s", pubkey.bytes]];
@@ -159,7 +152,6 @@ static NSString *kUserCertPassword = @"nop";
     NSString *pem_cert = [payload objectForKey:@"pem"];
     [self saveUser];
     [self saveCert: pem_cert];
-    [self saveIdent: pem_cert];
 
     [auth_cb response: @"ok"];
 

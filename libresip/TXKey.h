@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #include <openssl/pem.h>
-#include <openssl/pkcs12.h>
 
 @interface TXKey : NSObject {
     NSData *pub_key;
@@ -19,7 +18,5 @@
 
 @property (readonly) NSData* pub_key;
 @property (readonly) NSData* priv_key;
-
-- (NSData*) pkcs12:(NSData*)cert;
 
 @end

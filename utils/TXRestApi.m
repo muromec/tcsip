@@ -13,13 +13,26 @@
 
 #include "http.h"
 
-static struct httpc* app;
+
+static struct httpc app;
+static MailBox* root_box;
+
+static void pq_cb(int flags, void *arg)
+{
+    printf("pq cb\n");
+    if(!(flags & FD_READ))
+        return;
+
+    MailBox *mbox  = (__bridge MailBox *)arg;
+    id inv = [mbox qpop];
+    [inv invoke];
+}
 
 static void http_done(struct request *req, int code, void *arg) {
     TXRestApi *r = (__bridge_transfer TXRestApi*)arg;
     struct pl *data = http_data(req);
     NSData *nd = [NSData dataWithBytes:data->p length:data->l];
-    [r data:nd];
+    [r code: code data:nd];
 }
 
 static void http_err(int err, void *arg) {
@@ -29,34 +42,30 @@ static void http_err(int err, void *arg) {
 
 
 @implementation TXRestApi
-+ (void)r: (NSString*)path cb:(id)cb ident:(SecIdentityRef)ident
-{
-    TXRestApi *api = [[TXRestApi alloc] init];
-    [api rload: path cb: cb ident:ident post:NO];
-    [api start];
-}
+@synthesize proxy;
+@synthesize running;
 
 + (void)r: (NSString*)path cb:(id)cb
 {
     TXRestApi *api = [[TXRestApi alloc] init];
-    [api rload: path cb: cb ident:nil post:NO];
+    [api rload: path cb: cb];
     [api start];
 }
 
 + (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p
 {
     TXRestApi *api = [[TXRestApi alloc] init];
-    [api rload: path cb: cb ident:nil post:NO];
+    [api rload: path cb: cb];
     [api setAuth: u password:p];
     [api start];
 }
 
-- (void)rload: (NSString*)path cb:(id)pCb ident:(SecIdentityRef)ident post:(bool)post
+- (void)rload: (NSString*)path cb:(id)pCb
 {
     NSString *url = [NSString stringWithFormat:@"https://texr.enodev.org/api/%@",path];
-    http_init(app, &request, _byte(url));
+    http_init(&app, &request, _byte(url));
     http_cb(request, (__bridge_retained void*)self, http_done, http_err);
-    http_send(request);
+    cb = [MProxy withTargetBox: pCb box:root_box];
 }
 
 - (void)post:(NSString*)key val:(NSString*)val
@@ -65,11 +74,16 @@ static void http_err(int err, void *arg) {
 
 - (void)start
 {
+    http_send(request);
 }
 
-- (void)data:(NSData*)data
+- (void)code:(int) code data:(NSData*)data
 {
     // Use responseData
+    if(code!=200) {
+        [self fail];
+        return;
+    }
 
     JSONDecoder* decoder = [JSONDecoder decoder];
     NSDictionary *ret = [decoder objectWithData: data];
@@ -89,13 +103,63 @@ static void http_err(int err, void *arg) {
 
 + (void) https:(struct httpc*)_app
 {
-    app = _app;
+    memcpy(&app, _app, sizeof(struct httpc));
+}
+
++ (void)retbox: (MailBox*)_box
+{
+    root_box = _box;
 }
 
 - (void) dealloc
 {
-    mem_deref(request);
+    if(request)
+        mem_deref(request);
+    NSLog(@"http dealloc %@", proxy);
 }
 
+- (void) worker
+{
+    int err;
+    struct sa nsv[16];
+    uint32_t nsc = ARRAY_SIZE(nsv);
+
+    NSBundle *b = [NSBundle mainBundle];
+    NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
+
+    err = libre_init(); /// XXX: do this conditionally!!!
+    err = tls_alloc(&app.tls, TLS_METHOD_SSLV23, NULL, NULL);
+    tls_add_ca(app.tls, _byte(ca_cert));
+
+    err = dns_srv_get(NULL, 0, nsv, &nsc);
+
+    err = dnsc_alloc(&app.dnsc, NULL, nsv, nsc);
+
+    NSLog(@"start http worker");
+    proxy = [MProxy withTarget: self];
+    fd_listen(proxy.mbox.readFd, FD_READ, pq_cb, (__bridge void*)proxy.mbox);
+
+    running = YES;
+    NSLog(@"started %d", self.running);
+
+    re_main(NULL);
+
+    app.tls = mem_deref(app.tls);
+    app.dnsc = mem_deref(app.dnsc);
+    libre_close();
+
+    tmr_debug();
+    mem_debug();
+
+    NSLog(@"http loop end");
+
+    running = NO;
+}
+
+- (oneway void) stop
+{
+    NSLog(@"http stop");
+    re_cancel();
+}
 
 @end

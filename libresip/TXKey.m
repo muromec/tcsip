@@ -53,32 +53,6 @@ static bool _ssl_init = NO;
     BIO_reset(mem);
 
 }
-- (NSData*) pkcs12:(NSData*)data_cert
-{
-    PKCS12 *p12;
-    char *pp;
-    long len;
-    X509 *cert;
-
-    BIO_puts(mem, data_cert.bytes);
-    cert = PEM_read_bio_X509(mem, NULL, NULL, NULL);
-    NSLog(@"cert loaded %p", cert);
-    BIO_reset(mem);
-
-    p12 = PKCS12_create(&P12PASSW[0], "sip cert", pk, cert, NULL, 0,0,0,0,0);
-    NSLog(@"p12 created %p", p12);
-    i2d_PKCS12_bio(mem, p12);
-    len = BIO_get_mem_data(mem, &pp);
-
-    NSData *p12_data = [NSData dataWithBytes:pp length:len];
-    BIO_reset(mem);
-
-    PKCS12_free(p12);
-    X509_free(cert);
-
-    return p12_data;
-}
-
 - (void) dealloc
 {
     BIO_free(mem);
