@@ -47,6 +47,8 @@
 		852DA29916A00DE500AF5677 /* ReWrap.m in Sources */ = {isa = PBXBuildFile; fileRef = 852DA29616A00DE500AF5677 /* ReWrap.m */; };
 		852DA29B16A00ED800AF5677 /* ReWrap.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 852DA29516A00DE500AF5677 /* ReWrap.h */; };
 		852DA29E16A01AE400AF5677 /* re_wrap_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 852DA29D16A01AE400AF5677 /* re_wrap_priv.h */; };
+		852DA2A016A05CEE00AF5677 /* auth.c in Sources */ = {isa = PBXBuildFile; fileRef = 852DA29F16A05CEE00AF5677 /* auth.c */; };
+		852DA2A116A05CEE00AF5677 /* auth.c in Sources */ = {isa = PBXBuildFile; fileRef = 852DA29F16A05CEE00AF5677 /* auth.c */; };
 		8536A06B1634D6A2007543B4 /* TXSipCall.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277C71625B59700AB5038 /* TXSipCall.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8536A0751634D6C4007543B4 /* TXSipCall.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277C71625B59700AB5038 /* TXSipCall.h */; };
 		8536A0761634D6D1007543B4 /* TXBaseOp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; };
@@ -195,6 +197,7 @@
 		852DA29516A00DE500AF5677 /* ReWrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReWrap.h; path = rewrap/ReWrap.h; sourceTree = "<group>"; };
 		852DA29616A00DE500AF5677 /* ReWrap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReWrap.m; path = rewrap/ReWrap.m; sourceTree = "<group>"; };
 		852DA29D16A01AE400AF5677 /* re_wrap_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = re_wrap_priv.h; path = rewrap/re_wrap_priv.h; sourceTree = "<group>"; };
+		852DA29F16A05CEE00AF5677 /* auth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = auth.c; path = rehttp/auth.c; sourceTree = "<group>"; };
 		853B201C169F1DE700F423DB /* http.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = http.c; path = rehttp/http.c; sourceTree = "<group>"; };
 		853B201D169F1DE700F423DB /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = http.h; path = rehttp/http.h; sourceTree = "<group>"; };
 		855706FF1629185700407CCC /* libre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libre.a; path = deps/libre.a; sourceTree = "<group>"; };
@@ -404,6 +407,7 @@
 			children = (
 				852DA29C16A01AD400AF5677 /* rewrap */,
 				853B201C169F1DE700F423DB /* http.c */,
+				852DA29F16A05CEE00AF5677 /* auth.c */,
 				853B201D169F1DE700F423DB /* http.h */,
 				8517ADFD168B98D500EEFE37 /* MobileCoreServices.framework */,
 				8517ADFB168B989600EEFE37 /* CFNetwork.framework */,
@@ -871,6 +875,7 @@
 				858AC77D168DEABF00BA64C9 /* TXKey.m in Sources */,
 				853B201E169F1DE700F423DB /* http.c in Sources */,
 				852DA29816A00DE500AF5677 /* ReWrap.m in Sources */,
+				852DA2A016A05CEE00AF5677 /* auth.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -903,6 +908,7 @@
 				858AC77E168DEABF00BA64C9 /* TXKey.m in Sources */,
 				853B201F169F1DE700F423DB /* http.c in Sources */,
 				852DA29916A00DE500AF5677 /* ReWrap.m in Sources */,
+				852DA2A116A05CEE00AF5677 /* auth.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
