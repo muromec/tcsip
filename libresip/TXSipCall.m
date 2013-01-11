@@ -204,7 +204,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
          * and cannot be used to connect from outside
          *
          * */
-        sa_set_port(&msg->dst, sa_port(&uac->laddr));
+        sa_set_port((struct sa*)&msg->dst, sa_port(&uac->laddr));
 
         sipsess_answer(sess, 200, "OK", mb, NULL);
 

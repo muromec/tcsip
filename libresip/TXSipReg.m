@@ -169,7 +169,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 - (void)setApns_token:(NSData*)token
 {
     char enc_token[50];
-    int elen = sizeof(enc_token);
+    size_t elen = sizeof(enc_token);
     memset(enc_token, 0, elen);
 
     base64_encode([token bytes], [token length], enc_token, &elen);
@@ -177,6 +177,11 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     apns_token = [NSString stringWithFormat:@"%s", enc_token];
 
     NSLog(@"set token: %@ token %s", token, enc_token);
+}
+
+- (NSData*)apns_token
+{
+    return nil;
 }
 
 - (void) voipDest:(struct tcp_conn *)conn

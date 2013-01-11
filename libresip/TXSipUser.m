@@ -16,6 +16,7 @@
 @synthesize user;
 @synthesize name;
 @synthesize addr;
+@synthesize host;
 
 + (id) withName: (NSString*)pUser
 {

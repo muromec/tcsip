@@ -8,8 +8,6 @@
 
 #import "TXKey.h"
 
-static char P12PASSW[] = "nop";
-
 static bool _ssl_init = NO;
 
 @implementation TXKey
