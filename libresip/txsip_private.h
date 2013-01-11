@@ -17,11 +17,4 @@ struct uac {
     struct sipsess_sock *sock;
 };
 
-struct uac_serv{
-    struct sa nsv[16];
-    uint32_t nsc;
-    struct dnsc *dns;
-    struct tls *tls;
-};
-
 #endif

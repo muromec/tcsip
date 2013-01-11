@@ -17,8 +17,8 @@
 
 struct uac;
 typedef struct uac uac_t;
-struct uac_serv;
-typedef struct uac_serv uac_serv_t;
+
+struct reapp;
 
 typedef enum {
     REG_OFF,
@@ -39,8 +39,7 @@ typedef enum {
 @interface TXSip : NSObject {
     // sip core and sip services
     uac_t *uac;
-    uac_serv_t *uac_serv;
-    struct httpc *https;
+    struct reapp *app;
 
     // move invite listener to separate class
     TXAccount *account;
@@ -64,12 +63,10 @@ typedef enum {
 - (void) startChat: (NSString*)dest;
 
 - (uac_t*) getUa;
-- (oneway void) worker;
-- (oneway void) stop;
 - (oneway void) setRegObserver: (id)obs;
 - (oneway void) apns_token:(NSData*)token;
 - (oneway void) setOnline: (reg_state)state;
-- (oneway void) http:(NSString*)path;
+- (oneway void) close;
 
 @property id auth;
 @property (readonly) TXSipUser* user;

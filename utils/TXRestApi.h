@@ -22,13 +22,10 @@ struct httpc;
     NSString *password;
 
     struct request *request;
-    MProxy *proxy;
-    bool running;
 }
 
 - (void)rload: (NSString*)path cb:(id)pCb;
 - (void)start;
-- (void)stop;
 - (void)post:(NSString*)key val:(NSString*)val;
 - (void)code:(int) code data:(NSData*)data;
 
@@ -37,11 +34,9 @@ struct httpc;
 + (void)r: (NSString*)path cb:(id)cb;
 + (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p;
 + (void)https: (struct httpc*)_app;
++ (void)wrapper: (id)wrapper;
 + (void)retbox: (MailBox*)box;
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW;
-
-@property (readonly) id proxy;
-@property (readonly) bool running;
 
 @end

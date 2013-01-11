@@ -133,6 +133,7 @@ static NSString *kUserCertPassword = @"nop";
     }
 
     auth_cb = CB;
+    /*
     id api = [[TXRestApi alloc] init];
     [api rload: @"cert"
                cb: CB(self, certLoaded:)];
@@ -140,6 +141,8 @@ static NSString *kUserCertPassword = @"nop";
     [api post:@"pub_key" val:[NSString stringWithFormat:
 	    @"%s", pubkey.bytes]];
     [api start];
+    */
+    [TXRestApi r: @"cert" cb: CB(self, certLoaded:)];
 }
 
 - (void) certLoaded:(NSDictionary*)payload

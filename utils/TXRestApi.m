@@ -10,23 +10,13 @@
 #import "JSONKit.h"
 #import "Callback.h"
 #import "TXSip.h"
+#import "ReWrap.h"
 
 #include "http.h"
 
-
 static struct httpc app;
 static MailBox* root_box;
-
-static void pq_cb(int flags, void *arg)
-{
-    printf("pq cb\n");
-    if(!(flags & FD_READ))
-        return;
-
-    MailBox *mbox  = (__bridge MailBox *)arg;
-    id inv = [mbox qpop];
-    [inv invoke];
-}
+static ReWrap* wrapper;
 
 static void http_done(struct request *req, int code, void *arg) {
     TXRestApi *r = (__bridge_transfer TXRestApi*)arg;
@@ -42,12 +32,10 @@ static void http_err(int err, void *arg) {
 
 
 @implementation TXRestApi
-@synthesize proxy;
-@synthesize running;
-
 + (void)r: (NSString*)path cb:(id)cb
 {
     TXRestApi *api = [[TXRestApi alloc] init];
+    api = [wrapper wrap:api];
     [api rload: path cb: cb];
     [api start];
 }
@@ -55,6 +43,7 @@ static void http_err(int err, void *arg) {
 + (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p
 {
     TXRestApi *api = [[TXRestApi alloc] init];
+    api = [wrapper wrap:api];
     [api rload: path cb: cb];
     [api setAuth: u password:p];
     [api start];
@@ -72,7 +61,7 @@ static void http_err(int err, void *arg) {
 {
 }
 
-- (void)start
+- (oneway void)start
 {
     http_send(request);
 }
@@ -103,6 +92,18 @@ static void http_err(int err, void *arg) {
 
 + (void) https:(struct httpc*)_app
 {
+    if(app.tls)
+        mem_deref(app.tls);
+    if(app.dnsc)
+        mem_deref(app.dnsc);
+
+    memcpy(&app, _app, sizeof(struct httpc));
+}
+
++ (void)wrapper: (id)_wrapper
+{
+    wrapper = _wrapper;
+    void *_app = wrapper.app;
     memcpy(&app, _app, sizeof(struct httpc));
 }
 
@@ -115,51 +116,6 @@ static void http_err(int err, void *arg) {
 {
     if(request)
         mem_deref(request);
-    NSLog(@"http dealloc %@", proxy);
-}
-
-- (void) worker
-{
-    int err;
-    struct sa nsv[16];
-    uint32_t nsc = ARRAY_SIZE(nsv);
-
-    NSBundle *b = [NSBundle mainBundle];
-    NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
-
-    err = libre_init(); /// XXX: do this conditionally!!!
-    err = tls_alloc(&app.tls, TLS_METHOD_SSLV23, NULL, NULL);
-    tls_add_ca(app.tls, _byte(ca_cert));
-
-    err = dns_srv_get(NULL, 0, nsv, &nsc);
-
-    err = dnsc_alloc(&app.dnsc, NULL, nsv, nsc);
-
-    NSLog(@"start http worker");
-    proxy = [MProxy withTarget: self];
-    fd_listen(proxy.mbox.readFd, FD_READ, pq_cb, (__bridge void*)proxy.mbox);
-
-    running = YES;
-    NSLog(@"started %d", self.running);
-
-    re_main(NULL);
-
-    app.tls = mem_deref(app.tls);
-    app.dnsc = mem_deref(app.dnsc);
-    libre_close();
-
-    tmr_debug();
-    mem_debug();
-
-    NSLog(@"http loop end");
-
-    running = NO;
-}
-
-- (oneway void) stop
-{
-    NSLog(@"http stop");
-    re_cancel();
 }
 
 @end

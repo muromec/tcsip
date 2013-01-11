@@ -13,10 +13,11 @@
 #import "TXSipMessage.h"
 #import "TXSipAuth.h"
 #import "TXRestApi.h"
+#import "ReWrap.h"
 
 #include <re.h>
 #include "txsip_private.h"
-#include "http.h"
+#include "re_wrap_priv.h"
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 #define delegate( ) (self->delegate)
@@ -100,66 +101,50 @@ static void exit_handler(void *arg)
 }
 
 - (void) create_ua {
-	
-	int err; /* errno return values */
-    err = libre_init(); /// XXX: do this conditionally!!!
+
+    int err; /* errno return values */
     err = media_snd_init();
     err = srtp_init();
 
     uac = malloc(sizeof(uac_t));
-    uac_serv = malloc(sizeof(uac_serv_t));
 
-	/* fetch local IP address */
-	err = net_default_source_addr_get(AF_INET, &uac->laddr);
+    /* fetch local IP address */
+    err = net_default_source_addr_get(AF_INET, &uac->laddr);
 
-	uac_serv->nsc = ARRAY_SIZE(uac_serv->nsv);
-	/* fetch list of DNS server IP addresses */
-	err = dns_srv_get(NULL, 0, uac_serv->nsv, &uac_serv->nsc);
-	
-	/* create DNS client */
-	err = dnsc_alloc(&uac_serv->dns, NULL, uac_serv->nsv, uac_serv->nsc);
+    app = [ReWrap app];
 
-	/* create SIP stack instance */
-	err = sip_alloc(&uac->sip, uac_serv->dns, 32, 32, 32,
+    /* create SIP stack instance */
+    err = sip_alloc(&uac->sip, app->dnsc, 32, 32, 32,
                 USER_AGENT, exit_handler, NULL);
 
-        NSBundle *b = [NSBundle mainBundle];
-        NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
-	NSString *cert = [account cert];
-        err = tls_alloc(&uac_serv->tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
-        tls_add_ca(uac_serv->tls, _byte(ca_cert));
-        /*
-         * Workarround.
-         *
-         * When using sa_set_port(0) we cant get port
-         * number we bind for listening.
-         * This indead is faulty cz random port cant
-         * bue guarranted to be free to bind
-         * */
-        int port = rand_u32() | 1024;
-	sa_set_port(&uac->laddr, port);
+    NSBundle *b = [NSBundle mainBundle];
+    NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
+    NSString *cert = [account cert];
+    err = tls_alloc(&app->tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
+    tls_add_ca(app->tls, _byte(ca_cert));
+	
+    /*
+     * Workarround.
+     *
+     * When using sa_set_port(0) we cant get port
+     * number we bind for listening.
+     * This indead is faulty cz random port cant
+     * bue guarranted to be free to bind
+     * */
 
-	/* add supported SIP transports */
-	err |= sip_transp_add(uac->sip, SIP_TRANSP_TLS, &uac->laddr, uac_serv->tls);
-
-	/* create SIP session socket */
-	err = sipsess_listen(&uac->sock, uac->sip, 32, connect_handler, (__bridge void*)self);
-
+    int port = rand_u32() | 1024;
+    sa_set_port(&uac->laddr, port);
+	
+    /* add supported SIP transports */
+    err |= sip_transp_add(uac->sip, SIP_TRANSP_TLS, &uac->laddr, app->tls);
+	
+    /* create SIP session socket */
+    err = sipsess_listen(&uac->sock, uac->sip, 32, connect_handler, (__bridge void*)self);
 }
 
 - (void)https_ua
 {
-    https = malloc(sizeof(struct httpc));
-    https->dnsc = uac_serv->dns;
-    https->tls = uac_serv->tls;
-    [TXRestApi https: https];
-
-}
-
-- (oneway void) stop
-{
-    sreg = nil;
-    re_cancel();
+    [TXRestApi https: (struct httpc*)app];
 }
 
 - (void) close
@@ -173,15 +158,8 @@ static void exit_handler(void *arg)
     sip_close(uac->sip, 1);
     mem_deref(uac->sip);
     mem_deref(uac->sock);
-    mem_deref(uac_serv->dns);
-    mem_deref(uac_serv->tls);
 
     free(uac);
-    free(uac_serv);
-    free(https);
-
-    /* free librar state */
-    libre_close();
 
     tmr_debug();
     mem_debug();
@@ -202,16 +180,6 @@ static void exit_handler(void *arg)
 - (oneway void) setOnline: (reg_state)state
 {
     [sreg setState: state];
-}
-
-- (oneway void) worker
-{
-    NSLog(@"start worker %d", proxy.mbox.readFd);
-    fd_listen(proxy.mbox.readFd, FD_READ, pq_cb, (__bridge void*)proxy.mbox);
-    re_main(NULL);
-
-    NSLog(@"loop end");
-    [self close];
 }
 
 - (oneway void) startCall: (NSString*)dest {
