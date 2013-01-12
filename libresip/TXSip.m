@@ -21,7 +21,7 @@
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 #define delegate( ) (self->delegate)
-#define here(obj) ([MProxy withTargetBox: obj box:proxy.mbox])
+#define here(x) ([wrapper wrap:x])
 
 #if TARGET_OS_IPHONE
 #define USER_AGENT "TexR/iOS libre"
@@ -71,7 +71,7 @@ static void exit_handler(void *arg)
 @implementation TXSip
 @synthesize auth;
 @synthesize user;
-@synthesize proxy;
+@synthesize wrapper;
 @synthesize delegate;
 
 - (id) initWithAccount: (id) pAccount
@@ -94,8 +94,6 @@ static void exit_handler(void *arg)
     sreg = [[TXSipReg alloc] initWithApp:self];
     [sreg setInstanceId: account.uuid];
     [sreg setDest: user];
-
-    proxy = [MProxy withTarget: self];
 
     return self;
 }

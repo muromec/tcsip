@@ -34,6 +34,7 @@ typedef enum {
 
 @end
 
+@protocol Wrapper;
 @class TXSipReg;
 
 @interface TXSip : NSObject {
@@ -51,7 +52,7 @@ typedef enum {
     NSMutableArray * calls;
     NSMutableArray * chats;
 
-    MProxy *proxy;
+    id<Wrapper> wrapper;
     id<SipDelegate> delegate;
 }
 - (TXSip*) initWithAccount: (id) account;
@@ -70,7 +71,7 @@ typedef enum {
 
 @property id auth;
 @property (readonly) TXSipUser* user;
-@property (readonly) id proxy;
+@property id<Wrapper> wrapper;
 @property id delegate;
 
 @end

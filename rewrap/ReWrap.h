@@ -11,7 +11,11 @@
 @class MProxy;
 struct reapp;
 
-@interface ReWrap : NSObject {
+@protocol Wrapper <NSObject>
+- (id) wrap: (id)ob;
+@end
+
+@interface ReWrap : NSObject <Wrapper>{
     struct reapp *app;
     MProxy *proxy;
 }
