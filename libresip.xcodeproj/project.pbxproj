@@ -28,9 +28,6 @@
 		8507AAE81628BD9400CE9AE6 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAE71628BD9400CE9AE6 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8507AAE91628BEB100CE9AE6 /* TXAccount.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; };
 		8507AAEA1628BED400CE9AE6 /* Callback.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA931628AEEF00CE9AE6 /* Callback.h */; };
-		8517ADCB168B2FAC00EEFE37 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8517ADCA168B2FAC00EEFE37 /* Security.framework */; };
-		8517ADFA168B986E00EEFE37 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8517ADF9168B986E00EEFE37 /* Security.framework */; };
-		8517ADFC168B989600EEFE37 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8517ADFB168B989600EEFE37 /* CFNetwork.framework */; };
 		8517ADFE168B98D500EEFE37 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8517ADFD168B98D500EEFE37 /* MobileCoreServices.framework */; };
 		8523A5CB1650E3220071C23F /* libsrtp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8523A5CA1650E3220071C23F /* libsrtp.a */; };
 		8523A5CD1650E3520071C23F /* libsrtp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8523A5CA1650E3220071C23F /* libsrtp.a */; };
@@ -363,8 +360,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8517ADFE168B98D500EEFE37 /* MobileCoreServices.framework in Frameworks */,
-				8517ADFC168B989600EEFE37 /* CFNetwork.framework in Frameworks */,
-				8517ADFA168B986E00EEFE37 /* Security.framework in Frameworks */,
 				8561505C1664D3A600DBCFD5 /* libopus.a in Frameworks */,
 				8523A5CB1650E3220071C23F /* libsrtp.a in Frameworks */,
 				85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */,
@@ -382,7 +377,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8517ADCB168B2FAC00EEFE37 /* Security.framework in Frameworks */,
 				8561505B1664D34100DBCFD5 /* libopus.a in Frameworks */,
 				8523A5CD1650E3520071C23F /* libsrtp.a in Frameworks */,
 				85D6414F163C62F4008D3974 /* CoreAudio.framework in Frameworks */,
