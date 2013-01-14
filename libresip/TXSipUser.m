@@ -60,7 +60,11 @@
 {
     self = [super self];
 
+    // XXX: wtf? unify format!
     user = [data objectForKey:@"login"];
+    if(!user)
+	user = [data objectForKey:@"user"];
+
     name = [data objectForKey:@"name"];
     addr = [self netaddr]; // XXX wrong, use full addr
 
