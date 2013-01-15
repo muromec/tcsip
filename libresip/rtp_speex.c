@@ -99,7 +99,7 @@ rtp_send_ctx* rtp_send_speex_init() {
     send_ctx->ts = 0;
 
     send_ctx->magic = 0x1ee1F00D;
-    return send_ctx;
+    return (rtp_send_ctx*)send_ctx;
 }
 
 rtp_recv_ctx * rtp_recv_speex_init()
@@ -116,18 +116,20 @@ rtp_recv_ctx * rtp_recv_speex_init()
     ctx->fmt = FMT_SPEEX;
 
     ctx->magic = 0x1ab1D00F;
-    return ctx;
+    return (rtp_recv_ctx*)ctx;
 }
 
-void rtp_send_speex_stop(rtp_send_speex_ctx *ctx)
+void rtp_send_speex_stop(rtp_send_ctx *_ctx)
 {
+    rtp_send_speex_ctx *ctx = (rtp_send_speex_ctx*)_ctx;
     speex_bits_reset(&ctx->enc_bits);
     speex_bits_destroy(&ctx->enc_bits);
     speex_encoder_destroy(ctx->enc_state);
 }
 
-void rtp_recv_speex_stop(rtp_recv_speex_ctx *ctx)
+void rtp_recv_speex_stop(rtp_recv_ctx *_ctx)
 {
+    rtp_recv_speex_ctx *ctx = (rtp_recv_speex_ctx*)ctx;
     speex_bits_reset(&ctx->dec_bits);
     speex_bits_destroy(&ctx->dec_bits);
 

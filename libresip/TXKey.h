@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #include <openssl/pem.h>
+#include <openssl/err.h>
 
 @interface TXKey : NSObject {
     NSData *pub_key;

@@ -61,14 +61,11 @@ int rtp_un(srtp_t srtp, struct mbuf *mb);
 
 // implementations
 struct _rtp_send_speex_ctx;
-struct _rtp_recv_speex_ctx;
-typedef struct _rtp_send_speex_ctx rtp_send_speex_ctx;
-typedef struct _rtp_recv_speex_ctx rtp_recv_speex_ctx;
 
 void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
 void rtp_send_io(void *varg);
-void rtp_send_speex_stop(rtp_send_speex_ctx *ctx);
-void rtp_recv_speex_stop(rtp_recv_speex_ctx *ctx);
+void rtp_send_speex_stop(rtp_send_ctx *ctx);
+void rtp_recv_speex_stop(rtp_recv_ctx *ctx);
 rtp_send_ctx* rtp_send_speex_init();
 rtp_recv_ctx * rtp_recv_speex_init();
 

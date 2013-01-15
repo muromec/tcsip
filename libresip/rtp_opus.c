@@ -38,8 +38,8 @@ void rtp_recv_opus(const struct sa *src, const struct rtp_header *hdr, struct mb
 
     ajitter_packet * ajp;
     ajp = ajitter_put_ptr(arg->play_jitter);
-    char *inb = mbuf_buf(mb);
-    len = opus_decode(arg->dec, inb, len, ajp->data, 160, 0);
+    unsigned char *inb = mbuf_buf(mb);
+    len = opus_decode(arg->dec, inb, len, (short*)ajp->data, 160, 0);
     ajp->left = len * 2;
     ajp->off = 0;
 
@@ -55,20 +55,21 @@ void rtp_send_opus(void *varg)
         return;
 
     struct mbuf *mb = arg->mb;
-    char *obuf, *ibuf;
+    unsigned char *obuf;
+    short *ibuf;
 restart:
-    ibuf = ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
+    ibuf = (short*)ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
 
     if(!ibuf)
         goto timer;
 
     mb->pos = RTP_HEADER_SIZE;
-    obuf = (char*)mbuf_buf(mb);
+    obuf = mbuf_buf(mb);
 
     len = arg->frame_size / 2;
     mb->pos = 0;
 
-    len = opus_encode(arg->enc, ibuf, len, obuf, mb->size - RTP_HEADER_SIZE);
+    len = opus_encode(arg->enc, ibuf, len, obuf, (int)mb->size - RTP_HEADER_SIZE);
     mb->end = len + RTP_HEADER_SIZE;
 
     err = rtp_encode(arg->rtp, 0, arg->pt, arg->ts, mb);
@@ -86,29 +87,29 @@ timer:
 
 rtp_send_ctx* rtp_send_opus_init() {
 
+    int err;
     rtp_send_opus_ctx *send_ctx = malloc(sizeof(rtp_send_opus_ctx));
     tmr_init(&send_ctx->tmr);
     send_ctx->mb = mbuf_alloc(400 + RTP_HEADER_SIZE);
     send_ctx->fmt = FMT_OPUS;
     send_ctx->frame_size = 320;
-    int err;
     send_ctx->enc = opus_encoder_create(8000, 1, OPUS_APPLICATION_VOIP, &err);
 
     send_ctx->magic = 0x1ee1F00D;
-    return send_ctx;
+    return (rtp_send_ctx*)send_ctx;
 }
 
 rtp_recv_ctx * rtp_recv_opus_init()
 {
+    int err, size;
     rtp_recv_opus_ctx *ctx = malloc(sizeof(rtp_recv_opus_ctx));
     ctx->srtp_in = NULL;
     ctx->play_jitter = NULL;
     ctx->fmt = FMT_OPUS;
-    int err, size;
     size = opus_decoder_get_size(1);
     ctx->dec = malloc(size);
     err = opus_decoder_init(ctx->dec, 8000, 1);
 
     ctx->magic = 0x1ab1D00F;
-    return ctx;
+    return (rtp_recv_ctx*)ctx;
 }

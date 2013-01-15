@@ -18,8 +18,8 @@
 #define bset(val, bn) (val |= (1<<bn))
 #define bdrop(val, bn) (val &= val ^ (1<<bn))
 #else
-#define bset(val, bn) OSAtomicXor32Barrier(1<<bn, &val)
-#define bdrop(val, bn) OSAtomicXor32Barrier(1<<bn, &val)
+#define bset(val, bn) OSAtomicXor32Barrier(1<<bn, (unsigned int*)&val)
+#define bdrop(val, bn) OSAtomicXor32Barrier(1<<bn, (unsigned int*)&val)
 #endif
 
 ajitter * ajitter_init(int chunk_size)

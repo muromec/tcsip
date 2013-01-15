@@ -35,7 +35,7 @@ rtp_recv_ctx * rtp_recv_pcmu_init()
     ctx->frame_size = 320;
     ctx->magic = 0x1ab1D00F;
     ctx->fmt = FMT_PCMU;
-    return ctx;
+    return (rtp_recv_ctx*)ctx;
 }
 
 void rtp_send_pcmu(void *varg)
@@ -49,7 +49,7 @@ void rtp_send_pcmu(void *varg)
     short *ibuf;
     char *obuf;
 restart:
-    ibuf = ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
+    ibuf = (short*)ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
 
     if(!ibuf)
         goto timer;
@@ -97,8 +97,8 @@ void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mb
     int i;
     ajitter_packet * ajp;
     ajp = ajitter_put_ptr(arg->play_jitter);
-    short *obuf = ajp->data;
-    char *ibuf = mbuf_buf(mb);
+    short *obuf = (short*)ajp->data;
+    unsigned char *ibuf = mbuf_buf(mb);
     for(i=0; i< len; i++) {
 	*obuf = MuLaw_Decode(*ibuf);
 	obuf++;
@@ -121,5 +121,5 @@ rtp_send_ctx* rtp_send_pcmu_init() {
     send_ctx->ts = 0;
 
     send_ctx->magic = 0x1ee1F00D;
-    return send_ctx;
+    return (rtp_send_ctx*)send_ctx;
 }
