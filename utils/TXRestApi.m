@@ -136,9 +136,9 @@ static void http_err(int err, void *arg) {
 
 + (void) https:(struct httpc*)_app
 {
-    if(app.tls)
+    if(app.tls && (app.tls!=_app->tls))
         mem_deref(app.tls);
-    if(app.dnsc)
+    if(app.dnsc && (app.dnsc!=_app->dnsc))
         mem_deref(app.dnsc);
 
     memcpy(&app, _app, sizeof(struct httpc));
