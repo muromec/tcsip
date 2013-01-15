@@ -18,6 +18,8 @@
 #include <re.h>
 #include "txsip_private.h"
 #include "re_wrap_priv.h"
+#include "sound.h"
+#include <srtp.h>
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 #define delegate( ) (self->delegate)

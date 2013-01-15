@@ -24,13 +24,13 @@
 
 - (void) setup {
 
-    int err, port;
+    int err;
     media = NULL;
 
     rtp_listen(&rtp, IPPROTO_UDP, laddr, 6000, 7000, false,
             rtp_recv_io, NULL, &recv_io_arg);
 
-    laddr = rtp_local(rtp);
+    laddr = (struct sa*)rtp_local(rtp);
 
     /* create SDP session */
     err = sdp_session_alloc(&sdp, laddr);
@@ -68,17 +68,13 @@
 	 NULL, NULL, NULL, false, NULL);
 
     // dump local
-    const struct sdp_format *fmt;
+    const struct sdp_format *lfmt;
 
-    fmt = sdp_media_lformat(sdp_media, 97);
-    if (!fmt) {
+    lfmt = sdp_media_lformat(sdp_media, 97);
+    if (!lfmt) {
         re_printf("no local media format found\n");
         return;
     }
-
-    re_printf("local format: %s/%u/%u (payload type: %u)\n",
-		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
-
 }
 
 - (void) setupSRTP
@@ -245,19 +241,19 @@ out:
 
 - (void) sdpFormats {
 
-    const struct sdp_format *fmt = NULL;
+    const struct sdp_format *rfmt = NULL;
     const struct sdp_media *md;
     const struct list *list;
     struct le *le;
 
     list = sdp_session_medial(sdp, false);
 
-    for(le = list->head; le && !fmt; le = le->next) {
+    for(le = list->head; le && !rfmt; le = le->next) {
         md = le->data;
-        fmt = sdp_media_rformat(md, NULL);
+        rfmt = sdp_media_rformat(md, NULL);
     }
 
-    if (!fmt) {
+    if (!rfmt) {
         re_printf("no common media format found\n");
         return;
     }
@@ -267,7 +263,7 @@ out:
     size_t klen = 64;
 
     if(md == sdp_media_s) {
-        crypt = sdp_media_rattr(md, "crypto");
+        crypt = (char*)sdp_media_rattr(md, "crypto");
         if(!crypt) {
             printf("SAVP without crypto param? wtf\n");
             return;
@@ -276,30 +272,25 @@ out:
                 &crypt_n, &crypt_s, &key_m, &key, &key_param);
 
         if(key.l!=40) {
-            printf("invalid base64 key len %d\n", key.l);
+            printf("invalid base64 key len %ld\n", key.l);
             return;
         }
 
         base64_decode(key.p, key.l, srtp_in_key, &klen);
         if(klen!=30) {
-            printf("invalid key len %d\n", klen);
+            printf("invalid key len %ld\n", klen);
             return;
         }
 
         [self setupSRTP];
     }
 
-    re_printf("SDP peer address: %J\n", sdp_media_raddr(md));
-
-    re_printf("SDP media format: %s/%u/%u (payload type: %u)\n",
-		  fmt->name, fmt->srate, fmt->ch, fmt->pt);
-
     re_printf("SDP crypt %s\n", sdp_media_rattr(md, "crypto"));
 
-    dst = sdp_media_raddr(md);
+    dst = (struct sa*)sdp_media_raddr(md);
 
-    [self set_format: fmt->name];
-    pt = fmt->pt;
+    [self set_format: rfmt->name];
+    pt = rfmt->pt;
 }
 
 - (void) set_format:(char*)fmt_name

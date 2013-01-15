@@ -292,7 +292,7 @@ static OSStatus MyInputBusInputCallbackRS(void                       *inRefCon,
 	ajitter_packet *ajp = ajitter_put_ptr(snd_strm->record_jitter);
 	status = speex_resampler_process_int(snd_strm->resampler, 0,
 		abl->mBuffers[0].mData, &in_size,
-		ajp->data, &out_size);
+		(short*)ajp->data, &out_size);
 		
 	ajp->left = out_size * 2;
 	ajp->off = 0;

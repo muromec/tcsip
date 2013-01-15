@@ -7,6 +7,7 @@
 //
 
 #import "TXSipAuth.h"
+#import "re.h"
 
 /* called when challenged for credentials */
 int auth_handler(char **user, char **pass, const char *realm, void *arg)

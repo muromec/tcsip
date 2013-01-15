@@ -223,7 +223,6 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 
 	if( TEST(cstate, CSTATE_EST) ) {
 	    // bye sent automatically in deref
-            sipsess_bye(sess, false);
 	    DROP(cstate, CSTATE_EST);
             end_reason = CEND_OK;
 	}

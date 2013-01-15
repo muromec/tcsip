@@ -244,9 +244,9 @@
 		8557073716291BA200407CCC /* re.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = re.h; sourceTree = "<group>"; };
 		856150401664B5AC00DBCFD5 /* g711.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = g711.c; sourceTree = "<group>"; };
 		856150411664B5AC00DBCFD5 /* g711.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = g711.h; sourceTree = "<group>"; };
-		856150461664C70A00DBCFD5 /* rtp_opus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_opus.c; path = libresip/rtp_opus.c; sourceTree = "<group>"; };
-		856150471664C70B00DBCFD5 /* rtp_pcmu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_pcmu.c; path = libresip/rtp_pcmu.c; sourceTree = "<group>"; };
-		856150481664C70B00DBCFD5 /* rtp_speex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_speex.c; path = libresip/rtp_speex.c; sourceTree = "<group>"; };
+		856150461664C70A00DBCFD5 /* rtp_opus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_opus.c; path = ../libresip/rtp_opus.c; sourceTree = "<group>"; };
+		856150471664C70B00DBCFD5 /* rtp_pcmu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_pcmu.c; path = ../libresip/rtp_pcmu.c; sourceTree = "<group>"; };
+		856150481664C70B00DBCFD5 /* rtp_speex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_speex.c; path = ../libresip/rtp_speex.c; sourceTree = "<group>"; };
 		856150501664D20200DBCFD5 /* opus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opus.h; sourceTree = "<group>"; };
 		856150511664D20200DBCFD5 /* opus_custom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opus_custom.h; sourceTree = "<group>"; };
 		856150521664D20200DBCFD5 /* opus_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opus_defines.h; sourceTree = "<group>"; };
@@ -254,8 +254,8 @@
 		856150541664D20200DBCFD5 /* opus_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opus_types.h; sourceTree = "<group>"; };
 		8561505A1664D34000DBCFD5 /* libopus.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libopus.a; path = deps/libopus.a; sourceTree = "<group>"; };
 		8580184A1636FEFE00E9D54B /* txsip_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = txsip_private.h; sourceTree = "<group>"; };
-		858406861656933000BE8EB6 /* rtp_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtp_io.h; sourceTree = "<group>"; };
-		858406871656933000BE8EB6 /* rtp_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtp_io.c; sourceTree = "<group>"; };
+		858406861656933000BE8EB6 /* rtp_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rtp_io.h; path = ../libresip/rtp_io.h; sourceTree = "<group>"; };
+		858406871656933000BE8EB6 /* rtp_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rtp_io.c; path = ../libresip/rtp_io.c; sourceTree = "<group>"; };
 		8585A26716527CB000380B9C /* ajitter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ajitter.c; sourceTree = "<group>"; };
 		8585A26B16527CBB00380B9C /* ajitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ajitter.h; sourceTree = "<group>"; };
 		858AC77A168DEABF00BA64C9 /* TXKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXKey.h; sourceTree = "<group>"; };
@@ -419,17 +419,13 @@
 				852716971628F3AA00C4B8DD /* libcrypto.dylib */,
 				852716951628F3A300C4B8DD /* libssl.dylib */,
 				852716931628F39A00C4B8DD /* libresolv.dylib */,
+				8561505A1664D34000DBCFD5 /* libopus.a */,
 				85FF73D5162909E3005C64D5 /* deps */,
 				852DA29C16A01AD400AF5677 /* rewrap */,
 				853B201C169F1DE700F423DB /* http.c */,
 				852DA29F16A05CEE00AF5677 /* auth.c */,
 				853B201D169F1DE700F423DB /* http.h */,
-				8561505A1664D34000DBCFD5 /* libopus.a */,
-				8561504F1664D20200DBCFD5 /* opus */,
-				856150461664C70A00DBCFD5 /* rtp_opus.c */,
-				856150471664C70B00DBCFD5 /* rtp_pcmu.c */,
-				856150481664C70B00DBCFD5 /* rtp_speex.c */,
-				8561503F1664B5AC00DBCFD5 /* g711 */,
+				8557C90416A5E7E20019AD75 /* codecs */,
 				8507AAE51628BD8300CE9AE6 /* JSONKit */,
 				850277DB1625B5A400AB5038 /* util */,
 				850277A31625B53E00AB5038 /* libresip */,
@@ -474,8 +470,6 @@
 				850277BE1625B59700AB5038 /* TXBaseOp.m */,
 				850277BF1625B59700AB5038 /* TXCallMedia.h */,
 				850277C01625B59700AB5038 /* TXCallMedia.m */,
-				858406861656933000BE8EB6 /* rtp_io.h */,
-				858406871656933000BE8EB6 /* rtp_io.c */,
 				850277C31625B59700AB5038 /* TXSip.h */,
 				850277C41625B59700AB5038 /* TXSip.m */,
 				850277C51625B59700AB5038 /* TXSipAuth.h */,
@@ -539,13 +533,28 @@
 			name = rewrap;
 			sourceTree = "<group>";
 		};
+		8557C90416A5E7E20019AD75 /* codecs */ = {
+			isa = PBXGroup;
+			children = (
+				856150461664C70A00DBCFD5 /* rtp_opus.c */,
+				856150471664C70B00DBCFD5 /* rtp_pcmu.c */,
+				856150481664C70B00DBCFD5 /* rtp_speex.c */,
+				858406861656933000BE8EB6 /* rtp_io.h */,
+				858406871656933000BE8EB6 /* rtp_io.c */,
+				8561504F1664D20200DBCFD5 /* opus */,
+				8561503F1664B5AC00DBCFD5 /* g711 */,
+			);
+			name = codecs;
+			path = g711;
+			sourceTree = "<group>";
+		};
 		8561503F1664B5AC00DBCFD5 /* g711 */ = {
 			isa = PBXGroup;
 			children = (
 				856150401664B5AC00DBCFD5 /* g711.c */,
 				856150411664B5AC00DBCFD5 /* g711.h */,
 			);
-			path = g711;
+			name = g711;
 			sourceTree = "<group>";
 		};
 		8561504F1664D20200DBCFD5 /* opus */ = {
@@ -558,7 +567,7 @@
 				856150541664D20200DBCFD5 /* opus_types.h */,
 			);
 			name = opus;
-			path = deps/include/opus;
+			path = ../deps/include/opus;
 			sourceTree = "<group>";
 		};
 		859D3D471628D6A400385248 /* Other Frameworks */ = {

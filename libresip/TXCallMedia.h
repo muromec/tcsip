@@ -29,8 +29,8 @@
 
     srtp_t srtp_in;
     srtp_t srtp_out;
-    char srtp_in_key[64];
-    char srtp_out_key[64];
+    unsigned char srtp_in_key[64];
+    unsigned char srtp_out_key[64];
 
     struct sdp_session *sdp;
     struct sdp_media *sdp_media;
@@ -49,8 +49,5 @@
 - (int) answer: (struct mbuf*)offer;
 - (bool) start;
 - (void) stop;
-
-- (void) rtpData: (struct mbuf*)mb header:(const struct rtp_header *)hdr;
-- (int) rtpInput: (char *)data;
 
 @end
