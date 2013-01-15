@@ -122,6 +122,20 @@ static NSString *kUserCertPassword = @"nop";
 
 }
 
+- (void)drop
+{
+    NSFileManager *fm = [[NSFileManager alloc] init];
+    [fm
+        removeItemAtPath: [TXAccount userCert: user]
+		   error: nil];
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *nkey = [[NSString alloc]
+            initWithFormat:@"name/%@", user];
+
+    [defaults removeObjectForKey:nkey];
+}
+
 - (void)keygen
 {
     key = [[TXKey alloc] init];

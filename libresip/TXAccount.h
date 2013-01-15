@@ -26,6 +26,7 @@
 + (bool) canLogin;
 + (NSString*) deflt;
 - (void) auth:(NSString*)pUser password:(NSString*)pPassw cb:(Callback*)CB;
+- (void) drop;
 
 @property (readonly) NSString* user;
 @property (readonly) NSString* uuid;
