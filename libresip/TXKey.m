@@ -43,12 +43,12 @@ static bool _ssl_init = NO;
     len = BIO_get_mem_data(mem, &pp);
 
     pub_key = [NSData dataWithBytes:pp length:len];
-    BIO_reset(mem);
+    (void)BIO_reset(mem);
 
     PEM_write_bio_PrivateKey(mem, pk, NULL, NULL, 0, NULL, NULL);
     len = BIO_get_mem_data(mem, &pp);
     priv_key = [NSData dataWithBytes:pp length:len];
-    BIO_reset(mem);
+    (void)BIO_reset(mem);
 
 }
 - (void) dealloc
