@@ -991,7 +991,7 @@
 					/Users/muromec/sources/CHDataStructures/source,
 					deps/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
@@ -1050,7 +1050,7 @@
 					/Users/muromec/sources/CHDataStructures/source,
 					deps/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/deps\"",
@@ -1156,6 +1156,10 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
 				SDKROOT = macosx10.7;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Werror",
+				);
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -1223,6 +1227,10 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
 				SDKROOT = macosx10.7;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Werror",
+				);
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
