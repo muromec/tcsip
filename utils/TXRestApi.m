@@ -104,6 +104,7 @@ static void http_err(int err, void *arg) {
 
 - (void)code:(int) code data:(NSData*)data
 {
+    request = NULL;
     // Use responseData
     if(code!=200) {
         [self fail];
