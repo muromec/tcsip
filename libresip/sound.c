@@ -201,6 +201,7 @@ static OSStatus MyOutputBusRenderCallack(void                       *inRefCon,
 }
 
 
+#if IPHONE
 /**
  * Voice Unit Callback.
  * 
@@ -257,6 +258,7 @@ static OSStatus MyInputBusInputCallback(void                       *inRefCon,
 err:
 	return -1;
 }
+#endif
 
 static OSStatus MyInputBusInputCallbackRS(void                       *inRefCon,
                                         AudioUnitRenderActionFlags *ioActionFlags,
@@ -291,8 +293,8 @@ static OSStatus MyInputBusInputCallbackRS(void                       *inRefCon,
 
 	ajitter_packet *ajp = ajitter_put_ptr(snd_strm->record_jitter);
 	status = speex_resampler_process_int(snd_strm->resampler, 0,
-		abl->mBuffers[0].mData, &in_size,
-		(short*)ajp->data, &out_size);
+		abl->mBuffers[0].mData, (spx_uint32_t*)&in_size,
+		(short*)ajp->data, (spx_uint32_t*)&out_size);
 		
 	ajp->left = out_size * 2;
 	ajp->off = 0;
@@ -700,14 +702,12 @@ int media_snd_open(media_dir_t dir,
 	return 0;
 
 err:
-err_out:
 	if(snd_strm->resampler) speex_resampler_destroy(snd_strm->resampler);
 err_out_resampler:
 	free(snd_strm->inputBufferList);
 err_out_inbuf:
 	ajitter_destroy(snd_strm->record_jitter);
 err_out_ring:
-err_out_ring2:
 	free(snd_strm);
 	return -1;
 }
