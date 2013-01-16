@@ -129,7 +129,7 @@ void rtp_send_speex_stop(rtp_send_ctx *_ctx)
 
 void rtp_recv_speex_stop(rtp_recv_ctx *_ctx)
 {
-    rtp_recv_speex_ctx *ctx = (rtp_recv_speex_ctx*)ctx;
+    rtp_recv_speex_ctx *ctx = (rtp_recv_speex_ctx*)_ctx;
     speex_bits_reset(&ctx->dec_bits);
     speex_bits_destroy(&ctx->dec_bits);
 
