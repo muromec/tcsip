@@ -15,7 +15,6 @@ static struct reapp* root_app;
 
 static void pq_cb(int flags, void *arg)
 {
-    printf("pq cb\n");
     if(!(flags & FD_READ))
         return;
 
