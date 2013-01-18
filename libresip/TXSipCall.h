@@ -58,9 +58,15 @@ typedef enum {
 - (oneway void) control:(call_action_t)action;
 
 @property (readonly)NSInteger cid;
+@property (readonly)NSString *ckey;
 @property (readonly)TXSipUser* dest;
 @property (readonly)call_end_t end_reason;
 @property (readonly)call_dir_t cdir;
+
+@property (readonly) NSDate* date_start;
+@property (readonly) NSDate* date_end;
+@property (readonly) NSDate* date_create;
+
 @end
 
 @interface TXSipCall : TXBaseOp<Call> {
@@ -70,10 +76,11 @@ typedef enum {
     call_dir_t cdir;
     const struct sip_msg *msg;
 
-    // XXX: move out speex-specific code
-    	
-    struct sdp_session *sdp;    
     struct sipsess *sess;
+
+    NSDate *date_create;
+    NSDate *date_start;
+    NSDate *date_end;
 }
 
 - (id) initIncoming: (const struct sip_msg *)pMsg app:(id)pApp;
@@ -84,6 +91,7 @@ typedef enum {
 
 - (void) callActivate;
 - (NSInteger) cid;
+- (NSString*) ckey;
 
 @property (readonly) call_state_t cstate;
 @property (readonly) id media;

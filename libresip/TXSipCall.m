@@ -67,6 +67,9 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 @synthesize end_reason;
 @synthesize cdir;
 @synthesize media;
+@synthesize date_start;
+@synthesize date_end;
+@synthesize date_create;
 - (id) initIncoming: (const struct sip_msg *)pMsg app:(id)pApp;
 {
     self = [super initWithApp:pApp];
@@ -112,6 +115,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 
     cstate = CSTATE_STOP;
     cdir = CALL_OUT;
+    date_create = [NSDate date];
 }
 
 - (void) send
@@ -145,6 +149,10 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 {
     NSLog(@"handgup");
     mem_deref(sess);
+
+    if(date_start)
+        date_end = [NSDate date];
+
     if(!end_reason && (cstate & CSTATE_EST)==CSTATE_EST)
         end_reason = CEND_OK;
 
@@ -244,6 +252,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 - (void) callActivate
 {
     NSLog(@"activate call");
+    date_start = [NSDate date];
     /*
      * Everything ok, now activate media subsystem
      * */
@@ -275,6 +284,19 @@ out:
 - (NSInteger) cid
 {
    return (NSInteger)(self);
+}
+
+- (NSString*) ckey
+{
+    NSString *ret = [NSString stringWithFormat:
+	@"%f@%@->%@",
+       [date_create timeIntervalSince1970],
+       cdir ? app.user.addr : dest.addr,
+       cdir ? dest.addr : app.user.addr
+    ];
+    NSLog(@"key: %@", ret);
+
+    return ret;
 }
 
 @end
