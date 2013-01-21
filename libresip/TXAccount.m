@@ -96,7 +96,8 @@ static NSString *kUserCertPassword = @"nop";
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *nkey = [[NSString alloc]
             initWithFormat:@"name/%@", user];
-    [defaults setObject:name forKey:nkey];
+    if(name)
+        [defaults setObject:name forKey:nkey];
     [defaults setObject:user forKey:kSipUser];
     [defaults synchronize];
 }
