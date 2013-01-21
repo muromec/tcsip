@@ -14,6 +14,12 @@
 
 #include "http.h"
 
+#define URL(__x) ((NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL,\
+   (__bridge CFStringRef)__x,\
+    NULL,\
+    CFSTR("!*'();:@&=+$,/?%#[]"),\
+    kCFStringEncodingUTF8)))
+
 static struct httpc app;
 static MailBox* root_box;
 static ReWrap* wrapper;
@@ -89,7 +95,9 @@ static void http_err(int err, void *arg) {
 
 - (void)post:(NSString*)key val:(NSString*)val
 {
-    http_post(request, (char*)_byte(key), (char*)_byte(val));
+    http_post(request,
+                  (char*)_byte(URL(key)),
+                  (char*)_byte(URL(val)));
 }
 
 - (void)post:(NSString*)val
