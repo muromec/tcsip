@@ -193,6 +193,30 @@ static NSString *kUserCertPassword = @"nop";
 
 }
 
+- (void)create:(NSString*)email phone:(NSString*)phone cb:(Callback*)cb
+{
+    auth_cb = cb;
+    id api = [TXRestApi api];
+    [api rload: @"signup" cb: CB(self, createRet:)];
+    [api post:@"email" val:email];
+    [api post:@"phone" val:phone];
+    [api start];
+}
+
+- (void)createRet:(NSDictionary*)ret
+{
+    NSLog(@"create %@", ret);
+    NSString *login = [ret objectForKey:@"login"];
+    NSString *pass = [ret objectForKey:@"password"];
+
+    [auth_cb response:ret];
+    auth_cb = nil;
+
+    if([login length] && [pass length]) {
+        [self auth:login password:pass cb:nil];
+    }
+}
+
 - (NSString*) uuid
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
