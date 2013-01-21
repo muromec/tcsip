@@ -121,9 +121,8 @@ static void http_err(int err, void *arg) {
 
     JSONDecoder* decoder = [JSONDecoder decoder];
     NSDictionary *ret = [decoder objectWithData: data];
-    NSArray *payload = [ret objectForKey:@"data"];
 
-    [cb response: payload];
+    [cb response: ret];
 }
 - (void)fail
 {

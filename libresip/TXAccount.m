@@ -175,8 +175,9 @@ static NSString *kUserCertPassword = @"nop";
     [api start];
 }
 
-- (void) certLoaded:(NSDictionary*)payload
+- (void) certLoaded:(NSDictionary*)ret
 {
+    NSDictionary *payload = [ret objectForKey:@"data"];
     if(!payload) {
         [auth_cb response: nil];
         auth_cb = nil;
