@@ -179,8 +179,9 @@ static NSString *kUserCertPassword = @"nop";
 {
     NSDictionary *payload = [ret objectForKey:@"data"];
     if(!payload) {
-        [auth_cb response: nil];
+        id _cb = auth_cb;
         auth_cb = nil;
+        [_cb response:nil];
         return;
     }
     name = [payload objectForKey:@"name"];
@@ -205,16 +206,9 @@ static NSString *kUserCertPassword = @"nop";
 
 - (void)createRet:(NSDictionary*)ret
 {
-    NSLog(@"create %@", ret);
-    NSString *login = [ret objectForKey:@"login"];
-    NSString *pass = [ret objectForKey:@"password"];
-
-    [auth_cb response:ret];
+    id _cb = auth_cb;
     auth_cb = nil;
-
-    if([login length] && [pass length]) {
-        [self auth:login password:pass cb:nil];
-    }
+    [_cb response:ret];
 }
 
 - (NSString*) uuid
