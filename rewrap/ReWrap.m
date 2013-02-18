@@ -43,7 +43,7 @@ static void pq_cb(int flags, void *arg)
     app->nsc = ARRAY_SIZE(app->nsv);
 
     NSBundle *b = [NSBundle mainBundle];
-    NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
+    NSString *ca_cert = [b pathForResource:@"STARTSSL" ofType: @"cert"];
 
     err = libre_init(); /// XXX: do this conditionally!!!
     err = tls_alloc(&app->tls, TLS_METHOD_SSLV23, NULL, NULL);

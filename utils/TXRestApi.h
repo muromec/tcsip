@@ -34,7 +34,8 @@ struct httpc;
 
 + (void)r: (NSString*)path cb:(id)cb;
 + (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p;
-+ (void)https: (struct httpc*)_app;
++ (void) cert:(NSString*)cert;
+
 + (void)wrapper: (id)wrapper;
 + (void)retbox: (MailBox*)box;
 + (id)api;

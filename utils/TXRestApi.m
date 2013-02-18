@@ -142,14 +142,18 @@ static void http_err(int err, void *arg) {
 }
 
 
-+ (void) https:(struct httpc*)_app
++ (void) cert:(NSString*)cert
 {
-    if(app.tls && (app.tls!=_app->tls))
+    int err;
+    if(app.tls)
         mem_deref(app.tls);
-    if(app.dnsc && (app.dnsc!=_app->dnsc))
-        mem_deref(app.dnsc);
 
-    memcpy(&app, _app, sizeof(struct httpc));
+    err = tls_alloc(&app.tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
+
+    NSBundle *b = [NSBundle mainBundle];
+    NSString *ca_cert;
+    ca_cert = [b pathForResource:@"STARTSSL" ofType: @"cert"];
+    err = tls_add_ca(app.tls, _byte(ca_cert));
 }
 
 + (void)wrapper: (id)_wrapper

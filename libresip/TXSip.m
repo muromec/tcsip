@@ -144,7 +144,7 @@ static void exit_handler(void *arg)
 
 - (void)https_ua
 {
-    [TXRestApi https: (struct httpc*)app];
+    [TXRestApi cert: [account cert]];
 }
 
 - (void) close
