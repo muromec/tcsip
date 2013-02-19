@@ -80,7 +80,7 @@
 
     return [
         NSString
-        stringWithFormat:@"sip:%@@crap.muromec.org.ua",
+        stringWithFormat:@"sip:%@@texr.enodev.org",
 	user
     ];
 }

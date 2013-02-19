@@ -11,7 +11,7 @@
 
 #include "txsip_private.h"
 
-static const char *registrar = "sip:texr.enodev.org";
+static const char *registrar = "sip:r.texr.enodev.org";
 
 void impossible_cb (
    CFSocketRef s,
