@@ -9,6 +9,12 @@ void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
     _arg->handler(src, hdr, mb, _arg->ctx);
 }
 
+void rtcp_recv_io(const struct sa *src, struct rtcp_msg *msg,
+			   void *arg)
+{
+    re_printf("rtcp io addr %J %r\n", src, msg);
+}
+
 void rtp_p(srtp_t srtp, struct mbuf *mb)
 {
     int err, len;

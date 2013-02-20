@@ -35,6 +35,7 @@
     struct sdp_session *sdp;
     struct sdp_media *sdp_media;
     struct sdp_media *sdp_media_s;
+    struct sdp_media *sdp_media_sf;
 
     struct sa *laddr;
     struct sa *dst;

@@ -27,7 +27,7 @@
     int err;
     media = NULL;
 
-    rtp_listen(&rtp, IPPROTO_UDP, laddr, 6000, 7000, false,
+    rtp_listen(&rtp, IPPROTO_UDP, laddr, 6000, 7000, true,
             rtp_recv_io, NULL, &recv_io_arg);
 
     laddr = (struct sa*)rtp_local(rtp);
@@ -36,12 +36,14 @@
     err = sdp_session_alloc(&sdp, laddr);
     err = sdp_media_add(&sdp_media_s, sdp, "audio", sa_port(laddr), "RTP/SAVP");
     err = sdp_media_add(&sdp_media, sdp, "audio", sa_port(laddr), "RTP/AVP");
+    err = sdp_media_add(&sdp_media_sf, sdp, "audio", sa_port(laddr), "RTP/SAVPF");
 
     rand_bytes(srtp_out_key, 30);
     char crypto_line[] = "1 AES_CM_128_HMAC_SHA1_80 inline:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX      ";
     size_t klen = 40;
     base64_encode(srtp_out_key, 30, &crypto_line[33], &klen);
     sdp_media_set_lattr(sdp_media_s, true, "crypto", crypto_line);
+    sdp_media_set_lattr(sdp_media_sf, true, "crypto", crypto_line);
 
     err = sdp_format_add(NULL, sdp_media, true,
 	"97", "speex", 8000, 1,
@@ -55,6 +57,10 @@
 	"101", "opus", 48000, 2,
 	 NULL, NULL, NULL, false, NULL);
 
+    err = sdp_format_add(NULL, sdp_media_sf, false,
+	"101", "opus", 48000, 2,
+	 NULL, NULL, NULL, false, NULL);
+
     err = sdp_format_add(NULL, sdp_media, false,
 	"101", "opus", 48000, 2,
 	 NULL, NULL, NULL, false, NULL);
@@ -64,6 +70,10 @@
 	 NULL, NULL, NULL, false, NULL);
 
     err = sdp_format_add(NULL, sdp_media_s, false,
+	"0", "PCMU", 8000, 1,
+	 NULL, NULL, NULL, false, NULL);
+
+    err = sdp_format_add(NULL, sdp_media_sf, false,
 	"0", "PCMU", 8000, 1,
 	 NULL, NULL, NULL, false, NULL);
 
@@ -262,7 +272,7 @@ out:
     char *crypt;
     size_t klen = 64;
 
-    if(md == sdp_media_s) {
+    if(md == sdp_media_s || md == sdp_media_sf) {
         crypt = (char*)sdp_media_rattr(md, "crypto");
         if(!crypt) {
             printf("SAVP without crypto param? wtf\n");
