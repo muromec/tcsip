@@ -117,6 +117,7 @@ static void exit_handler(void *arg)
     err = sip_alloc(&uac->sip, app->dnsc, 32, 32, 32,
                 USER_AGENT, exit_handler, NULL);
 
+    uac->dnsc = app->dnsc;
     NSBundle *b = [NSBundle mainBundle];
     NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
     NSString *cert = [account cert];

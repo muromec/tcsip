@@ -15,6 +15,7 @@ struct uac {
     struct sip *sip;
     struct sa laddr;
     struct sipsess_sock *sock;
+    struct dnsc *dnsc;
 };
 
 #endif
