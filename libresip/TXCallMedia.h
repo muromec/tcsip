@@ -19,10 +19,18 @@
 // ring buffer limit
 #define O_LIM (320*12)
 
+struct uac;
+
 @interface TXCallMedia : NSObject {
     struct pjmedia_snd_stream *media;
     struct rtp_sock *rtp;
+    struct ice* ice;
+    struct icem* icem;
+    struct stun_dns *stun_dns;
+
     struct tmr rtp_tmr;
+    BOOL flow;
+    BOOL wait_ice;
 
     void *send_io_ctx;
     rtp_recv_arg recv_io_arg;
@@ -39,13 +47,17 @@
 
     struct sa *laddr;
     struct sa *dst;
+    struct uac* uac;
     int pt;
     int fmt;
 }
 
-- (id) initWithLaddr: (struct sa*)pLaddr;
+- (id) initWithUAC: (struct uac*)uac;
 - (int) offer: (struct mbuf*)offer ret:(struct mbuf **)ret;
 - (int) offer: (struct mbuf **)ret;
+- (void) gather: (uint16_t)scode err:(int)err reason:(const char*)reason;
+- (void) conn_check: (bool)update err:(int)err;
+- (void)stun:(const struct sa*)srv;
 
 - (int) answer: (struct mbuf*)offer;
 - (bool) start;

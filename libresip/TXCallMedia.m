@@ -8,14 +8,109 @@
 
 #import "TXCallMedia.h"
 #include "ajitter.h"
+#include "txsip_private.h"
+
+bool sdp_crypto(const char *name, const char *value, void *arg)
+{
+    unsigned char *srtp_in_key = arg;
+
+    struct pl key, crypt_n, crypt_s, key_m, key_param;
+    size_t klen = 64;
+
+    re_regex(value, strlen(value), "[0-9]+ [a-zA-Z0-9_]+ [a-zA-Z]+:[A-Za-z0-9+/]*|*[^]*",
+            &crypt_n, &crypt_s, &key_m, &key, &key_param);
+
+    re_printf("crypt s %r\n", &crypt_s);
+    if(pl_strcmp(&crypt_s, "AES_CM_128_HMAC_SHA1_80"))
+        return false;
+
+    if(key.l!=40) {
+        printf("invalid base64 key len %ld\n", key.l);
+        return false;
+    }
+
+    base64_decode(key.p, key.l, srtp_in_key, &klen);
+    if(klen!=30) {
+        printf("invalid key len %ld\n", klen);
+        return false;
+    }
+    re_printf("use key %r", &key);
+
+    return true;
+
+}
+
+static void rtcp_recv_io(const struct sa *src, struct rtcp_msg *msg,
+			   void *arg)
+{
+    re_printf("rtcp handler %J\n", src);
+}
+
+static bool candidate_handler(struct le *le, void *arg)
+{
+	re_printf("candidate %p %H\n", arg, ice_cand_encode, le->data);
+	return 0 != sdp_media_set_lattr(arg, false, ice_attr_cand, "%H",
+					ice_cand_encode, le->data);
+}
+
+static bool media_attr_handler(const char *name, const char *value, void *arg)
+{
+	struct icem *icem = arg;
+	return 0 != icem_sdp_decode(icem, name, value);
+}
+
+static bool if_handler(const char *ifname, const struct sa *sa, void *arg)
+{
+
+    struct icem *icem = arg;
+    int err;
+    uint16_t lprio;
+
+    /* Skip loopback and link-local addresses */
+    if (sa_is_loopback(sa) || sa_is_linklocal(sa))
+            return false;
+
+    re_printf("interface %s %J\n", ifname, sa);
+
+    lprio = 0;
+    err = icem_cand_add(icem, 1, lprio, ifname, sa);
+    err = icem_cand_add(icem, 2, lprio, ifname, sa);
+
+    return true;
+}
+
+static void dns_handler(int err, const struct sa *srv, void *arg)
+{
+   TXCallMedia *media = (__bridge TXCallMedia*)arg;
+
+   re_printf("dns handler %d %J\n", err, srv);
+   if(err)
+       return;
+
+   [media stun: srv];
+}
+
+static void gather_handler(int err, uint16_t scode, const char *reason,
+			   void *arg)
+{
+   TXCallMedia *media = (__bridge TXCallMedia*)arg;
+   [media gather: scode err:err reason:reason];
+}
+static void conncheck_handler(int err, bool update, void *arg)
+{
+   TXCallMedia *media = (__bridge TXCallMedia*)arg;
+   [media conn_check: update err:err];
+}
 
 @implementation TXCallMedia
-- (id) initWithLaddr: (struct sa*)pLaddr {
+- (id) initWithUAC: (struct uac*)pUac
+{
 
     self = [super init];
     if(!self) return self;
 
-    laddr = pLaddr;
+    uac = pUac;
+    laddr = &uac->laddr;
 
     [self setup];
 
@@ -28,15 +123,24 @@
     media = NULL;
 
     rtp_listen(&rtp, IPPROTO_UDP, laddr, 6000, 7000, true,
-            rtp_recv_io, NULL, &recv_io_arg);
+            rtp_recv_io, rtcp_recv_io, &recv_io_arg);
 
     laddr = (struct sa*)rtp_local(rtp);
 
+    err = ice_alloc(&ice, ICE_MODE_FULL, false); // XXX: answer
+    err |= icem_alloc(&icem, ice, IPPROTO_UDP, 0,
+			gather_handler, conncheck_handler,
+                        (__bridge void*)self);
+
+    icem_comp_add(icem, 1, rtp_sock(rtp));
+    icem_comp_add(icem, 2, rtcp_sock(rtp));
+    wait_ice = YES;
+
     /* create SDP session */
-    err = sdp_session_alloc(&sdp, laddr);
-    err = sdp_media_add(&sdp_media_s, sdp, "audio", sa_port(laddr), "RTP/SAVP");
-    err = sdp_media_add(&sdp_media, sdp, "audio", sa_port(laddr), "RTP/AVP");
-    err = sdp_media_add(&sdp_media_sf, sdp, "audio", sa_port(laddr), "RTP/SAVPF");
+    err |= sdp_session_alloc(&sdp, laddr);
+    err |= sdp_media_add(&sdp_media_s, sdp, "audio", sa_port(laddr), "RTP/SAVP");
+    err |= sdp_media_add(&sdp_media, sdp, "audio", sa_port(laddr), "RTP/AVP");
+    err |= sdp_media_add(&sdp_media_sf, sdp, "audio", sa_port(laddr), "RTP/SAVPF");
 
     rand_bytes(srtp_out_key, 30);
     char crypto_line[] = "1 AES_CM_128_HMAC_SHA1_80 inline:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX      ";
@@ -85,6 +189,62 @@
         re_printf("no local media format found\n");
         return;
     }
+
+    stun_server_discover(&stun_dns, uac->dnsc,
+	stun_usage_binding,  stun_proto_udp,
+	AF_INET, "stun.l.google.com", 19302,
+	dns_handler, (__bridge void*)self);
+
+
+}
+- (void) gather: (uint16_t)scode err:(int)err reason:(const char*)reason
+{
+    re_printf("gather %J\n",
+            icem_cand_default(icem, 1),
+            icem_cand_default(icem, 2)
+    );
+    [self update_media];
+}
+- (void) conn_check: (bool)update err:(int)err
+{
+    re_printf("conncheck complete %d\n", err);
+
+    re_printf("check %J, %J\n",
+            icem_selected_laddr(icem, 1),
+            icem_selected_laddr(icem, 2));
+
+    if(err==0) {
+        [self stream_start];
+    }
+
+}
+
+- (void)update_media
+{
+    sdp_media_del_lattr(sdp_media_sf, ice_attr_cand);
+
+    list_apply(icem_lcandl(icem), true, candidate_handler, sdp_media_sf);
+
+    if (ice_remotecands_avail(icem)) {
+        sdp_media_set_lattr(sdp_media_sf, true,
+		   ice_attr_remote_cand, "%H",
+		   ice_remotecands_encode, icem);
+    }
+
+    sdp_media_set_lattr(sdp_media_sf, true,
+				   ice_attr_ufrag, ice_ufrag(ice));
+    sdp_media_set_lattr(sdp_media_sf, true,
+				   ice_attr_pwd, ice_pwd(ice));
+}
+
+- (void)stun:(const struct sa*)srv
+{
+    int err;
+
+    net_if_apply(if_handler, icem);
+
+    err = icem_gather_srflx(icem, srv);
+    re_printf("media start %d %J\n", err, srv);;
 }
 
 - (void) setupSRTP
@@ -165,13 +325,17 @@
 }
 
 - (bool) start {
-    int ok;
+
+    icem_update(icem);
+    ice_conncheck_start(ice);
+
+    flow = NO;
 
     if(!media)
         [self open];
 
     if(!media)
-        return -1;
+        return YES;
 
     rtp_send_ctx *send_ctx = rtp_send_init(fmt);
     send_ctx->record_jitter = media->record_jitter;
@@ -182,9 +346,6 @@
 
     send_io_ctx = send_ctx;
 
-    ok = media_snd_stream_start(media);
-    rtp_send_start(send_ctx);
-
     // set recv side
     rtp_recv_ctx * recv_ctx = rtp_recv_init(fmt);
     recv_ctx->srtp_in = srtp_in;
@@ -193,7 +354,34 @@
     recv_io_arg.ctx = recv_ctx;
     recv_io_arg.handler = rtp_recv_func(fmt);
 
-    return (bool)ok;
+    if(!wait_ice) {
+        [self stream_start];
+    }
+
+    return NO;
+}
+
+- (void)stream_start
+{
+    int ok;
+    if(flow)
+        return;
+
+    const struct sa *ice_dst1, *ice_dst2;
+
+    ice_dst1 = icem_selected_raddr(icem, 1);
+    ice_dst2 = icem_selected_raddr(icem, 2);
+
+    re_printf("ice dst %J (%J) and %J\n", ice_dst1, dst, ice_dst2);
+
+    sa_cpy(dst, ice_dst1);
+
+    re_printf("ice dst %J (%J) and %J\n", ice_dst1, dst, ice_dst2);
+
+    ok = media_snd_stream_start(media);
+    rtp_send_start(send_io_ctx);
+    rtcp_start(rtp, "texr", ice_dst2); // XXX: name
+    flow = YES;
 }
 
 
@@ -268,36 +456,19 @@ out:
         return;
     }
 
-    struct pl key, crypt_n, crypt_s, key_m, key_param;
-    char *crypt;
-    size_t klen = 64;
-
     if(md == sdp_media_s || md == sdp_media_sf) {
-        crypt = (char*)sdp_media_rattr(md, "crypto");
-        if(!crypt) {
-            printf("SAVP without crypto param? wtf\n");
-            return;
-        }
-        re_regex(crypt, strlen(crypt), "[0-9]+ [a-zA-Z0-9_]+ [a-zA-Z]+:[A-Za-z0-9+/]*|*[^]*",
-                &crypt_n, &crypt_s, &key_m, &key, &key_param);
-
-        if(key.l!=40) {
-            printf("invalid base64 key len %ld\n", key.l);
-            return;
-        }
-
-        base64_decode(key.p, key.l, srtp_in_key, &klen);
-        if(klen!=30) {
-            printf("invalid key len %ld\n", klen);
-            return;
-        }
-
+        (void)sdp_media_rattr_apply(md, "crypto", sdp_crypto, srtp_in_key);
         [self setupSRTP];
     }
 
     re_printf("SDP crypt %s\n", sdp_media_rattr(md, "crypto"));
 
+    sdp_media_rattr_apply(md, NULL, media_attr_handler, icem);
+
     dst = (struct sa*)sdp_media_raddr(md);
+    icem_verify_support(icem, 1, dst);
+    re_printf("dest %J\n", dst);
+    icem_verify_support(icem, 2, dst);
 
     [self set_format: rfmt->name];
     pt = rfmt->pt;

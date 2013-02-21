@@ -111,7 +111,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void) setup
 {
-    media = [[TXCallMedia alloc] initWithLaddr: &uac->laddr];
+    media = [[TXCallMedia alloc] initWithUAC: uac];
 
     cstate = CSTATE_STOP;
     cdir = CALL_OUT;
