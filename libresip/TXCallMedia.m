@@ -10,6 +10,8 @@
 #include "ajitter.h"
 #include "txsip_private.h"
 
+static char numbers[]="ABCDEFGHIJKLMNOPQRSTUVWXYabcdefghijklmnopqrstuvwxy";
+
 bool sdp_crypto(const char *name, const char *value, void *arg)
 {
     unsigned char *srtp_in_key = arg;
@@ -194,7 +196,21 @@ static void conncheck_handler(int err, bool update, void *arg)
 	dns_handler, (__bridge void*)self);
 
 
+    [self gencname];
+
 }
+
+- (void)gencname
+{
+    unsigned char rbytes[11];
+    rand_bytes(rbytes, 11);
+    int i;
+    for(i=0;i<10;i++) {
+        cname[i] = numbers[rbytes[i] & 0x2F];
+    }
+    cname[i] = '\0';
+}
+
 - (void) gather: (uint16_t)scode err:(int)err reason:(const char*)reason
 {
     re_printf("gather %J\n",
@@ -370,7 +386,7 @@ static void conncheck_handler(int err, bool update, void *arg)
 
     re_printf("change dst ice dst %J (%J) and %J\n", ice_dst1, dst, ice_dst2);
 
-    rtcp_start(rtp, "texr", ice_dst2); // XXX: name
+    rtcp_start(rtp, cname, ice_dst2);
 }
 
 

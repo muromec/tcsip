@@ -37,6 +37,7 @@ struct uac;
     srtp_t srtp_out;
     unsigned char srtp_in_key[64];
     unsigned char srtp_out_key[64];
+    char cname[11];
 
     struct sdp_session *sdp;
     struct sdp_media *sdp_media;
