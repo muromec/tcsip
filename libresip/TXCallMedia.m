@@ -14,13 +14,12 @@ bool sdp_crypto(const char *name, const char *value, void *arg)
 {
     unsigned char *srtp_in_key = arg;
 
-    struct pl key, crypt_n, crypt_s, key_m, key_param;
+    struct pl key, crypt_n, crypt_s, key_m;
     size_t klen = 64;
 
-    re_regex(value, strlen(value), "[0-9]+ [a-zA-Z0-9_]+ [a-zA-Z]+:[A-Za-z0-9+/]*|*[^]*",
-            &crypt_n, &crypt_s, &key_m, &key, &key_param);
+    re_regex(value, strlen(value), "[0-9]+ [a-zA-Z0-9_]+ [a-zA-Z]+:[A-Za-z0-9+/]+",
+            &crypt_n, &crypt_s, &key_m, &key);
 
-    re_printf("crypt s %r\n", &crypt_s);
     if(pl_strcmp(&crypt_s, "AES_CM_128_HMAC_SHA1_80"))
         return false;
 
