@@ -10,8 +10,6 @@
 #include "ajitter.h"
 #include "txsip_private.h"
 
-static char numbers[]="ABCDEFGHIJKLMNOPQRSTUVWXYabcdefghijklmnopqrstuvwxy";
-
 bool sdp_crypto(const char *name, const char *value, void *arg)
 {
     unsigned char *srtp_in_key = arg;
@@ -197,18 +195,38 @@ static void conncheck_handler(int err, bool update, void *arg)
 
 
     [self gencname];
+    [self set_ssrc];
 
 }
 
 - (void)gencname
 {
-    unsigned char rbytes[11];
-    rand_bytes(rbytes, 11);
-    int i;
-    for(i=0;i<10;i++) {
-        cname[i] = numbers[rbytes[i] & 0x2F];
-    }
-    cname[i] = '\0';
+    unsigned char rbytes[20];
+    rand_bytes(rbytes, 20);
+    size_t i=9, olen=12;
+    base64_encode(rbytes, i, cname, &olen);
+    cname[olen] = '\0';
+
+    rand_bytes(rbytes, 20); 
+    olen=31;
+    i=20;
+    base64_encode(rbytes, i, msid, &olen); 
+    msid[olen] = '\0';
+    re_printf("cname: %s, msid(%ld) %s\n", cname, olen, msid);
+}
+
+- (void)set_ssrc
+{
+    uint32_t ssrc;
+    sdp_session_set_lattr(sdp, true, "msid-semantic", "WMS %s", msid);
+    
+    ssrc = rtp_sess_ssrc(rtp);
+    sdp_media_set_lattr(sdp_media_sf, true, "ssrc", "%d cname:%s", ssrc, cname);
+
+    sdp_media_set_lattr(sdp_media_sf, false, "ssrc", "%d msid:%s mic0", ssrc, msid);
+    sdp_media_set_lattr(sdp_media_sf, false, "ssrc", "%d mslabel:%s", ssrc, msid);
+    sdp_media_set_lattr(sdp_media_sf, false, "ssrc", "%d label:mic0", ssrc);
+
 }
 
 - (void) gather: (uint16_t)scode err:(int)err reason:(const char*)reason
