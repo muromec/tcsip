@@ -29,8 +29,6 @@ struct uac;
     struct stun_dns *stun_dns;
 
     struct tmr rtp_tmr;
-    BOOL flow;
-    BOOL wait_ice;
 
     void *send_io_ctx;
     rtp_recv_arg recv_io_arg;

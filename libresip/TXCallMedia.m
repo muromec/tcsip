@@ -134,7 +134,6 @@ static void conncheck_handler(int err, bool update, void *arg)
 
     icem_comp_add(icem, 1, rtp_sock(rtp));
     icem_comp_add(icem, 2, rtcp_sock(rtp));
-    wait_ice = YES;
 
     /* create SDP session */
     err |= sdp_session_alloc(&sdp, laddr);
@@ -214,7 +213,7 @@ static void conncheck_handler(int err, bool update, void *arg)
             icem_selected_laddr(icem, 2));
 
     if(err==0) {
-        [self stream_start];
+        [self change_dst];
     }
 
 }
@@ -281,10 +280,11 @@ static void conncheck_handler(int err, bool update, void *arg)
 
 - (void) stop {
 
-    if(rtp) {
-        mem_deref(rtp);
-	rtp = NULL;
-    }
+    if(rtp)
+        rtp = mem_deref(rtp);
+
+    if(ice)
+        ice = mem_deref(ice);
 
     if(send_io_ctx) {
         rtp_send_stop(send_io_ctx);
@@ -326,10 +326,10 @@ static void conncheck_handler(int err, bool update, void *arg)
 
 - (bool) start {
 
+    int ok;
+
     icem_update(icem);
     ice_conncheck_start(ice);
-
-    flow = NO;
 
     if(!media)
         [self open];
@@ -354,34 +354,24 @@ static void conncheck_handler(int err, bool update, void *arg)
     recv_io_arg.ctx = recv_ctx;
     recv_io_arg.handler = rtp_recv_func(fmt);
 
-    if(!wait_ice) {
-        [self stream_start];
-    }
+    ok = media_snd_stream_start(media);
+    rtp_send_start(send_io_ctx);
 
     return NO;
 }
 
-- (void)stream_start
+- (void)change_dst
 {
-    int ok;
-    if(flow)
-        return;
-
     const struct sa *ice_dst1, *ice_dst2;
 
     ice_dst1 = icem_selected_raddr(icem, 1);
     ice_dst2 = icem_selected_raddr(icem, 2);
 
-    re_printf("ice dst %J (%J) and %J\n", ice_dst1, dst, ice_dst2);
-
     sa_cpy(dst, ice_dst1);
 
-    re_printf("ice dst %J (%J) and %J\n", ice_dst1, dst, ice_dst2);
+    re_printf("change dst ice dst %J (%J) and %J\n", ice_dst1, dst, ice_dst2);
 
-    ok = media_snd_stream_start(media);
-    rtp_send_start(send_io_ctx);
     rtcp_start(rtp, "texr", ice_dst2); // XXX: name
-    flow = YES;
 }
 
 
