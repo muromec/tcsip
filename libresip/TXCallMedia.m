@@ -79,7 +79,7 @@ static bool if_handler(const char *ifname, const struct sa *sa, void *arg)
     err = icem_cand_add(icem, 1, lprio, ifname, sa);
     err = icem_cand_add(icem, 2, lprio, ifname, sa);
 
-    return true;
+    return false;
 }
 
 static void dns_handler(int err, const struct sa *srv, void *arg)
