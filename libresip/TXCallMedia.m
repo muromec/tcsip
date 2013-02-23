@@ -162,6 +162,9 @@ static void conncheck_handler(int err, bool update, void *arg)
 	 NULL, NULL, NULL, false, NULL);}
 
 #define FMT(pt, name) FMT_CH(pt, name, 8000, 1)
+    sdp_media_set_laddr_rtcp(sdp_media, rtcp_sock(rtp));
+    sdp_media_set_laddr_rtcp(sdp_media_s, rtcp_sock(rtp));
+    sdp_media_set_laddr_rtcp(sdp_media_sf, rtcp_sock(rtp));
 
     FMT("97", "speex");
     FMT("0", "PCMU");
@@ -483,7 +486,10 @@ out:
     dst = (struct sa*)sdp_media_raddr(md);
     icem_verify_support(icem, 1, dst);
     re_printf("dest %J\n", dst);
-    icem_verify_support(icem, 2, dst);
+
+    sdp_media_raddr_rtcp(md, &rtcp_dst);
+    re_printf("rtcp dest %J\n", &rtcp_dst);
+    icem_verify_support(icem, 2, &rtcp_dst);
 
     [self set_format: rfmt->name];
     pt = rfmt->pt;
