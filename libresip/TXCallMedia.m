@@ -209,11 +209,11 @@ static void conncheck_handler(int err, bool update, void *arg)
     sdp_session_set_lattr(sdp, true, "msid-semantic", "WMS %s", msid);
     
     ssrc = rtp_sess_ssrc(rtp);
-    sdp_media_set_lattr(sdp_media_sf, true, "ssrc", "%d cname:%s", ssrc, cname);
+    sdp_media_set_lattr(sdp_media_sf, true, "ssrc", "%u cname:%s", ssrc, cname);
 
-    sdp_media_set_lattr(sdp_media_sf, false, "ssrc", "%d msid:%s mic0", ssrc, msid);
-    sdp_media_set_lattr(sdp_media_sf, false, "ssrc", "%d mslabel:%s", ssrc, msid);
-    sdp_media_set_lattr(sdp_media_sf, false, "ssrc", "%d label:mic0", ssrc);
+    sdp_media_set_lattr(sdp_media_sf, false, "ssrc", "%u msid:%s mic0", ssrc, msid);
+    sdp_media_set_lattr(sdp_media_sf, false, "ssrc", "%u mslabel:%s", ssrc, msid);
+    sdp_media_set_lattr(sdp_media_sf, false, "ssrc", "%u label:mic0", ssrc);
 
 }
 
