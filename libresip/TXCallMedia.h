@@ -21,6 +21,8 @@
 
 struct uac;
 
+enum call_dir_t;
+
 @interface TXCallMedia : NSObject {
     struct pjmedia_snd_stream *media;
     struct rtp_sock *rtp;
@@ -52,7 +54,7 @@ struct uac;
     int fmt;
 }
 
-- (id) initWithUAC: (struct uac*)uac;
+- (id) initWithUAC: (struct uac*)uac dir:(enum call_dir_t)pDir;
 - (int) offer: (struct mbuf*)offer ret:(struct mbuf **)ret;
 - (int) offer: (struct mbuf **)ret;
 - (void) gather: (uint16_t)scode err:(int)err reason:(const char*)reason;

@@ -70,21 +70,17 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 @synthesize date_start;
 @synthesize date_end;
 @synthesize date_create;
-- (id) initIncoming: (const struct sip_msg *)pMsg app:(id)pApp;
+
+- (void) incoming:(const struct sip_msg *)pMsg
 {
-    self = [super initWithApp:pApp];
 
-    // XXX: fill remote part
-
+    [self setup: CALL_IN];
     cstate = CSTATE_IN_RING;
     msg = mem_ref((void*)pMsg);
     [self parseFrom];
     [self acceptSession];
-    cdir = CALL_IN;
-
-    return self;
 }
-
+ 
 - (void) parseFrom
 {
     dest = [TXSipUser withAddr: (struct sip_taddr*)&msg->from];
@@ -109,12 +105,18 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 
 }
 
-- (void) setup
+- (void) outgoing:(TXSipUser*)pDest
 {
-    media = [[TXCallMedia alloc] initWithUAC: uac];
-
+    [self setDest: pDest];
+    [self setup: CALL_OUT];
     cstate = CSTATE_STOP;
-    cdir = CALL_OUT;
+}
+
+- (void) setup:(call_dir_t)pDir;
+{
+    media = [[TXCallMedia alloc] initWithUAC:uac dir:pDir];
+
+    cdir = pDir;
     date_create = [NSDate date];
 }
 

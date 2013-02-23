@@ -43,7 +43,7 @@ typedef enum {
 }
 call_action_t;
 
-typedef enum {
+typedef enum call_dir_t {
     CALL_IN,
     CALL_OUT,
 } call_dir_t;
@@ -83,7 +83,8 @@ typedef enum {
     NSDate *date_end;
 }
 
-- (id) initIncoming: (const struct sip_msg *)pMsg app:(id)pApp;
+- (void) incoming:(const struct sip_msg *)pMsg;
+- (void) outgoing:(TXSipUser*)pDest;
 
 - (void) send;
 - (void) hangup;

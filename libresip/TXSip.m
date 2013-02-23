@@ -57,7 +57,9 @@ static void connect_handler(const struct sip_msg *msg, void *arg)
     NSLog(@"incoming connect");
     TXSip* sip = (__bridge id)arg;
 
-    id in_call = [[TXSipCall alloc] initIncoming:msg app:sip];
+    id in_call = [[TXSipCall alloc] initWithApp:sip];
+    [in_call incoming: msg];
+
     [sip callIncoming: in_call];
 }
 
@@ -191,6 +193,7 @@ static void exit_handler(void *arg)
 - (oneway void) startCallUser: (TXSipUser*)udest
 {
     id out_call = [[TXSipCall alloc] initWithApp:self];
+    [out_call outgoing: udest];
     [out_call setDest: udest];
     [out_call setCb: CB(self, callChange:)];
     [out_call send];

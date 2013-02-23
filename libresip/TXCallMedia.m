@@ -7,8 +7,12 @@
 //
 
 #import "TXCallMedia.h"
+#import "TXSipCall.h"
 #include "ajitter.h"
 #include "txsip_private.h"
+
+static char stun_srv[] = "stun.l.google.com";
+static int stun_port = 19302;
 
 bool sdp_crypto(const char *name, const char *value, void *arg)
 {
@@ -102,7 +106,7 @@ static void conncheck_handler(int err, bool update, void *arg)
 }
 
 @implementation TXCallMedia
-- (id) initWithUAC: (struct uac*)pUac
+- (id) initWithUAC: (struct uac*)pUac dir:(call_dir_t)pDir
 {
 
     self = [super init];
@@ -111,12 +115,12 @@ static void conncheck_handler(int err, bool update, void *arg)
     uac = pUac;
     laddr = &uac->laddr;
 
-    [self setup];
+    [self setup: pDir];
 
     return self;
 }
 
-- (void) setup {
+- (void) setup:(call_dir_t)pDir {
 
     int err;
     media = NULL;
@@ -126,7 +130,7 @@ static void conncheck_handler(int err, bool update, void *arg)
 
     laddr = (struct sa*)rtp_local(rtp);
 
-    err = ice_alloc(&ice, ICE_MODE_FULL, false); // XXX: answer
+    err = ice_alloc(&ice, ICE_MODE_FULL, pDir == CALL_OUT);
     err |= icem_alloc(&icem, ice, IPPROTO_UDP, 0,
 			gather_handler, conncheck_handler,
                         (__bridge void*)self);
@@ -190,9 +194,8 @@ static void conncheck_handler(int err, bool update, void *arg)
 
     stun_server_discover(&stun_dns, uac->dnsc,
 	stun_usage_binding,  stun_proto_udp,
-	AF_INET, "stun.l.google.com", 19302,
+	AF_INET, stun_srv, stun_port,
 	dns_handler, (__bridge void*)self);
-
 
     [self gencname];
     [self set_ssrc];
