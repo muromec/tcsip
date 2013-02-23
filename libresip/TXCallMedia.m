@@ -151,37 +151,22 @@ static void conncheck_handler(int err, bool update, void *arg)
     sdp_media_set_lattr(sdp_media_s, true, "crypto", crypto_line);
     sdp_media_set_lattr(sdp_media_sf, true, "crypto", crypto_line);
 
-    err = sdp_format_add(NULL, sdp_media, true,
-	"97", "speex", 8000, 1,
-	 NULL, NULL, NULL, false, NULL);
+#define FMT_CH(pt, name, srate, ch) {\
+    err |= sdp_format_add(NULL, sdp_media, true,\
+	pt, name, srate, ch,\
+	 NULL, NULL, NULL, false, NULL);\
+    err |= sdp_format_add(NULL, sdp_media_s, true,\
+	pt, name, srate, ch,\
+	 NULL, NULL, NULL, false, NULL);\
+    err |= sdp_format_add(NULL, sdp_media_sf, false,\
+	pt, name, srate, ch,\
+	 NULL, NULL, NULL, false, NULL);}
 
-    err = sdp_format_add(NULL, sdp_media_s, true,
-	"97", "speex", 8000, 1,
-	 NULL, NULL, NULL, false, NULL);
+#define FMT(pt, name) FMT_CH(pt, name, 8000, 1)
 
-    err = sdp_format_add(NULL, sdp_media_s, false,
-	"101", "opus", 48000, 2,
-	 NULL, NULL, NULL, false, NULL);
-
-    err = sdp_format_add(NULL, sdp_media_sf, false,
-	"101", "opus", 48000, 2,
-	 NULL, NULL, NULL, false, NULL);
-
-    err = sdp_format_add(NULL, sdp_media, false,
-	"101", "opus", 48000, 2,
-	 NULL, NULL, NULL, false, NULL);
-
-    err = sdp_format_add(NULL, sdp_media, false,
-	"0", "PCMU", 8000, 1,
-	 NULL, NULL, NULL, false, NULL);
-
-    err = sdp_format_add(NULL, sdp_media_s, false,
-	"0", "PCMU", 8000, 1,
-	 NULL, NULL, NULL, false, NULL);
-
-    err = sdp_format_add(NULL, sdp_media_sf, false,
-	"0", "PCMU", 8000, 1,
-	 NULL, NULL, NULL, false, NULL);
+    FMT("97", "speex");
+    FMT("0", "PCMU");
+    FMT_CH("101", "opus", 4800, 2);
 
     // dump local
     const struct sdp_format *lfmt;
