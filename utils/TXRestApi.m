@@ -91,6 +91,7 @@ static void http_err(int err, void *arg) {
     http_init(&app, &request, (char*)_byte(url));
     http_cb(request, (__bridge_retained void*)self, http_done, http_err);
     cb = [MProxy withTargetBox: pCb box:root_box];
+    request = mem_ref(request);
 }
 
 - (void)post:(NSString*)key val:(NSString*)val
@@ -170,8 +171,7 @@ static void http_err(int err, void *arg) {
 
 - (void) dealloc
 {
-    if(request)
-        mem_deref(request);
+    mem_deref(request);
 }
 
 @end
