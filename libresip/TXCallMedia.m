@@ -478,8 +478,6 @@ out:
         [self setupSRTP];
     }
 
-    re_printf("SDP crypt %s\n", sdp_media_rattr(md, "crypto"));
-
     sdp_media_rattr_apply(md, NULL, media_attr_handler, icem);
 
     dst = (struct sa*)sdp_media_raddr(md);
