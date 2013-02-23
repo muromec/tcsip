@@ -109,9 +109,7 @@ static void exit_handler(void *arg)
     err = srtp_init();
 
     uac = malloc(sizeof(uac_t));
-
-    /* fetch local IP address */
-    err = net_default_source_addr_get(AF_INET, &uac->laddr);
+    memset(uac, 0, sizeof(uac_t));
 
     app = [ReWrap app];
 
