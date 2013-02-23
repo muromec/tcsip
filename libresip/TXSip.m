@@ -156,6 +156,7 @@ static void exit_handler(void *arg)
 	
     /* create SIP session socket */
     err = sipsess_listen(&uac->sock, uac->sip, 32, connect_handler, (__bridge void*)self);
+    re_printf("got laddr %J, listen %d\n", &uac->laddr, err);
 }
 
 - (void)https_ua
