@@ -217,6 +217,10 @@ static void exit_handler(void *arg)
 
 - (oneway void) startCallUser: (TXSipUser*)udest
 {
+    if(! sa_isset(&uac->laddr, SA_ADDR)) {
+	NSLog(@"no laddr, cant call");
+        return;
+    }
     id out_call = [[TXSipCall alloc] initWithApp:self];
     [out_call outgoing: udest];
     [out_call setDest: udest];
