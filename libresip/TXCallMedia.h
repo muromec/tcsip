@@ -23,12 +23,16 @@ struct uac;
 
 enum call_dir_t;
 
+@class Callback;
+
 @interface TXCallMedia : NSObject {
     struct pjmedia_snd_stream *media;
     struct rtp_sock *rtp;
     struct ice* ice;
     struct icem* icem;
     struct stun_dns *stun_dns;
+
+    Callback *iceCB;
 
     struct tmr rtp_tmr;
 
@@ -60,6 +64,7 @@ enum call_dir_t;
 - (void) gather: (uint16_t)scode err:(int)err reason:(const char*)reason;
 - (void) conn_check: (bool)update err:(int)err;
 - (void)stun:(const struct sa*)srv;
+- (void)setIceCb:(Callback*)pCb;
 
 - (int) answer: (struct mbuf*)offer;
 - (bool) start;

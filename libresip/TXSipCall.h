@@ -93,6 +93,7 @@ typedef enum call_dir_t {
 - (void) callActivate;
 - (NSInteger) cid;
 - (NSString*) ckey;
+- (void)waitIce;
 
 @property (readonly) call_state_t cstate;
 @property (readonly) id media;

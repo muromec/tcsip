@@ -224,6 +224,8 @@ static void conncheck_handler(int err, bool update, void *arg)
             icem_cand_default(icem, 2)
     );
     [self update_media];
+    [iceCB response: @"done"];
+    iceCB = nil;
 }
 - (void) conn_check: (bool)update err:(int)err
 {
@@ -265,6 +267,11 @@ static void conncheck_handler(int err, bool update, void *arg)
 
     err = icem_gather_srflx(icem, srv);
     re_printf("media start %d %J\n", err, srv);;
+}
+
+- (void)setIceCb:(Callback*)pCB
+{
+    iceCB = pCB;
 }
 
 - (void) setupSRTP

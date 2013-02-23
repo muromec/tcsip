@@ -120,6 +120,17 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     date_create = [NSDate date];
 }
 
+- (void)waitIce
+{
+    [media setIceCb: CB(self, iceReady)];
+}
+
+- (void)iceReady
+{
+    [self send];
+    [self upd];
+}
+
 - (void) send
 {
     struct mbuf *mb;

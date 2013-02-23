@@ -225,7 +225,7 @@ static void exit_handler(void *arg)
     [out_call outgoing: udest];
     [out_call setDest: udest];
     [out_call setCb: CB(self, callChange:)];
-    [out_call send];
+    [out_call waitIce];
     [calls addObject: out_call];
     [delegate() addCall: here(out_call)];
 }
