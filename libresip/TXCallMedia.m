@@ -37,7 +37,6 @@ bool sdp_crypto(const char *name, const char *value, void *arg)
         printf("invalid key len %ld\n", klen);
         return false;
     }
-    re_printf("use key %r", &key);
 
     return true;
 
