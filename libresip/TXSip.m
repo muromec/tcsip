@@ -126,6 +126,21 @@ static void exit_handler(void *arg)
     err = tls_alloc(&app->tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
     tls_add_ca(app->tls, _byte(ca_cert));
 	
+    [self listen_laddr];
+}
+
+- (void)listen_laddr
+{
+    int err;
+
+    /* fetch local IP address */
+    sa_init(&uac->laddr, AF_UNSPEC);
+    err = net_default_source_addr_get(AF_INET, &uac->laddr);
+    if(err) {
+	NSLog(@"no local addr found");
+	return;
+    }
+
     /*
      * Workarround.
      *
@@ -182,6 +197,17 @@ static void exit_handler(void *arg)
 
 - (oneway void) setOnline: (reg_state)state
 {
+    if(state == REG_OFF) {
+        NSLog(@"go offline");
+        sip_transp_flush(uac->sip);
+        if(uac->sock)
+            uac->sock = mem_deref(uac->sock);
+        sa_init(&uac->laddr, AF_UNSPEC);
+    } else {
+        NSLog(@"go online %p", uac->sock);
+        if(!uac->sock)
+            [self listen_laddr];
+    }
     [sreg setState: state];
 }
 
