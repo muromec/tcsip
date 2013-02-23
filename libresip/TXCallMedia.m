@@ -463,7 +463,7 @@ out:
 
     list = sdp_session_medial(sdp, false);
 
-    for(le = list->head; le && !rfmt; le = le->next) {
+    for(le = list->head; le ; le = le->next) {
         md = le->data;
         rfmt = sdp_media_rformat(md, NULL);
     }
