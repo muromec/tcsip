@@ -12,8 +12,6 @@
 
 #import <Security/Security.h>
 
-static NSString *kUserCertPassword = @"nop";
-
 @implementation TXAccount
 @synthesize user;
 @synthesize name;
