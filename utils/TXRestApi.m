@@ -87,7 +87,7 @@ static void http_err(int err, void *arg) {
 
 - (void)rload: (NSString*)path cb:(id)pCb
 {
-    NSString *url = [NSString stringWithFormat:@"https://texr.enodev.org/api/%@",path];
+    NSString *url = [NSString stringWithFormat:@"https://www.texr.net/api/%@",path];
     http_init(&app, &request, (char*)_byte(url));
     http_cb(request, (__bridge_retained void*)self, http_done, http_err);
     cb = [MProxy withTargetBox: pCb box:root_box];
