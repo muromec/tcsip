@@ -47,6 +47,25 @@ err:
 	return -1;
 }
 
+float get_srate(AudioUnit unit, int id) {
+	Float64	    in_srate = kAudioStreamAnyRate;
+	UInt32	    sz = sizeof(in_srate);
+	OSStatus status;
+
+	status = AudioUnitGetProperty(unit,
+			kAudioUnitProperty_SampleRate,
+			kAudioUnitScope_Input,
+			1,
+			&in_srate,
+			&sz);
+
+	ERR("cant get current sample rate err: %d\n");
+	return in_srate;
+err:
+	return 0;
+
+}
+
 int set_current(AudioUnit unit, int id) {
 
 	return AudioUnitSetProperty(unit,

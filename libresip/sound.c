@@ -635,15 +635,17 @@ int media_snd_open(media_dir_t dir,
 
 	if(snd_strm->dir & DIR_CAP)
 	{
+
+		Float64	in_srate = get_srate(snd_strm->in_unit, 1);
 #if IPHONE
 		status = set_format(snd_strm->in_unit, inputBus, 8000);
 		snd_strm->resampler = NULL;
 #else
-		status = set_format(snd_strm->in_unit, inputBus, 44100);
+		status = set_format(snd_strm->in_unit, inputBus, in_srate);
 		ERR("cant set input format. err %d");
 		MSG("input format ok");
 
-		snd_strm->resampler = speex_resampler_init(1, 44100, clock_rate, 4, &status);
+		snd_strm->resampler = speex_resampler_init(1, in_srate, clock_rate, 4, &status);
 		printf("created resampler: %d %lx\n", status, (long)snd_strm->resampler );
 		if(!snd_strm->resampler) {
 			goto err_out_resampler;
