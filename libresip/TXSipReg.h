@@ -21,7 +21,10 @@ typedef enum {
 
 @protocol RegObserver
 - (void) onlineState: (NSString*)state;
-- (void) uplink: (NSString*)uri alive:(bool)state;
+@end
+
+@protocol Obs
+- (void) report:(id)data;
 @end
 
 @interface TXSipReg : TXBaseOp {
@@ -44,7 +47,6 @@ typedef enum {
 - (void) setInstanceId: (NSString*) pUUID;
 - (void) voipDest:(struct tcp_conn *)conn;
 - (void) contacts: (const struct sip_msg*)msg;
-- (void) uplink: (NSString*) up;
 - (void) setState: (reg_state) state;
 
 @property NSData* apns_token;

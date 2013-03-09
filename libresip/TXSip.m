@@ -13,6 +13,7 @@
 #import "TXSipMessage.h"
 #import "TXSipAuth.h"
 #import "TXRestApi.h"
+#import "TXUplinks.h"
 #import "ReWrap.h"
 
 #include <re.h>
@@ -74,6 +75,7 @@ static void exit_handler(void *arg)
 
 @implementation TXSip
 @synthesize auth;
+@synthesize uplinks;
 @synthesize user;
 @synthesize wrapper;
 @synthesize delegate;
@@ -98,6 +100,7 @@ static void exit_handler(void *arg)
     sreg = [[TXSipReg alloc] initWithApp:self];
     [sreg setInstanceId: account.uuid];
     [sreg setDest: user];
+    uplinks = [[TXUplinks alloc] init];
 
     return self;
 }
@@ -267,6 +270,7 @@ static void exit_handler(void *arg)
 
 - (oneway void) setRegObserver: (id)obs {
     sreg.obs = obs;
+    uplinks.cb = CB(obs, uplinks:);
 }
 
 @end

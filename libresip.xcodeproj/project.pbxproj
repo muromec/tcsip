@@ -29,6 +29,9 @@
 		8507AAE91628BEB100CE9AE6 /* TXAccount.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; };
 		8507AAEA1628BED400CE9AE6 /* Callback.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA931628AEEF00CE9AE6 /* Callback.h */; };
 		8517ADFE168B98D500EEFE37 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8517ADFD168B98D500EEFE37 /* MobileCoreServices.framework */; };
+		8520171A16EAE4380020BC02 /* TXUplinks.h in Headers */ = {isa = PBXBuildFile; fileRef = 8520171816EAE4380020BC02 /* TXUplinks.h */; };
+		8520171B16EAE4380020BC02 /* TXUplinks.m in Sources */ = {isa = PBXBuildFile; fileRef = 8520171916EAE4380020BC02 /* TXUplinks.m */; };
+		8520171C16EAE4380020BC02 /* TXUplinks.m in Sources */ = {isa = PBXBuildFile; fileRef = 8520171916EAE4380020BC02 /* TXUplinks.m */; };
 		8523A5CB1650E3220071C23F /* libsrtp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8523A5CA1650E3220071C23F /* libsrtp.a */; };
 		8523A5CD1650E3520071C23F /* libsrtp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8523A5CA1650E3220071C23F /* libsrtp.a */; };
 		852716921628F35B00C4B8DD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716911628F35B00C4B8DD /* SystemConfiguration.framework */; };
@@ -185,6 +188,8 @@
 		8517ADF9168B986E00EEFE37 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		8517ADFB168B989600EEFE37 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		8517ADFD168B98D500EEFE37 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		8520171816EAE4380020BC02 /* TXUplinks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXUplinks.h; path = utils/TXUplinks.h; sourceTree = "<group>"; };
+		8520171916EAE4380020BC02 /* TXUplinks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TXUplinks.m; path = utils/TXUplinks.m; sourceTree = "<group>"; };
 		8523A5CA1650E3220071C23F /* libsrtp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsrtp.a; path = deps/libsrtp.a; sourceTree = "<group>"; };
 		852716911628F35B00C4B8DD /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
 		852716931628F39A00C4B8DD /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/usr/lib/libresolv.dylib; sourceTree = DEVELOPER_DIR; };
@@ -502,6 +507,8 @@
 		850277DB1625B5A400AB5038 /* util */ = {
 			isa = PBXGroup;
 			children = (
+				8520171816EAE4380020BC02 /* TXUplinks.h */,
+				8520171916EAE4380020BC02 /* TXUplinks.m */,
 				8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */,
 				8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */,
 				8507AA921628AEEF00CE9AE6 /* Callback.m */,
@@ -768,6 +775,7 @@
 				858AC77C168DEABF00BA64C9 /* TXKey.h in Headers */,
 				853B2020169F1DE700F423DB /* http.h in Headers */,
 				852DA29E16A01AE400AF5677 /* re_wrap_priv.h in Headers */,
+				8520171A16EAE4380020BC02 /* TXUplinks.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -879,6 +887,7 @@
 				853B201E169F1DE700F423DB /* http.c in Sources */,
 				852DA29816A00DE500AF5677 /* ReWrap.m in Sources */,
 				852DA2A016A05CEE00AF5677 /* auth.c in Sources */,
+				8520171B16EAE4380020BC02 /* TXUplinks.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -912,6 +921,7 @@
 				853B201F169F1DE700F423DB /* http.c in Sources */,
 				852DA29916A00DE500AF5677 /* ReWrap.m in Sources */,
 				852DA2A116A05CEE00AF5677 /* auth.c in Sources */,
+				8520171C16EAE4380020BC02 /* TXUplinks.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

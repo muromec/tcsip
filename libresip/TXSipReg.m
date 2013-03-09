@@ -29,14 +29,15 @@ static bool find_uplink(const struct sip_hdr *hdr, const struct sip_msg *msg,
     id ctx = (__bridge id)arg;
 
     struct sip_addr addr;
-    struct pl _non;
+    struct pl state;
+    state.l = 0;
     int err;
 
     err = sip_addr_decode(&addr, &hdr->val);
     if(err) {
         return false;
     }
-    err = sip_param_exists(&addr.params, "uplink", &_non);
+    err = sip_param_exists(&addr.params, "uplink", &state);
     if(err == ENOENT) {
         return false;
     }
@@ -44,12 +45,25 @@ static bool find_uplink(const struct sip_hdr *hdr, const struct sip_msg *msg,
         return false;
     }
 
+    state.l = 0;
+    sip_param_decode(&addr.params, "uplink", &state);
+
+    NSString *nstate;
     NSString *str = [[NSString alloc] 
         initWithBytes: addr.auri.p
                length: addr.auri.l
              encoding: NSASCIIStringEncoding
     ];
-    [ctx uplink: str];
+    if(state.l) {
+        nstate = [[NSString alloc]
+            initWithBytes: state.p
+               length: state.l
+             encoding: NSASCIIStringEncoding
+        ];
+    } else {
+        nstate = @"ok";
+    }
+    [ctx addObject: [NSArray arrayWithObjects: str, nstate, nil]];
 
     return false;
 }
@@ -213,12 +227,11 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void) contacts: (const struct sip_msg*)msg
 {
-    sip_msg_hdr_apply(msg, true, SIP_HDR_CONTACT, find_uplink, (__bridge void*)self);
-}
+    NSMutableArray *ups = [[NSMutableArray alloc] init];
 
-- (void) uplink: (NSString*) up
-{
-    [obs uplink: up alive:YES];
+    sip_msg_hdr_apply(msg, true, SIP_HDR_CONTACT, find_uplink, (__bridge void*)ups);
+
+    [app.uplinks report: ups];
 }
 
 @end

@@ -36,6 +36,7 @@ typedef enum {
 
 @protocol Wrapper;
 @class TXSipReg;
+@class TXUplinks;
 
 @interface TXSip : NSObject {
     // sip core and sip services
@@ -46,6 +47,7 @@ typedef enum {
     TXAccount *account;
 
     TXSipReg *sreg;
+    TXUplinks *uplinks;
     id auth;
     TXSipUser *user;
 
@@ -70,6 +72,7 @@ typedef enum {
 - (oneway void) close;
 
 @property id auth;
+@property id uplinks;
 @property (readonly) TXSipUser* user;
 @property id<Wrapper> wrapper;
 @property id delegate;
