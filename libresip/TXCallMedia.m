@@ -409,22 +409,8 @@ static void conncheck_handler(int err, bool update, void *arg)
 
     int err;
 
-    /*
-     * Workarround here
-     *
-     * for some reason libre sets mb->end to the
-     * offset, pointing to payload start.
-     *
-     * Settind mb->end to mb->size breaks connection buffer,
-     * so we just copy payload to separate mb
-     *
-     * */
-    struct mbuf *mb = mbuf_alloc(0);
-    mbuf_write_mem(mb, mbuf_buf(offer), mbuf_get_space(offer));
-    mb->pos = 0;
-
     NSLog(@"processing offer in call media");
-    err = sdp_decode(sdp, mb, true);
+    err = sdp_decode(sdp, offer, true);
     if(err) {
         NSLog(@"cant decode offer %d\n", err);
         goto out;
@@ -434,7 +420,6 @@ static void conncheck_handler(int err, bool update, void *arg)
 
     err = sdp_encode(ret, sdp, false);
 out:
-    mem_deref(mb);
     return err;
 }
 - (int) offer: (struct mbuf **)ret {
