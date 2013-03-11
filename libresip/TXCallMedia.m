@@ -444,16 +444,19 @@ out:
 
 - (void) sdpFormats {
 
-    const struct sdp_format *rfmt = NULL;
-    const struct sdp_media *md;
+    const struct sdp_format *rfmt = NULL, *_rfmt = NULL;
+    const struct sdp_media *md = NULL;
     const struct list *list;
     struct le *le;
 
     list = sdp_session_medial(sdp, false);
 
     for(le = list->head; le ; le = le->next) {
-        md = le->data;
-        rfmt = sdp_media_rformat(md, NULL);
+        _rfmt = sdp_media_rformat(le->data, NULL);
+        if(_rfmt) {
+            rfmt = _rfmt;
+            md = le->data;
+        }
     }
 
     if (!rfmt) {
