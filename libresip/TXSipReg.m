@@ -113,8 +113,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void)resend
 {
-    reg = mem_deref(reg);
-    [self send];
+    sipreg_expires(reg, reg_time);
 }
 
 - (void) send
