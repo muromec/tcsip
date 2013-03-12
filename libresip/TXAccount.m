@@ -133,6 +133,10 @@
             initWithFormat:@"name/%@", user];
 
     [defaults removeObjectForKey:nkey];
+
+    nkey = [[NSString alloc]
+            initWithFormat:@"changes/%@", user];
+    [defaults removeObjectForKey:nkey];
 }
 
 - (void)keygen
