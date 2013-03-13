@@ -93,9 +93,6 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void) setState: (reg_state) state
 {
-    tmr_cancel(&reg_tmr);
-    if(reg) reg = mem_deref(reg);
-
     switch(state) {
     case REG_OFF:
         return;
@@ -108,7 +105,10 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     }
  
     NSLog(@"set state %d time %d", state, reg_time);
-    [self send];
+    if(reg)
+        [self resend];
+    else
+	[self send];
 }
 
 - (void)resend
