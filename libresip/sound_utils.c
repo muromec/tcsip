@@ -1,4 +1,5 @@
 #include "sound_utils.h"
+#include "cross.h"
 #include <AudioToolbox/AudioServices.h>
 
 
@@ -130,4 +131,40 @@ int set_cb(AudioUnit unit, int bus, void *cb, void *user) {
 		bus,
 		&Callback,
 		sizeof(Callback));
+}
+
+int set_voice_proc(AudioUnit unit, UInt32 agc, UInt32 quality) {
+	OSStatus status;
+
+	const UInt32 kInputBus  = 1;
+        const UInt32 zero = 0;
+
+	status = AudioUnitSetProperty(unit,
+		kAUVoiceIOProperty_BypassVoiceProcessing,
+		kAudioUnitScope_Global,
+		kInputBus,
+		&zero,
+		sizeof(zero));
+
+	ERR("cant enable voice processing %d\n");
+
+	status = AudioUnitSetProperty(unit,
+		kAUVoiceIOProperty_VoiceProcessingEnableAGC,
+		kAudioUnitScope_Global,
+		kInputBus,
+		&agc,
+		sizeof(agc));
+
+	ERR("cant enable agc %d\n");
+
+	status = AudioUnitSetProperty(unit,
+		kAUVoiceIOProperty_VoiceProcessingQuality,
+		kAudioUnitScope_Global,
+		kInputBus,
+		&quality,
+                sizeof(quality));
+
+	ERR("cant set voice quality %d\n");
+err:
+	return status;
 }

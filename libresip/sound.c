@@ -36,6 +36,7 @@
 
 #include "sound.h"
 #include "sound_utils.h"
+#include "cross.h"
 
 #define THIS_FILE "iphonesound.c"
 
@@ -367,11 +368,15 @@ int media_snd_init()
 	// };
 	
 	desc.componentType = kAudioUnitType_Output;
-#if IPHONE
-	desc.componentSubType = kAudioUnitSubType_RemoteIO;
-#else
-    desc.componentSubType = kAudioUnitSubType_HALOutput;
-#endif
+	on_iphone({
+	    desc.componentSubType = kAudioUnitSubType_RemoteIO;
+	})
+	on_ipad({
+	    desc.componentSubType = kAudioUnitSubType_VoiceProcessingIO;
+	})
+	on_mac({
+	    desc.componentSubType = kAudioUnitSubType_HALOutput;
+	})
 	desc.componentManufacturer = kAudioUnitManufacturer_Apple;
 	desc.componentFlags = 0;
 	desc.componentFlagsMask = 0;
@@ -600,6 +605,12 @@ int media_snd_open(media_dir_t dir,
 	
 	AudioUnitElement inputBus = 1;
 	AudioUnitElement outputBus = 0;
+
+	on_ipad({
+		IF_CAP(dir){
+			set_voice_proc(snd_strm->in_unit, 1, 127);
+		}
+	})
 
 	IF_CAP(dir) {
 		status = enable_io(snd_strm->in_unit, inputBus);

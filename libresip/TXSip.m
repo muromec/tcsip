@@ -32,6 +32,8 @@
 #define USER_AGENT "TexR/OSX libre"
 #endif
 
+int ui_idiom;
+
 char* byte(NSString * input){
       int len = (int)[input lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
 

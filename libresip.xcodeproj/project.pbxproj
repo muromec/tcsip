@@ -114,6 +114,7 @@
 		85B57C7C163299AD00456ADD /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7B163299AD00456ADD /* CoreAudio.framework */; };
 		85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7D163299B100456ADD /* AudioToolbox.framework */; };
 		85D6414F163C62F4008D3974 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C781632999000456ADD /* CoreAudio.framework */; };
+		85EF252616F3CDE200068C00 /* cross.h in Headers */ = {isa = PBXBuildFile; fileRef = 85EF252416F3CCEC00068C00 /* cross.h */; };
 		85FF742516290A60005C64D5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742316290A60005C64D5 /* libcrypto.a */; };
 		85FF742616290A60005C64D5 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742416290A60005C64D5 /* libssl.a */; };
 		85FF742F16291027005C64D5 /* TXSip.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277C31625B59700AB5038 /* TXSip.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -280,6 +281,7 @@
 		85B57C7B163299AD00456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		85B57C7D163299B100456ADD /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		85D64144163C62EA008D3974 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
+		85EF252416F3CCEC00068C00 /* cross.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cross.h; sourceTree = "<group>"; };
 		85FF73D8162909F4005C64D5 /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
 		85FF73D9162909F4005C64D5 /* asn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1.h; sourceTree = "<group>"; };
 		85FF73DA162909F4005C64D5 /* asn1_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1_mac.h; sourceTree = "<group>"; };
@@ -462,6 +464,7 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				85EF252416F3CCEC00068C00 /* cross.h */,
 				8585A26B16527CBB00380B9C /* ajitter.h */,
 				8585A26716527CB000380B9C /* ajitter.c */,
 				8580184A1636FEFE00E9D54B /* txsip_private.h */,
@@ -776,6 +779,7 @@
 				853B2020169F1DE700F423DB /* http.h in Headers */,
 				852DA29E16A01AE400AF5677 /* re_wrap_priv.h in Headers */,
 				8520171A16EAE4380020BC02 /* TXUplinks.h in Headers */,
+				85EF252616F3CDE200068C00 /* cross.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

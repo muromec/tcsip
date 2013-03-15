@@ -3,17 +3,12 @@
 #ifndef SOUND_UTILS_H
 #define SOUND_UTILS_H
 
-#if TARGET_OS_IPHONE
-#define IPHONE 1
-#else
-#define IPHONE 0
-#endif
-
 int default_device(char in);
 int get_current(AudioUnit unit);
 int set_current(AudioUnit unit, int id);
 int set_enable_io(AudioUnit unit, int bus, int state);
 float get_srate(AudioUnit unit, int id);
+int set_voice_proc(AudioUnit unit, UInt32 agc, UInt32 quality);
 
 #define enable_io(u, bus) set_enable_io(u, bus, 1)
 #define disable_io(u, bus) set_enable_io(u, bus, 0)
