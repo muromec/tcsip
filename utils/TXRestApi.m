@@ -41,22 +41,13 @@ static void http_ret(struct request *req, int code, void *arg) {
 }
 
 static void http_done(struct request *req, int code, void *arg) {
-    char *user=NULL, *pass=NULL;
     int ok = -EINVAL;
     TXRestApi *r = (__bridge TXRestApi*)arg;
 
     if(code==401) {
-	[r getAuth: &user password: &pass];
+	ok = [r sendAuth];
 
-	if(user && pass)
-	    ok = http_auth(req, user, pass);
-
-	if(user)
-	    free(user);
-	if(pass)
-            free(pass);
-
-	if(ok!=0)
+	if(!ok)
 	    http_ret(req, code, arg); 
 	return;
     }
@@ -149,10 +140,18 @@ static void http_err(int err, void *arg) {
     password = pW;
 }
 
-- (void) getAuth:(char**)_user password:(char**)_passw
+- (BOOL) sendAuth
 {
-    *_user = byte(username);
-    *_passw = byte(password);
+    char *_user = byte(username);
+    char *_passw = byte(password);
+    struct request *new_req;
+    int err = http_auth(request, &new_req, _user, _passw);
+    if(!err) {
+        request = mem_deref(request);
+	request = mem_ref(new_req);
+	return YES;
+    }
+    return NO;
 }
 
 
@@ -177,7 +176,6 @@ static void http_err(int err, void *arg) {
     memcpy(&app, _app, sizeof(struct httpc));
 
     if(!df) setup_df();
-
 }
 
 + (void)retbox: (MailBox*)_box

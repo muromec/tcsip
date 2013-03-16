@@ -42,6 +42,6 @@ struct httpc;
 + (id)api;
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW;
-- (void) getAuth:(char**)_user password:(char**)_passw;
+- (BOOL) sendAuth;
 
 @end
