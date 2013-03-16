@@ -113,7 +113,9 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void)resend
 {
+    reg_time++;
     sipreg_expires(reg, reg_time);
+    [obs onlineState: @"try"];
 }
 
 - (void) send
@@ -142,6 +144,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     if(err) {
         [obs onlineState: @"off"];
     } else {
+        [obs onlineState: @"try"];
         rstate |= REG_START;
     }
     NSLog(@"sreg apns token %@", apns_token);
