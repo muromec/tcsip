@@ -181,13 +181,20 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void)setApns_token:(NSData*)token
 {
+    const char *fmt = NULL;
+    NSString* nfmt;
     char enc_token[50];
     size_t elen = sizeof(enc_token);
     memset(enc_token, 0, elen);
 
     base64_encode([token bytes], [token length], enc_token, &elen);
-
     apns_token = [NSString stringWithFormat:@"%s", enc_token];
+
+    if(apns_token) {
+	nfmt = [NSString stringWithFormat:@"Push-Token: %@\r\n", apns_token];
+	fmt = _byte(nfmt);
+    }
+    sipreg_headers(reg, fmt);
 
     NSLog(@"set token: %@ token %s", token, enc_token);
 }
