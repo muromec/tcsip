@@ -201,16 +201,28 @@ static void exit_handler(void *arg)
 
 - (oneway void) setOnline: (reg_state)state
 {
+    int err;
     if(state == REG_OFF) {
         NSLog(@"go offline");
         sip_transp_flush(uac->sip);
         if(uac->sock)
             uac->sock = mem_deref(uac->sock);
         sa_init(&uac->laddr, AF_UNSPEC);
+        sa_init(app->nsv, AF_UNSPEC);
+        app->nsc = 1;
     } else {
         NSLog(@"go online %p", uac->sock);
         if(!uac->sock)
             [self listen_laddr];
+
+        if(!app->nsc || !sa_isset(app->nsv, SA_ADDR)) {
+            err = dns_srv_get(NULL, 0, app->nsv, &app->nsc);
+            if(err) {
+                sa_set_str(app->nsv, "8.8.8.8", 53);
+                app->nsc = 1;
+            }
+            dnsc_srv_set(app->dnsc, app->nsv, app->nsc);
+        }
     }
     [sreg setState: state];
 }
