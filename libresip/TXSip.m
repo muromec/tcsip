@@ -116,7 +116,9 @@ static void exit_handler(void *arg)
     uac = malloc(sizeof(uac_t));
     memset(uac, 0, sizeof(uac_t));
 
-    app = [ReWrap app];
+    void *_app = [ReWrap app];
+    app = mem_alloc(sizeof(struct reapp), NULL);
+    memcpy(app, _app, sizeof(struct reapp));
 
     /* create SIP stack instance */
     err = sip_alloc(&uac->sip, app->dnsc, 32, 32, 32,
@@ -180,6 +182,8 @@ static void exit_handler(void *arg)
     sip_close(uac->sip, 1);
     mem_deref(uac->sip);
     mem_deref(uac->sock);
+    mem_deref(app->tls);
+    mem_deref(app);
 
     free(uac);
 

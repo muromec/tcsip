@@ -38,6 +38,7 @@ struct httpc;
 + (void) cert:(NSString*)cert;
 
 + (void)wrapper: (id)wrapper;
++ (void)drop_cert;
 + (void)retbox: (MailBox*)box;
 + (id)api;
 

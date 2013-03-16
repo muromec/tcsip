@@ -20,7 +20,7 @@
     CFSTR("!*'();:@&=+$,/?%#[]"),\
     kCFStringEncodingUTF8)))
 
-static struct httpc app;
+static struct httpc app = {NULL, NULL};
 static MailBox* root_box;
 static ReWrap* wrapper;
 static NSDateFormatter *df = NULL;
@@ -158,8 +158,7 @@ static void http_err(int err, void *arg) {
 + (void) cert:(NSString*)cert
 {
     int err;
-    if(app.tls)
-        mem_deref(app.tls);
+    if(app.tls) app.tls = mem_deref(app.tls);
 
     err = tls_alloc(&app.tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
 
@@ -171,11 +170,19 @@ static void http_err(int err, void *arg) {
 
 + (void)wrapper: (id)_wrapper
 {
+    if(app.tls) app.tls = mem_deref(app.tls);
+
     wrapper = _wrapper;
     void *_app = wrapper.app;
     memcpy(&app, _app, sizeof(struct httpc));
+    app.tls = mem_ref(app.tls);
 
     if(!df) setup_df();
+}
+
++ (void)drop_cert
+{
+    if(app.tls) app.tls = mem_deref(app.tls);
 }
 
 + (void)retbox: (MailBox*)_box
