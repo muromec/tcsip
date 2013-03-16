@@ -21,6 +21,7 @@ struct reapp;
 }
 
 - (id)wrap:(id)ob;
+- (oneway void)stop;
 + (void*)app;
 
 @property (readonly) id proxy;
