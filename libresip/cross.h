@@ -28,4 +28,10 @@ extern int ui_idiom;
 #define on_wide(x) {x}
 #endif
 
+#ifdef RELEASE
+#define D(...)
+#else
+#define D(...) NSLog(__VA_ARGS__)
+#endif
+
 #endif

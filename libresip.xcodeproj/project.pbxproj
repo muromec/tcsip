@@ -1122,7 +1122,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				HEADER_SEARCH_PATHS = (
 					/Users/muromec/sources/speex/include,
-					"/Users/muromec/sources/re-0.4.2/include",
+					./deps/include/,
 					/Users/muromec/sources/srtp/include,
 					/Users/muromec/sources/srtp/crypto/include,
 					/Users/muromec/sources/CHDataStructures/source,
@@ -1162,10 +1162,12 @@
 					"-DHAVE_UNISTD_H",
 					"-DHAVE_STRINGS_H",
 					"-DHAVE_GAI_STRERROR",
-					"-DVERSION=\"0.4.2\"",
 					"-Iinclude",
 					"-DHAVE_ROUTE_LIST",
 					"-DUSE_OPENSSL_DTLS=1",
+					"-DOS=\"darwin\"",
+					"-DARCH=\"x86_64\"",
+					"-DVERSION=\"0.4.2\"",
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
@@ -1194,7 +1196,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				HEADER_SEARCH_PATHS = (
 					/Users/muromec/sources/speex/include,
-					"/Users/muromec/sources/re-0.4.2/include",
+					./deps/include/,
 					/Users/muromec/sources/srtp/include,
 					/Users/muromec/sources/srtp/crypto/include,
 					/Users/muromec/sources/CHDataStructures/source,
@@ -1233,10 +1235,13 @@
 					"-DHAVE_UNISTD_H",
 					"-DHAVE_STRINGS_H",
 					"-DHAVE_GAI_STRERROR",
-					"-DVERSION=\"0.4.2\"",
 					"-Iinclude",
 					"-DHAVE_ROUTE_LIST",
 					"-DUSE_OPENSSL_DTLS=1",
+					"-DOS=\"darwin\"",
+					"-DARCH=\"x86_64\"",
+					"-DVERSION=\"0.4.2\"",
+					"-DRELEASE",
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = libresip;
