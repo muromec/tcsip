@@ -66,8 +66,10 @@ static void connect_handler(const struct sip_msg *msg, void *arg)
     D(@"incoming connect");
     TXSip* sip = (__bridge id)arg;
 
-    id in_call = [[TXSipCall alloc] initWithApp:sip];
+    TXSipCall* in_call = [[TXSipCall alloc] initWithApp:sip];
     [in_call incoming: msg];
+    if(in_call.cstate & CSTATE_ERR)
+        return;
 
     [sip callIncoming: in_call];
 }

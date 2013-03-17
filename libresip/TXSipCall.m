@@ -151,9 +151,12 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
                           NULL, NULL, close_handler, ctx, NULL);
     mem_deref(mb); /* free SDP buffer */
 
-    NSLog(@"invite sent %d", err);
+    D(@"invite sent %d", err);
+    if(err)
+	cstate |= CSTATE_ERR;
+    else
+        cstate |= CSTATE_OUT_RING;
 
-    cstate |= CSTATE_OUT_RING;
     return;
 }
 
