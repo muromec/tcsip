@@ -13,7 +13,7 @@
 
 static int offer_handler(struct mbuf **mbp, const struct sip_msg *msg,
 			 void *arg) {
-    NSLog(@"sdp offer");
+    D(@"sdp offer");
     TXSipCall *call = (__bridge TXSipCall*)arg;
     return [call.media offer: msg->mb ret:mbp];
 }
@@ -21,7 +21,7 @@ static int offer_handler(struct mbuf **mbp, const struct sip_msg *msg,
 /* called when an SDP answer is received */
 static int answer_handler(const struct sip_msg *msg, void *arg)
 {
-    NSLog(@"sdp answer");
+    D(@"sdp answer");
     TXSipCall *call = (__bridge TXSipCall*)arg;
 
     [call.media answer: msg->mb];
@@ -57,7 +57,7 @@ static void establish_handler(const struct sip_msg *msg, void *arg)
 /* called when the session fails to connect or is terminated from peer */
 static void close_handler(int err, const struct sip_msg *msg, void *arg)
 {
-        NSLog(@"session close handler");
+        D(@"session close handler");
         id ctx = (__bridge id)arg;
         [ctx hangup];
 }
@@ -98,7 +98,6 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
                          offer_handler, answer_handler,
                          establish_handler, NULL, NULL,
                          close_handler, ctx, NULL);
-    NSLog(@"accept %d", err);
     if(err)
         cstate |= CSTATE_ERR;
 
@@ -160,7 +159,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void) hangup
 {
-    NSLog(@"handgup");
+    D(@"handgup");
     mem_deref(sess);
 
     if(date_start)
@@ -264,14 +263,14 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
 
 - (void) callActivate
 {
-    NSLog(@"activate call");
+    D(@"activate call");
     date_start = [NSDate date];
     /*
      * Everything ok, now activate media subsystem
      * */
 
     if(TEST(cstate, CSTATE_FLOW|CSTATE_MEDIA)) {
-	NSLog(@"rtp and media already started, wtf?");
+	D(@"rtp and media already started, wtf?");
 	return;
     }
 
@@ -283,7 +282,7 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     ret = [media start];
     if(ret) {
         cstate |= CSTATE_ERR;
-        NSLog(@"media failed to start");
+        D(@"media failed to start");
         goto out;
     }
     // XXX: assert rtp not null
@@ -307,7 +306,7 @@ out:
        cdir ? app.user.addr : dest.addr,
        cdir ? dest.addr : app.user.addr
     ];
-    NSLog(@"key: %@", ret);
+    D(@"key: %@", ret);
 
     return ret;
 }

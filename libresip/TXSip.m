@@ -57,7 +57,7 @@ void pq_cb(int flags, void *arg)
 /* called upon incoming calls */
 static void connect_handler(const struct sip_msg *msg, void *arg)
 {
-    NSLog(@"incoming connect");
+    D(@"incoming connect");
     TXSip* sip = (__bridge id)arg;
 
     id in_call = [[TXSipCall alloc] initWithApp:sip];
@@ -69,7 +69,7 @@ static void connect_handler(const struct sip_msg *msg, void *arg)
 /* called when all sip transactions are completed */
 static void exit_handler(void *arg)
 {
-    NSLog(@"exit handler");
+    D(@"exit handler");
     /* stop libre main loop */
     re_cancel();
 }
@@ -142,7 +142,7 @@ static void exit_handler(void *arg)
     sa_init(&uac->laddr, AF_UNSPEC);
     err = net_default_source_addr_get(AF_INET, &uac->laddr);
     if(err) {
-	NSLog(@"no local addr found");
+	D(@"no local addr found");
 	return;
     }
 
@@ -174,7 +174,7 @@ static void exit_handler(void *arg)
 - (void) close
 {
 
-    NSLog(@"close");
+    D(@"close sip instance");
     sreg = nil;
     
     sipsess_close_all(uac->sock);
@@ -207,7 +207,7 @@ static void exit_handler(void *arg)
 {
     int err;
     if(state == REG_OFF) {
-        NSLog(@"go offline");
+        D(@"go offline");
         sip_transp_flush(uac->sip);
         if(uac->sock)
             uac->sock = mem_deref(uac->sock);
@@ -215,7 +215,7 @@ static void exit_handler(void *arg)
         sa_init(app->nsv, AF_UNSPEC);
         app->nsc = 1;
     } else {
-        NSLog(@"go online %p", uac->sock);
+        D(@"go online %p", uac->sock);
         if(!uac->sock)
             [self listen_laddr];
 
@@ -239,7 +239,7 @@ static void exit_handler(void *arg)
 - (oneway void) startCallUser: (TXSipUser*)udest
 {
     if(! sa_isset(&uac->laddr, SA_ADDR)) {
-	NSLog(@"no laddr, cant call");
+	D(@"no laddr, cant call");
         return;
     }
     id out_call = [[TXSipCall alloc] initWithApp:self];
@@ -258,7 +258,7 @@ static void exit_handler(void *arg)
 }
 
 - (void) callChange: (TXSipCall*) call {
-    NSLog(@"call changed %@, state %d", call, call.cstate);
+    D(@"call changed %@, state %d", call, call.cstate);
     if((call.cstate & CSTATE_ALIVE) == 0) {
         [calls removeObject: call];
 	[delegate() dropCall: call];

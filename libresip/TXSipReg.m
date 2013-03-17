@@ -104,7 +104,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
         break;
     }
  
-    NSLog(@"set state %d time %d", state, reg_time);
+    D(@"set state %d time %d", state, reg_time);
     if(reg)
         [self resend];
     else
@@ -140,19 +140,19 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
                           NULL, 0, 1, auth_handler, ctx, false,
                           register_handler, ctx, params, fmt);
 
-    NSLog(@"send register %d %d %s", err, reg_time, user);
+    D(@"send register %d %d %s", err, reg_time, user);
     if(err) {
         [obs onlineState: @"off"];
     } else {
         [obs onlineState: @"try"];
         rstate |= REG_START;
     }
-    NSLog(@"sreg apns token %@", apns_token);
+    D(@"sreg apns token %@", apns_token);
 }
 
 - (void) response: (int) status phrase:(const char*)phrase
 {
-    NSLog(@"reg response %d, %@", status, cb);
+    D(@"reg response %d, %@", status, cb);
 
     switch(status) {
     case 200:
@@ -163,7 +163,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 	break;
     case 401:
 	if((rstate & REG_AUTH)==0) {
-            NSLog(@"auth fail. how this can be?");
+            D(@"auth fail. how this can be?");
 	}
 	// fallthrough!
     default:
@@ -199,7 +199,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     }
     sipreg_headers(reg, fmt);
 
-    NSLog(@"set token: %@ token %s", token, enc_token);
+    D(@"set token: %@ token %s", token, enc_token);
 }
 
 - (NSData*)apns_token
@@ -228,7 +228,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     CFReadStreamSetProperty(read_stream, kCFStreamNetworkServiceType, kCFStreamNetworkServiceTypeVoIP);
     CFReadStreamOpen(read_stream);
 
-    NSLog(@"read stream %@", read_stream);
+    D(@"read stream %@", read_stream);
 
     upstream = conn;
     upstream_ref = read_stream;

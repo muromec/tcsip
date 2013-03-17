@@ -60,7 +60,7 @@ static void pq_cb(int flags, void *arg)
 - (void) worker
 {
 
-    NSLog(@"start re worker");
+    D(@"start re worker");
     fd_listen(proxy.mbox.readFd, FD_READ, pq_cb, (__bridge void*)proxy.mbox);
 
     re_main(NULL);
@@ -77,7 +77,7 @@ static void pq_cb(int flags, void *arg)
 
 - (oneway void) stop
 {
-    NSLog(@"re stop");
+    D(@"re stop");
     re_cancel();
 }
 

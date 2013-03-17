@@ -348,7 +348,7 @@ static void conncheck_handler(int err, bool update, void *arg)
     // XXX: use audio, video, chat flags
     int ok = media_snd_open(DIR_BI, 8000, O_LIM, &media);
     if(ok!=0) {
-        NSLog(@"media faled to open %d", ok);
+        D(@"media faled to open %d", ok);
         return;
     }
 
@@ -409,10 +409,10 @@ static void conncheck_handler(int err, bool update, void *arg)
 
     int err;
 
-    NSLog(@"processing offer in call media");
+    D(@"processing offer in call media");
     err = sdp_decode(sdp, offer, true);
     if(err) {
-        NSLog(@"cant decode offer %d\n", err);
+        D(@"cant decode offer %d\n", err);
         goto out;
     }
 
@@ -428,11 +428,11 @@ out:
 
 - (int) answer: (struct mbuf*)offer {
     int err;
-    NSLog(@"processing answer");
+    D(@"processing answer");
 
     err = sdp_decode(sdp, offer, false);
     if(err) {
-        NSLog(@"cant decode answer %d", err);
+        D(@"cant decode answer %d", err);
         goto out;
     }
 

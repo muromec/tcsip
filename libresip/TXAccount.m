@@ -48,7 +48,7 @@
     NSFileManager *fm = [[NSFileManager alloc] init];
     bool ok = [fm isReadableFileAtPath:[self
                               userCert: user]];
-    NSLog(@"check if user %@ available: %d", user, ok);
+    D(@"check if user %@ available: %d", user, ok);
     return ok;
 }
 
@@ -158,7 +158,7 @@
 
 - (void) auth:(NSString*)pUser password:(NSString*)pPassw cb:(Callback*)CB
 {
-    NSLog(@"try auth");
+    D(@"try auth");
     user = pUser;
 
     NSData *pubkey = [self findKey:YES];
