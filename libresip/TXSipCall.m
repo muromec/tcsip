@@ -161,13 +161,18 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
     
     [media offer: &mb];
 
+    NSString* nfmt = [NSString stringWithFormat:
+            @"Date: %@\r\n",
+	    [http_df stringFromDate:date_create]
+    ];
+
     err = sipsess_connect(&sess, uac->sock, to_uri, from_name,
                           from_uri, to_user,
                           NULL, 0, "application/sdp", mb,
                           auth_handler, ctx, false,
                           offer_handler, answer_handler,
                           progress_handler, establish_handler,
-                          NULL, NULL, close_handler, ctx, NULL);
+                          NULL, NULL, close_handler, ctx, _byte(nfmt));
     mem_deref(mb); /* free SDP buffer */
 
     D(@"invite sent %d", err);
