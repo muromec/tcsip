@@ -333,8 +333,8 @@ out:
 - (NSString*) ckey
 {
     NSString *ret = [NSString stringWithFormat:
-	@"%f@%@->%@",
-       [date_create timeIntervalSince1970],
+	@"%d@%@->%@",
+       (int)[date_create timeIntervalSince1970],
        cdir ? app.user.addr : dest.addr,
        cdir ? dest.addr : app.user.addr
     ];
