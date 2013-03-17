@@ -225,7 +225,7 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
 {
 
     int err;
-    struct mbuf *mb;
+    struct mbuf *mb = NULL;
 
     /*
      * XXX: drop bytes when confirmation received
@@ -236,6 +236,11 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
 	    return;
 	// 200
         err = [media offer: msg->mb ret:&mb];
+	if(err) {
+	    DROP(cstate, CSTATE_RING);
+            err |= CSTATE_ERR;
+	    break;
+	}
 
         /*
          * Workarround
@@ -336,6 +341,11 @@ out:
     D(@"key: %@", ret);
 
     return ret;
+}
+
+- (void)dealloc
+{
+    if(msg) mem_deref((void*)msg);
 }
 
 @end
