@@ -58,7 +58,6 @@ typedef enum {
     id<SipDelegate> delegate;
 }
 - (TXSip*) initWithAccount: (id) account;
-- (void) register;
 
 - (void) startCall: (NSString*)dest;
 - (void) startCallUser: (TXSipUser*)dest;

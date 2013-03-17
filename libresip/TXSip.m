@@ -198,11 +198,6 @@ static void exit_handler(void *arg)
     sreg.apns_token = token;
 }
 
-- (oneway void) register
-{
-    NSLog(@"register ...");
-}
-
 - (oneway void) setOnline: (reg_state)state
 {
     int err;
