@@ -23,14 +23,6 @@
 static struct httpc app = {NULL, NULL};
 static MailBox* root_box;
 static ReWrap* wrapper;
-static NSDateFormatter *df = NULL;
-
-static void setup_df() {
-    df = [[NSDateFormatter alloc] init];
-    df.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-    df.dateFormat = @"EEE',' dd MMM yyyy HH':'mm':'ss 'GMT'";
-    df.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
-}
 
 static void http_ret(struct request *req, int code, void *arg) {
 
@@ -106,7 +98,7 @@ static void http_err(int err, void *arg) {
 }
 - (void)ifs:(NSDate*)date
 {
-    NSString *header = [df stringFromDate:date];
+    NSString *header = [http_df stringFromDate:date];
     http_header(request, "If-Modified-Since", (char*)_byte(header));
 }
 
@@ -176,8 +168,6 @@ static void http_err(int err, void *arg) {
     void *_app = wrapper.app;
     memcpy(&app, _app, sizeof(struct httpc));
     app.tls = mem_ref(app.tls);
-
-    if(!df) setup_df();
 }
 
 + (void)drop_cert

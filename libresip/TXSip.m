@@ -39,6 +39,14 @@
 #endif
 
 int ui_idiom;
+NSDateFormatter *http_df = NULL;
+
+static void setup_df() {
+    http_df = [[NSDateFormatter alloc] init];
+    http_df.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+    http_df.dateFormat = @"EEE',' dd MMM yyyy HH':'mm':'ss 'GMT'";
+    http_df.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+}
 
 char* byte(NSString * input){
       int len = (int)[input lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
@@ -120,6 +128,8 @@ static void exit_handler(void *arg)
     int err; /* errno return values */
     err = media_snd_init();
     err = srtp_init();
+
+    if(!http_df) setup_df();
 
     uac = malloc(sizeof(uac_t));
     memset(uac, 0, sizeof(uac_t));
