@@ -62,6 +62,16 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
         [ctx hangup];
 }
 
+static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
+			  void *arg)
+{
+	int *stamp = arg;
+	NSString *hdr_str = _pstr(hdr->val);
+	NSDate *cdate = [http_df dateFromString:hdr_str];
+	*stamp = (int)[cdate timeIntervalSince1970];
+	return true;
+}
+
 @implementation TXSipCall
 @synthesize cstate;
 @synthesize end_reason;
@@ -78,12 +88,21 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     cstate = CSTATE_IN_RING;
     msg = mem_ref((void*)pMsg);
     [self parseFrom];
+    [self parseDate];
     [self acceptSession];
 }
  
 - (void) parseFrom
 {
     dest = [TXSipUser withAddr: (struct sip_taddr*)&msg->from];
+}
+
+- (void) parseDate
+{
+    int timestamp = 0;
+    sip_msg_hdr_apply(msg, true, SIP_HDR_DATE, find_date, &timestamp);
+    if(timestamp)
+        date_create = [NSDate dateWithTimeIntervalSince1970: timestamp];
 }
 
 - (void) acceptSession
