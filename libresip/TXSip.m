@@ -17,6 +17,12 @@
 #import "ReWrap.h"
 
 #include <re.h>
+
+#define DEBUG_MODULE "txsip"
+#define DEBUG_LEVEL 5
+
+#include <re_dbg.h>
+
 #include "txsip_private.h"
 #include "re_wrap_priv.h"
 #include "sound.h"
@@ -163,7 +169,7 @@ static void exit_handler(void *arg)
 	
     /* create SIP session socket */
     err = sipsess_listen(&uac->sock, uac->sip, 32, connect_handler, (__bridge void*)self);
-    re_printf("got laddr %J, listen %d\n", &uac->laddr, err);
+    DEBUG_INFO("got laddr %J, listen %d\n", &uac->laddr, err);
 }
 
 - (void)https_ua
