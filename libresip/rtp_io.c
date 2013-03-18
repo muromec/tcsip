@@ -6,7 +6,8 @@ void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
 
     rtp_recv_arg * _arg = varg;
 
-    _arg->handler(src, hdr, mb, _arg->ctx);
+    if(_arg->handler)
+        _arg->handler(src, hdr, mb, _arg->ctx);
 }
 
 void rtcp_recv_io(const struct sa *src, struct rtcp_msg *msg,
