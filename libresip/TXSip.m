@@ -274,12 +274,12 @@ static void exit_handler(void *arg)
     D(@"call changed %@, state %d", call, call.cstate);
     if((call.cstate & CSTATE_ALIVE) == 0) {
         [calls removeObject: call];
-	[delegate() dropCall: call];
+	[delegate() dropCall: here(call)];
 	return;
     }
 
     if(call.cstate & CSTATE_EST) {
-	[delegate() estabCall: call];
+	[delegate() estabCall: here(call)];
 	return;
     }
 }

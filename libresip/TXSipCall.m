@@ -187,7 +187,8 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
 - (void) hangup
 {
     D(@"handgup");
-    mem_deref(sess);
+    if(sess)
+        sess = mem_deref(sess);
 
     if(date_start)
         date_end = [NSDate date];
@@ -214,7 +215,7 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
      * TODO: move frames to call context
      * */
     [self upd];
-
+    cb = nil;
 }
 
 - (void) upd {
