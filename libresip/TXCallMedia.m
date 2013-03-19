@@ -343,6 +343,13 @@ static void conncheck_handler(int err, bool update, void *arg)
 
 }
 
+- (void)dealloc
+{
+    if(stun_dns) stun_dns = mem_deref(stun_dns);
+
+    if(sdp) sdp = mem_deref(sdp);
+}
+
 - (void) open {
 
     // XXX: use audio, video, chat flags
