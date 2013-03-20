@@ -7,6 +7,7 @@
 //
 
 #import "ReWrap.h"
+#import "MailBox.h"
 #import "TXSip.h"
 #include <re.h>
 #include "re_wrap_priv.h"
@@ -19,17 +20,16 @@ static void pq_cb(int flags, void *arg)
         return;
 
     MailBox *mbox  = (__bridge MailBox *)arg;
-    id inv = [mbox inv_pop];
-    [inv invoke];
+    [mbox kick];
 }
 
 @implementation ReWrap
-@synthesize proxy;
+@synthesize mbox;
 - (id)init
 {
     self = [super init];
     if(self) {
-        proxy = [MProxy withTarget: self];
+	mbox = [[MailBox alloc] init];
 	[self setup];
     }
 
@@ -44,6 +44,8 @@ static void pq_cb(int flags, void *arg)
 
     NSBundle *b = [NSBundle mainBundle];
     NSString *ca_cert = [b pathForResource:@"STARTSSL" ofType: @"cert"];
+    if(!ca_cert)
+        ca_cert = @"cert/STARTSSL.cert";
 
     err = libre_init(); /// XXX: do this conditionally!!!
     err = tls_alloc(&app->tls, TLS_METHOD_SSLV23, NULL, NULL);
@@ -61,7 +63,7 @@ static void pq_cb(int flags, void *arg)
 {
 
     D(@"start re worker");
-    fd_listen(proxy.mbox.readFd, FD_READ, pq_cb, (__bridge void*)proxy.mbox);
+    fd_listen(mbox.readFd, FD_READ, pq_cb, (__bridge void*)mbox);
 
     re_main(NULL);
 
@@ -79,11 +81,6 @@ static void pq_cb(int flags, void *arg)
 {
     D(@"re stop");
     re_cancel();
-}
-
-- (id)wrap:(id)ob
-{
-    return [MProxy withTargetBox: ob box:proxy.mbox];
 }
 
 - (void*)app

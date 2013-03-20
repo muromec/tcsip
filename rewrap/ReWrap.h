@@ -8,23 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
-@class MProxy;
 struct reapp;
+@class MailBox;
 
-@protocol Wrapper <NSObject>
-- (id) wrap: (id)ob;
-@end
-
-@interface ReWrap : NSObject <Wrapper>{
+@interface ReWrap : NSObject {
     struct reapp *app;
-    MProxy *proxy;
+    MailBox *mbox;
 }
 
-- (id)wrap:(id)ob;
 - (oneway void)stop;
 + (void*)app;
 
-@property (readonly) MProxy* proxy;
+@property (readonly) MailBox* mbox;
 @property (readonly) void* app;
 
 @end

@@ -15,6 +15,7 @@
 #import "TXRestApi.h"
 #import "TXUplinks.h"
 #import "ReWrap.h"
+#import "MailBox.h"
 
 #include <re.h>
 #include <msgpack.h>
@@ -30,15 +31,7 @@
 #include <srtp.h>
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
-#define delegate( ) (self->delegate)
-#define here(x) ([wrapper wrap:x])
 
-#define push_str(__s) {\
-    msgpack_pack_raw(pk, [__s length]);\
-    msgpack_pack_raw_body(pk, _byte(__s), [__s length]);}
-#define push_cstr(__c) {\
-    msgpack_pack_raw(pk, sizeof(__c)-1);\
-    msgpack_pack_raw_body(pk, __c, sizeof(__c)-1);}
 
 #if TARGET_OS_IPHONE
 #define USER_AGENT "TexR/iOS libre"
@@ -93,10 +86,8 @@ static void exit_handler(void *arg)
 @synthesize auth;
 @synthesize uplinks;
 @synthesize user;
-@synthesize wrapper;
-@synthesize delegate;
 @synthesize mbox;
-
+@synthesize own_box;
 - (id) initWithAccount: (id) pAccount
 {
     self = [super init];
@@ -144,6 +135,9 @@ static void exit_handler(void *arg)
     uac->dnsc = app->dnsc;
     NSBundle *b = [NSBundle mainBundle];
     NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
+    if(!ca_cert)
+        ca_cert = @"cert/CA.cert";
+
     NSString *cert = [account cert];
     err = tls_alloc(&app->tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
     tls_add_ca(app->tls, _byte(ca_cert));
@@ -210,11 +204,6 @@ static void exit_handler(void *arg)
     media_snd_deinit();
 }
 
-- (oneway void) apns_token:(NSData*)token
-{
-    sreg.apns_token = token;
-}
-
 - (oneway void) setOnline: (reg_state)state
 {
     int err;
@@ -243,6 +232,87 @@ static void exit_handler(void *arg)
     [sreg setState: state];
 }
 
+- (void)obCmd:(msgpack_object)ob
+{
+    msgpack_object *arg;
+    msgpack_object_raw cmd;
+    arg = ob.via.array.ptr;
+
+    if(arg->type != MSGPACK_OBJECT_RAW)
+	    return;
+
+    cmd = arg->via.raw;
+
+    if(!strncmp(cmd.ptr, "sip.online", cmd.size)) {
+        arg++;
+        [self setOnline: (reg_state)arg->via.i64];
+    }
+
+    if(!strncmp(cmd.ptr, "sip.call.place", cmd.size)) {
+        arg++;
+        NSString *login = _str(arg->via.raw.ptr, arg->via.raw.size);
+        arg++;
+        TXSipUser* dest = [TXSipUser withName:login];
+        dest.name = _str(arg->via.raw.ptr, arg->via.raw.size);
+        [self startCallUser:dest];
+    }
+    if(!strncmp(cmd.ptr, "sip.call.control", cmd.size)) {
+        arg++;
+        NSString *ckey = _str(arg->via.raw.ptr, arg->via.raw.size);
+        arg++;
+	int op = (int)arg->via.i64;
+	for(TXSipCall* call in calls) {
+            if(![call.ckey isEqualToString:ckey]) continue;
+
+	    [call control: op];
+	    break;
+	}
+    }
+
+    if(!strncmp(cmd.ptr, "sip.apns", cmd.size)) {
+        arg++;
+	sreg.apns_token = [NSData dataWithBytes:
+		arg->via.raw.ptr
+		length:	arg->via.raw.size];
+    }
+}
+
+- (void)online:(reg_state)state
+{
+    struct msgpack_packer *pk = own_box.packer;
+    msgpack_pack_array(pk, 2);
+    push_cstr("sip.online");
+    msgpack_pack_int(pk, state);
+}
+
+- (void)control:(NSString*)ckey op:(int)op
+{
+    struct msgpack_packer *pk = own_box.packer;
+    msgpack_pack_array(pk, 3);
+    push_cstr("sip.call.control");
+    push_str(ckey);
+    msgpack_pack_int(pk, op);
+}
+
+- (void)call:(TXSipUser*)dest
+{
+    struct msgpack_packer *pk = own_box.packer;
+    msgpack_pack_array(pk, 3);
+    push_cstr("sip.call.place");
+    push_str(dest.user);
+    push_str(dest.name);
+}
+
+- (void) apns:(NSData*)token
+{
+    struct msgpack_packer *pk = own_box.packer;
+    msgpack_pack_array(pk, 2);
+    push_cstr("sip.apns");
+    msgpack_pack_raw(pk, [token length]);
+    msgpack_pack_raw_body(pk, [token bytes], [token length]);
+}
+
+
 - (oneway void) startCall: (NSString*)dest {
 
     [self startCallUser: [TXSipUser withName: dest]];
@@ -260,26 +330,30 @@ static void exit_handler(void *arg)
     [out_call setCb: CB(self, callChange:)];
     [out_call waitIce];
     [calls addObject: out_call];
-//    [delegate() addCall: here(out_call)];
 
-    NSString *ckey = [out_call ckey];
+    [self reportCall:out_call];
+}
+
+- (void) reportCall:(TXSipCall*)call {
+
+    NSString *ckey = [call ckey];
 
     msgpack_packer *pk = [mbox packer];
     msgpack_pack_array(pk, 7);
     push_cstr("sip.call.add");
     push_str(ckey);
-    msgpack_pack_int(pk, out_call.cdir);
-    msgpack_pack_int(pk, out_call.cstate);
-    msgpack_pack_int(pk, (int)[out_call.date_create timeIntervalSince1970]);
-    push_str(udest.name);
-    push_str(udest.user);
-
+    msgpack_pack_int(pk, call.cdir);
+    msgpack_pack_int(pk, call.cstate);
+    msgpack_pack_int(pk, (int)[call.date_create timeIntervalSince1970]);
+    push_str(call.dest.name);
+    push_str(call.dest.user);
 }
 
 - (void) callIncoming: (id)in_call {
     [in_call setCb: CB(self, callChange:)];
     [calls addObject: in_call];
-    [delegate() addCall: here(in_call)];
+    [self reportCall:in_call];
+
 }
 
 - (void) callChange: (TXSipCall*) call {
@@ -288,7 +362,6 @@ static void exit_handler(void *arg)
 
     if((call.cstate & CSTATE_ALIVE) == 0) {
         [calls removeObject: call];
-	//[delegate() dropCall: here(call)];
 
 	msgpack_packer *pk = [mbox packer]; 
 	msgpack_pack_array(pk, 3);
@@ -300,10 +373,8 @@ static void exit_handler(void *arg)
 
     if(call.cstate & CSTATE_EST) {
 	msgpack_packer *pk = [mbox packer]; 
-	msgpack_pack_array(pk, 3);
+	msgpack_pack_array(pk, 2);
 	push_cstr("sip.call.est");
-        msgpack_pack_int(pk, call.cdir);
-
         push_str(ckey);
 
 	return;

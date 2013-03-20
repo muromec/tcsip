@@ -56,7 +56,6 @@ static void http_err(int err, void *arg) {
 + (void)r: (NSString*)path cb:(id)cb
 {
     TXRestApi *api = [[TXRestApi alloc] init];
-    api = [wrapper wrap:api];
     [api rload: path cb: cb];
     [api start];
 }
@@ -64,7 +63,6 @@ static void http_err(int err, void *arg) {
 + (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p
 {
     TXRestApi *api = [[TXRestApi alloc] init];
-    api = [wrapper wrap:api];
     [api rload: path cb: cb];
     [api setAuth: u password:p];
     [api start];
@@ -73,7 +71,7 @@ static void http_err(int err, void *arg) {
 + (id)api
 {
     TXRestApi *api = [[TXRestApi alloc] init];
-    return [wrapper wrap:api];
+    return api;
 }
 
 - (void)rload: (NSString*)path cb:(id)pCb
@@ -81,7 +79,7 @@ static void http_err(int err, void *arg) {
     NSString *url = [NSString stringWithFormat:@"https://www.texr.net/api/%@",path];
     http_init(&app, &request, (char*)_byte(url));
     http_cb(request, (__bridge_retained void*)self, http_done, http_err);
-    cb = [MProxy withTargetBox: pCb box:root_box];
+    cb = pCb;
     request = mem_ref(request);
 }
 
@@ -102,9 +100,9 @@ static void http_err(int err, void *arg) {
     http_header(request, "If-Modified-Since", (char*)_byte(header));
 }
 
-- (oneway void)start
+- (void)start
 {
-    http_send(request);
+    //http_send(request);
 }
 
 - (void)code:(int) code data:(NSData*)data

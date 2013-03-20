@@ -11,8 +11,6 @@
 #import "TXSipUser.h"
 #import "TXAccount.h" // XXX: depends out!
 
-#import "MProxy.h"
-
 #include <string.h>
 
 struct uac;
@@ -27,16 +25,6 @@ typedef enum {
     REG_FG
 } reg_state;
 
-@protocol SipDelegate <NSObject>
-
-- (void) addCall: (id)call;
-- (void) dropCall: (id)call;
-- (void) estabCall: (id)call;
-
-@end
-
-@protocol Wrapper;
-@class ReWrap;
 @class TXSipReg;
 @class TXUplinks;
 @class MailBox;
@@ -57,30 +45,29 @@ typedef enum {
     NSMutableArray * calls;
     NSMutableArray * chats;
 
-    ReWrap* wrapper;
-    id<SipDelegate> delegate;
     MailBox *mbox;
+    MailBox *own_box;
 }
 - (TXSip*) initWithAccount: (id) account;
 
-- (void) startCall: (NSString*)dest;
-- (void) startCallUser: (TXSipUser*)dest;
+// for callback
 - (void) callIncoming: (id)in_call;
-- (void) startChat: (NSString*)dest;
 
 - (uac_t*) getUa;
-- (oneway void) setRegObserver: (id)obs;
-- (oneway void) apns_token:(NSData*)token;
-- (oneway void) setOnline: (reg_state)state;
 - (oneway void) close;
 - (void)reportReg:(enum reg_state)state;
+
+// public api
+- (void)online:(reg_state)state;
+- (void)control:(NSString*)ckey op:(int)op;
+- (void)call:(TXSipUser*)user;
+- (void)apns:(NSData*)token;
 
 @property id auth;
 @property id uplinks;
 @property (readonly) TXSipUser* user;
-@property id<Wrapper> wrapper;
-@property id delegate;
 @property MailBox* mbox;
+@property MailBox* own_box;
 
 @end
 

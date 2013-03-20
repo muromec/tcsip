@@ -42,16 +42,6 @@ int write_fd(void* data, const char* buf, unsigned int len)
     return self;
 }
 
-- (id) inv_pop
-{
-    id ret;
-    box_msg msg;
-
-    read(readFd, &msg, sizeof(msg));
-    ret = (__bridge_transfer id)msg.arg;
-    return ret;
-}
-
 - (struct msgpack_object) qpop:(int)rd
 {
     size_t rsize;
@@ -83,19 +73,17 @@ none:
     return ob;
 }
 
-- (void) qput: (id) data;
+- (void)kick
 {
-    if(!data) return;
-    box_msg msg;
-    msg.arg = (__bridge_retained void*)data;
-    msg.magic = 0xDEADF123;
-
-    if(!kickFd) {
-        NSLog(@"wtf??");
-        return;
-    }
-
-    write(kickFd, &msg, sizeof(msg));
+    msgpack_object ob;
+    int read=1;
+    do {
+	ob = [self qpop: read];
+	read = 0;
+	if(ob.type==MSGPACK_OBJECT_ARRAY) {
+	    [delegate obCmd:ob];
+	}
+    } while(ob.type<10);
 }
 
 - (void) cmd: (char*)data len:(int)len
