@@ -110,6 +110,8 @@
 		859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		859D3D7E1628D6D300385248 /* TXAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		859D3D831628D79200385248 /* TXRestApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		85AA389016F8F7C700701FCA /* libmsgpack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AA388F16F8F7C700701FCA /* libmsgpack.a */; };
+		85AA389116F8F7C700701FCA /* libmsgpack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AA388F16F8F7C700701FCA /* libmsgpack.a */; };
 		85B57C7A1632999F00456ADD /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859D3D8E1628D99F00385248 /* AudioUnit.framework */; };
 		85B57C7C163299AD00456ADD /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7B163299AD00456ADD /* CoreAudio.framework */; };
 		85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7D163299B100456ADD /* AudioToolbox.framework */; };
@@ -277,6 +279,7 @@
 		859D3D521628D6A400385248 /* libresip_osx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libresip_osx.h; sourceTree = "<group>"; };
 		859D3D531628D6A400385248 /* libresip_osx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = libresip_osx.m; sourceTree = "<group>"; };
 		859D3D8E1628D99F00385248 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AudioUnit.framework; sourceTree = DEVELOPER_DIR; };
+		85AA388F16F8F7C700701FCA /* libmsgpack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmsgpack.a; path = deps/libmsgpack.a; sourceTree = "<group>"; };
 		85B57C781632999000456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
 		85B57C7B163299AD00456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		85B57C7D163299B100456ADD /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -377,6 +380,7 @@
 				850277A21625B53E00AB5038 /* Foundation.framework in Frameworks */,
 				855707031629185700407CCC /* libspeexdsp.a in Frameworks */,
 				855707041629185700407CCC /* libspeex.a in Frameworks */,
+				85AA389016F8F7C700701FCA /* libmsgpack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,6 +401,7 @@
 				859D3D461628D6A400385248 /* Cocoa.framework in Frameworks */,
 				855707061629187C00407CCC /* libspeexdsp.a in Frameworks */,
 				855707071629188000407CCC /* libspeex.a in Frameworks */,
+				85AA389116F8F7C700701FCA /* libmsgpack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -427,6 +432,7 @@
 				852716951628F3A300C4B8DD /* libssl.dylib */,
 				852716931628F39A00C4B8DD /* libresolv.dylib */,
 				8561505A1664D34000DBCFD5 /* libopus.a */,
+				85AA388F16F8F7C700701FCA /* libmsgpack.a */,
 				85FF73D5162909E3005C64D5 /* deps */,
 				852DA29C16A01AD400AF5677 /* rewrap */,
 				853B201C169F1DE700F423DB /* http.c */,
@@ -1175,6 +1181,7 @@
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Werror",
+					"-Wno-unused-function",
 				);
 				WRAPPER_EXTENSION = framework;
 			};
@@ -1249,6 +1256,7 @@
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Werror",
+					"-Wno-unused-function",
 				);
 				WRAPPER_EXTENSION = framework;
 			};
