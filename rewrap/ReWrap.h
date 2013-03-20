@@ -24,7 +24,7 @@ struct reapp;
 - (oneway void)stop;
 + (void*)app;
 
-@property (readonly) id proxy;
+@property (readonly) MProxy* proxy;
 @property (readonly) void* app;
 
 @end

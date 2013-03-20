@@ -19,7 +19,7 @@ static void pq_cb(int flags, void *arg)
         return;
 
     MailBox *mbox  = (__bridge MailBox *)arg;
-    id inv = [mbox qpop];
+    id inv = [mbox inv_pop];
     [inv invoke];
 }
 

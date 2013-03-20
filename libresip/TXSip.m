@@ -17,6 +17,7 @@
 #import "ReWrap.h"
 
 #include <re.h>
+#include <msgpack.h>
 
 #define DEBUG_MODULE "txsip"
 #define DEBUG_LEVEL 5
@@ -31,6 +32,13 @@
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 #define delegate( ) (self->delegate)
 #define here(x) ([wrapper wrap:x])
+
+#define push_str(__s) {\
+    msgpack_pack_raw(pk, [__s length]);\
+    msgpack_pack_raw_body(pk, _byte(__s), [__s length]);}
+#define push_cstr(__c) {\
+    msgpack_pack_raw(pk, sizeof(__c)-1);\
+    msgpack_pack_raw_body(pk, __c, sizeof(__c)-1);}
 
 #if TARGET_OS_IPHONE
 #define USER_AGENT "TexR/iOS libre"
@@ -56,16 +64,6 @@ char* byte(NSString * input){
       strcpy(toReturn,[input cStringUsingEncoding:NSUTF8StringEncoding]);
 
       return toReturn;
-}
-
-void pq_cb(int flags, void *arg)
-{
-    if(!(flags & FD_READ))
-        return;
-
-    MailBox *mbox  = (__bridge MailBox *)arg;
-    id inv = [mbox qpop];
-    [inv invoke];
 }
 
 /* called upon incoming calls */
@@ -97,6 +95,7 @@ static void exit_handler(void *arg)
 @synthesize user;
 @synthesize wrapper;
 @synthesize delegate;
+@synthesize mbox;
 
 - (id) initWithAccount: (id) pAccount
 {
@@ -255,13 +254,26 @@ static void exit_handler(void *arg)
 	D(@"no laddr, cant call");
         return;
     }
-    id out_call = [[TXSipCall alloc] initWithApp:self];
+    TXSipCall *out_call = [[TXSipCall alloc] initWithApp:self];
     [out_call outgoing: udest];
     [out_call setDest: udest];
     [out_call setCb: CB(self, callChange:)];
     [out_call waitIce];
     [calls addObject: out_call];
-    [delegate() addCall: here(out_call)];
+//    [delegate() addCall: here(out_call)];
+
+    NSString *ckey = [out_call ckey];
+
+    msgpack_packer *pk = [mbox packer];
+    msgpack_pack_array(pk, 7);
+    push_cstr("sip.call.add");
+    push_str(ckey);
+    msgpack_pack_int(pk, out_call.cdir);
+    msgpack_pack_int(pk, out_call.cstate);
+    msgpack_pack_int(pk, (int)[out_call.date_create timeIntervalSince1970]);
+    push_str(udest.name);
+    push_str(udest.user);
+
 }
 
 - (void) callIncoming: (id)in_call {
@@ -271,15 +283,29 @@ static void exit_handler(void *arg)
 }
 
 - (void) callChange: (TXSipCall*) call {
-    D(@"call changed %@, state %d", call, call.cstate);
+    NSString *ckey = [call ckey];
+    D(@"call changed %@, state %d", ckey, call.cstate);
+
     if((call.cstate & CSTATE_ALIVE) == 0) {
         [calls removeObject: call];
-	[delegate() dropCall: here(call)];
+	//[delegate() dropCall: here(call)];
+
+	msgpack_packer *pk = [mbox packer]; 
+	msgpack_pack_array(pk, 3);
+	push_cstr("sip.call.del");
+        push_str(ckey);
+        msgpack_pack_int(pk, call.end_reason);
 	return;
     }
 
     if(call.cstate & CSTATE_EST) {
-	[delegate() estabCall: here(call)];
+	msgpack_packer *pk = [mbox packer]; 
+	msgpack_pack_array(pk, 3);
+	push_cstr("sip.call.est");
+        msgpack_pack_int(pk, call.cdir);
+
+        push_str(ckey);
+
 	return;
     }
 }
@@ -299,9 +325,19 @@ static void exit_handler(void *arg)
     return uac;
 }
 
+- (void)reportReg:(reg_state_t)state
+{
+    msgpack_packer *pk = [mbox packer];
+    msgpack_pack_array(pk, 2);
+    msgpack_pack_raw(pk, 7);
+    msgpack_pack_raw_body(pk, "sip.reg", 7);
+    msgpack_pack_int(pk, state);
+
+}
+
 - (oneway void) setRegObserver: (id)obs {
-    sreg.obs = obs;
-    uplinks.cb = CB(obs, uplinks:);
+    //sreg.obs = obs;
+    //uplinks.cb = CB(obs, uplinks:);
 }
 
 @end

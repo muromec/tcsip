@@ -17,6 +17,7 @@
 
 struct uac;
 typedef struct uac uac_t;
+enum reg_state;
 
 struct reapp;
 
@@ -35,8 +36,10 @@ typedef enum {
 @end
 
 @protocol Wrapper;
+@class ReWrap;
 @class TXSipReg;
 @class TXUplinks;
+@class MailBox;
 
 @interface TXSip : NSObject {
     // sip core and sip services
@@ -54,8 +57,9 @@ typedef enum {
     NSMutableArray * calls;
     NSMutableArray * chats;
 
-    id<Wrapper> wrapper;
+    ReWrap* wrapper;
     id<SipDelegate> delegate;
+    MailBox *mbox;
 }
 - (TXSip*) initWithAccount: (id) account;
 
@@ -69,12 +73,14 @@ typedef enum {
 - (oneway void) apns_token:(NSData*)token;
 - (oneway void) setOnline: (reg_state)state;
 - (oneway void) close;
+- (void)reportReg:(enum reg_state)state;
 
 @property id auth;
 @property id uplinks;
 @property (readonly) TXSipUser* user;
 @property id<Wrapper> wrapper;
 @property id delegate;
+@property MailBox* mbox;
 
 @end
 

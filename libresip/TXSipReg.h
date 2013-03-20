@@ -12,12 +12,15 @@
 
 struct tcp_conn;
 
-typedef enum {
+enum reg_state {
     REG_NONE,
     REG_START=1,
     REG_AUTH=2,
-    REG_ONLINE=4
-} reg_state_t;
+    REG_ONLINE=4,
+    REG_TRY=5,
+};
+
+typedef enum reg_state reg_state_t;
 
 @protocol RegObserver
 - (void) onlineState: (NSString*)state;

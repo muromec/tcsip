@@ -115,7 +115,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 {
     reg_time++;
     sipreg_expires(reg, reg_time);
-    [obs onlineState: @"try"];
+    [app reportReg:REG_TRY];
 }
 
 - (void) send
@@ -142,9 +142,9 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
     D(@"send register %d %d %s", err, reg_time, user);
     if(err) {
-        [obs onlineState: @"off"];
+	[app reportReg:REG_NONE];
     } else {
-        [obs onlineState: @"try"];
+	[app reportReg:REG_TRY];
         rstate |= REG_START;
     }
     D(@"sreg apns token %@", apns_token);
@@ -156,7 +156,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
     switch(status) {
     case 200:
-        [obs onlineState: @"ok"];
+	[app reportReg:REG_ONLINE];
 
 	rstate |= REG_AUTH;
 	rstate |= REG_ONLINE;
@@ -168,7 +168,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 	// fallthrough!
     default:
 	rstate &= rstate^REG_ONLINE;
-        [obs onlineState: @"lost"];
+	[app reportReg:REG_NONE];
     }
 }
 

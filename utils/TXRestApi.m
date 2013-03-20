@@ -118,12 +118,13 @@ static void http_err(int err, void *arg) {
 
     JSONDecoder* decoder = [JSONDecoder decoder];
     NSDictionary *ret = [decoder objectWithData: data];
+    NSLog(@"ret: %@", ret);
 
-    [cb response: ret];
+    //[cb response: ret];
 }
 - (void)fail
 {
-   [cb response: nil];
+   //[cb response: nil];
 }
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW

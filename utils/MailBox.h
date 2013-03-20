@@ -7,14 +7,28 @@
 //
 
 #import <Foundation/Foundation.h>
+struct msgpack_zone;
+struct msgpack_packer;
+struct msgpack_unpacker;
+struct msgpack_object;
 
 @interface MailBox : NSObject {
     int kickFd;
     int readFd;
+    id delegate;
+    struct msgpack_zone *mempool;
+    struct msgpack_packer *packer;
+    struct msgpack_unpacker *up;
+    BOOL call;
 }
-- (id) qpop;
+- (struct msgpack_object) qpop:(int)read;
+- (id) inv_pop;
+
 - (void) qput: (id) data;
+- (void) cmd: (char*)data len:(int)len;
+- (struct msgpack_packer*) packer;
 
 @property int readFd;
+@property id delegate;
 
 @end
