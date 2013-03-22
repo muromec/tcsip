@@ -8,41 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-struct httpc;
-@class MProxy;
-@class MailBox;
-
-@interface TXRestApi : NSObject <NSURLConnectionDelegate> {
-    NSMutableData *responseData;
-    int status_code;
-    id cb;
-    id url_con;
-
-    NSString *username;
-    NSString *password;
-
-    struct request *request;
+@interface TXRestApi : NSObject {
+    struct httpc* app;
 }
 
-- (void)rload: (NSString*)path cb:(id)pCb;
-- (void)start;
-- (void)post:(NSString*)key val:(NSString*)val;
-- (void)post:(NSString*)val;
-- (void)code:(int) code data:(NSData*)data;
-- (void)ifs:(NSDate*)date;
-
-- (void)fail;
-
-+ (void)r: (NSString*)path cb:(id)cb;
-+ (void)r: (NSString*)path cb:(id)cb user:(NSString*)u password:(NSString*)p;
-+ (void) cert:(NSString*)cert;
-
-+ (void)wrapper: (id)wrapper;
-+ (void)drop_cert;
-+ (void)retbox: (MailBox*)box;
-+ (id)api;
-
-- (void) setAuth:(NSString*)pU password:(NSString*)pW;
-- (BOOL) sendAuth;
+- (id)request: (NSString*)path cb:(id)pCb;
+- (id)load: (NSString*)path cb:(id)pCb;
 
 @end

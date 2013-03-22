@@ -13,12 +13,14 @@
 #define kSipUUID @"sipuuid"
 
 @class TXKey;
+@class TXRestApi;
 
 @interface TXAccount : NSObject {
     NSString* user;
     NSString* name;
     Callback *auth_cb;
     TXKey *key;
+    TXRestApi *api;
 }
 - (id) initWithUser: (NSString*) pUser;
 - (NSString*) cert;
@@ -32,5 +34,6 @@
 @property (readonly) NSString* user;
 @property (readonly) NSString* uuid;
 @property NSString* name;
+@property (readonly) TXRestApi *api;
 
 @end

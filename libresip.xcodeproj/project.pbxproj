@@ -113,6 +113,9 @@
 		85B57C7C163299AD00456ADD /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7B163299AD00456ADD /* CoreAudio.framework */; };
 		85B57C7E163299B100456ADD /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C7D163299B100456ADD /* AudioToolbox.framework */; };
 		85D6414F163C62F4008D3974 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85B57C781632999000456ADD /* CoreAudio.framework */; };
+		85DBA21F16FCC4C500FB7B84 /* TXHttp.h in Headers */ = {isa = PBXBuildFile; fileRef = 85DBA21D16FCC4C500FB7B84 /* TXHttp.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		85DBA22016FCC4C500FB7B84 /* TXHttp.m in Sources */ = {isa = PBXBuildFile; fileRef = 85DBA21E16FCC4C500FB7B84 /* TXHttp.m */; };
+		85DBA22116FCC4C500FB7B84 /* TXHttp.m in Sources */ = {isa = PBXBuildFile; fileRef = 85DBA21E16FCC4C500FB7B84 /* TXHttp.m */; };
 		85EF252616F3CDE200068C00 /* cross.h in Headers */ = {isa = PBXBuildFile; fileRef = 85EF252416F3CCEC00068C00 /* cross.h */; };
 		85FF742516290A60005C64D5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742316290A60005C64D5 /* libcrypto.a */; };
 		85FF742616290A60005C64D5 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742416290A60005C64D5 /* libssl.a */; };
@@ -277,6 +280,8 @@
 		85B57C7B163299AD00456ADD /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		85B57C7D163299B100456ADD /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		85D64144163C62EA008D3974 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
+		85DBA21D16FCC4C500FB7B84 /* TXHttp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXHttp.h; path = utils/TXHttp.h; sourceTree = "<group>"; };
+		85DBA21E16FCC4C500FB7B84 /* TXHttp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TXHttp.m; path = utils/TXHttp.m; sourceTree = "<group>"; };
 		85EF252416F3CCEC00068C00 /* cross.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cross.h; sourceTree = "<group>"; };
 		85FF73D8162909F4005C64D5 /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
 		85FF73D9162909F4005C64D5 /* asn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1.h; sourceTree = "<group>"; };
@@ -517,6 +522,8 @@
 				8507AA931628AEEF00CE9AE6 /* Callback.h */,
 				850277DD1625B5C300AB5038 /* MailBox.h */,
 				850277DE1625B5C300AB5038 /* MailBox.m */,
+				85DBA21D16FCC4C500FB7B84 /* TXHttp.h */,
+				85DBA21E16FCC4C500FB7B84 /* TXHttp.m */,
 			);
 			name = util;
 			sourceTree = "<group>";
@@ -765,6 +772,7 @@
 				8536A06B1634D6A2007543B4 /* TXSipCall.h in Headers */,
 				8545D51F164447E400DD7533 /* JSONKit.h in Headers */,
 				852DA29716A00DE500AF5677 /* ReWrap.h in Headers */,
+				85DBA21F16FCC4C500FB7B84 /* TXHttp.h in Headers */,
 				856150441664B5AC00DBCFD5 /* g711.h in Headers */,
 				856150551664D20200DBCFD5 /* opus.h in Headers */,
 				856150561664D20200DBCFD5 /* opus_custom.h in Headers */,
@@ -887,6 +895,7 @@
 				852DA29816A00DE500AF5677 /* ReWrap.m in Sources */,
 				852DA2A016A05CEE00AF5677 /* auth.c in Sources */,
 				8520171B16EAE4380020BC02 /* TXUplinks.m in Sources */,
+				85DBA22016FCC4C500FB7B84 /* TXHttp.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -920,6 +929,7 @@
 				852DA29916A00DE500AF5677 /* ReWrap.m in Sources */,
 				852DA2A116A05CEE00AF5677 /* auth.c in Sources */,
 				8520171C16EAE4380020BC02 /* TXUplinks.m in Sources */,
+				85DBA22116FCC4C500FB7B84 /* TXHttp.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

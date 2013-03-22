@@ -100,7 +100,6 @@ static void exit_handler(void *arg)
     user.name = account.name;
 
     [self create_ua];
-    [self https_ua];
     calls = [[NSMutableArray alloc] init];
     chats = [[NSMutableArray alloc] init];
     
@@ -175,11 +174,6 @@ static void exit_handler(void *arg)
     /* create SIP session socket */
     err = sipsess_listen(&uac->sock, uac->sip, 32, connect_handler, (__bridge void*)self);
     DEBUG_INFO("got laddr %J, listen %d\n", &uac->laddr, err);
-}
-
-- (void)https_ua
-{
-    [TXRestApi cert: [account cert]];
 }
 
 - (void) close

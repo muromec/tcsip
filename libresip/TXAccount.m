@@ -8,6 +8,7 @@
 
 #import "TXAccount.h"
 #import "TXRestApi.h"
+#import "TXHttp.h"
 #import "TXKey.h"
 
 #import <Security/Security.h>
@@ -15,6 +16,17 @@
 @implementation TXAccount
 @synthesize user;
 @synthesize name;
+@synthesize api;
+
+- (id) init
+{
+    self = [super init];
+    if(!self) return self;
+
+    api = [[TXRestApi alloc] init];
+
+    return self;
+}
 
 - (id) initWithUser: (NSString*) pUser
 {
@@ -168,13 +180,11 @@
     }
 
     auth_cb = CB;
-    id api = [TXRestApi api];
-    [api rload: @"cert"
-               cb: CB(self, certLoaded:)];
-    [api setAuth:pUser password:pPassw];
-    [api post:[NSString stringWithFormat:
+    id req = [api request: @"cert" cb:CB(self, certLoaded:)];
+    [req setAuth:pUser password:pPassw];
+    [req post:[NSString stringWithFormat:
 	    @"%s", pubkey.bytes]];
-    [api start];
+    [req start];
 }
 
 - (void) certLoaded:(NSDictionary*)ret
@@ -199,11 +209,10 @@
 - (void)create:(NSString*)email phone:(NSString*)phone cb:(Callback*)cb
 {
     auth_cb = cb;
-    id api = [TXRestApi api];
-    [api rload: @"signup" cb: CB(self, createRet:)];
-    [api post:@"email" val:email];
-    [api post:@"phone" val:phone];
-    [api start];
+    id req = [api request: @"signup" cb: CB(self, createRet:)];
+    [req post:@"email" val:email];
+    [req post:@"phone" val:phone];
+    [req start];
 }
 
 - (void)createRet:(NSDictionary*)ret
