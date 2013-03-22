@@ -8,21 +8,27 @@
 
 #import <Foundation/Foundation.h>
 struct httpc;
+@class TXRestApi;
 @class Callback;
 
 @interface TXHttp : NSObject {
-    struct httpc* app;
+    struct httpc* httpc;
 
     NSMutableData *responseData;
     int status_code;
     Callback* cb;
+    TXRestApi* api;
+    BOOL ready;
     id url_con;
 
+    NSDictionary *ret;
     NSString *username;
     NSString *password;
 
     struct request *request;
 }
+- (id) initWithApp:(struct httpc*)app api:(id)pApi;
+
 - (void)rload: (NSString*)path cb:(id)pCb;
 
 - (void)setAuth:(NSString*)pU password:(NSString*)pW;
@@ -35,5 +41,6 @@ struct httpc;
 
 - (void)start;
 - (void)fail;
+- (BOOL)kick;
 
 @end

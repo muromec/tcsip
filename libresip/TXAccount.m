@@ -10,6 +10,7 @@
 #import "TXRestApi.h"
 #import "TXHttp.h"
 #import "TXKey.h"
+#import "ReWrap.h"
 
 #import <Security/Security.h>
 
@@ -23,14 +24,14 @@
     self = [super init];
     if(!self) return self;
 
-    api = [[TXRestApi alloc] init];
+    api = [[TXRestApi alloc] initWithApp:[ReWrap app]];
 
     return self;
 }
 
 - (id) initWithUser: (NSString*) pUser
 {
-    self = [super init];
+    self = [self init];
     if(!self)
         return self;
 
@@ -201,9 +202,8 @@
 
     NSString *pem_cert = [payload objectForKey:@"pem"];
     [self saveCert: pem_cert];
-
+ 
     [auth_cb response: @"ok"];
-
 }
 
 - (void)create:(NSString*)email phone:(NSString*)phone cb:(Callback*)cb

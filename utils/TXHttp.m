@@ -8,6 +8,7 @@
 
 #import "TXSip.h"
 #import "TXHttp.h"
+#import "TXRestApi.h"
 #import "JSONKit.h"
 #include "http.h"
 
@@ -45,10 +46,21 @@ static void http_err(int err, void *arg) {
 }
 
 @implementation TXHttp
+- (id) initWithApp:(struct httpc*)app api:(id)pApi {
+    self = [super init];
+    if(!self) return self;
+
+    httpc = mem_ref(app);
+    api = pApi;
+
+    return self;
+}
+
+
 - (void)rload: (NSString*)path cb:(id)pCb
 {
     NSString *url = [NSString stringWithFormat:@"https://www.texr.net/api/%@",path];
-    http_init(app, &request, (char*)_byte(url));
+    http_init(httpc, &request, (char*)_byte(url));
     http_cb(request, (__bridge_retained void*)self, http_done, http_err);
     cb = pCb;
     request = mem_ref(request);
@@ -73,7 +85,7 @@ static void http_err(int err, void *arg) {
 
 - (void)start
 {
-    //http_send(request);
+    http_send(request);
 }
 
 - (void)code:(int) code data:(NSData*)data
@@ -86,14 +98,24 @@ static void http_err(int err, void *arg) {
     }
 
     JSONDecoder* decoder = [JSONDecoder decoder];
-    NSDictionary *ret = [decoder objectWithData: data];
-    NSLog(@"ret: %@", ret);
+    ret = [decoder objectWithData: data];
 
-    //[cb response: ret];
+    ready = YES;
+    [api ready: self];
 }
 - (void)fail
 {
-   //[cb response: nil];
+    ready = YES;
+    [api ready: self];
+}
+
+- (BOOL)kick
+{
+    if(!ready) return NO;
+
+    [cb response: ret];
+    cb = nil;
+    return YES;
 }
 
 - (void) setAuth:(NSString*)pU password:(NSString*)pW
@@ -120,6 +142,4 @@ static void http_err(int err, void *arg) {
 {
     mem_deref(request);
 }
-
-
 @end

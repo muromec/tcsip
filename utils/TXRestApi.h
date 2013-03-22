@@ -7,12 +7,24 @@
 //
 
 #import <Foundation/Foundation.h>
+struct httpc;
+@class MailBox;
 
 @interface TXRestApi : NSObject {
-    struct httpc* app;
+    struct httpc* httpc;
+    MailBox* ret_box;
+    NSMutableArray *rq;
 }
+
+- (id) initWithApp:(struct httpc*)app;
 
 - (id)request: (NSString*)path cb:(id)pCb;
 - (id)load: (NSString*)path cb:(id)pCb;
+- (void)ready: (id)req;
+- (void)kick;
+
+- (void) cert:(NSString*)cert;
+
+@property MailBox* ret_box;
 
 @end
