@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "Callback.h"
-#import "TXSipUser.h"
 #import "TXAccount.h" // XXX: depends out!
 
 #include <string.h>
@@ -18,6 +17,7 @@ typedef struct uac uac_t;
 enum reg_state;
 
 struct reapp;
+struct sip_addr;
 
 typedef enum {
     REG_OFF,
@@ -42,8 +42,7 @@ typedef enum {
 
     TXSipReg *sreg;
     TXUplinks *uplinks;
-    id auth;
-    TXSipUser *user;
+    struct sip_addr *user_c;
 
     NSMutableArray * calls;
     NSMutableArray * chats;
@@ -60,9 +59,7 @@ typedef enum {
 
 - (TXSipIpc*) ipc:(MailBox*)pBox;
 
-@property id auth;
 @property id uplinks;
-@property (readonly) TXSipUser* user;
 @property MailBox* mbox;
 @property (readonly) TXSipReg* sreg;
 

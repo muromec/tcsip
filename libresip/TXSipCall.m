@@ -90,12 +90,11 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
     msg = mem_ref((void*)pMsg);
     [self parseFrom];
     [self parseDate];
-    [self acceptSession];
 }
  
 - (void) parseFrom
 {
-    dest = [TXSipUser withAddr: (struct sip_taddr*)&msg->from];
+    remote = mem_ref((void*)&msg->from);
 }
 
 - (void) parseDate
@@ -110,23 +109,24 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
 {
 
     int err;
-    const char *my_user = _byte(app.user.user);
+    char *my_user;
+    pl_strdup(&my_user, &local->uri.user);
 
     err = sipsess_accept(&sess, uac->sock, msg, 180, "Ringing",
                          my_user, "application/sdp", NULL,
-                         auth_handler, ctx, false,
+                         NULL, ctx, false,
                          offer_handler, answer_handler,
                          establish_handler, NULL, NULL,
                          close_handler, ctx, NULL);
     if(err)
         cstate |= CSTATE_ERR;
 
+    mem_deref(my_user);
 
 }
 
-- (void) outgoing:(TXSipUser*)pDest
+- (void) outgoing
 {
-    [self setDest: pDest];
     [self setup: CALL_OUT];
     cstate = CSTATE_STOP;
 }
@@ -155,11 +155,17 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
     struct mbuf *mb;
     int err;
 
-    const char *to_uri = _byte(dest.addr);
-    const char *to_user = _byte(dest.user);
-    const char *from_uri = _byte(app.user.addr);
-    const char *from_name = _byte(app.user.name);
-    
+    char *to_uri, *to_user;
+    char *from_uri, *from_name;
+    pl_strdup(&to_uri, &remote->auri);
+    pl_strdup(&to_user, &remote->uri.user);
+
+    pl_strdup(&from_uri, &local->auri);
+    if(local->dname.l)
+        pl_strdup(&from_name, &local->dname);
+    else
+	pl_strdup(&from_name, &local->uri.user);
+
     [media offer: &mb];
 
     NSString* nfmt = [NSString stringWithFormat:
@@ -170,7 +176,7 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
     err = sipsess_connect(&sess, uac->sock, to_uri, from_name,
                           from_uri, to_user,
                           NULL, 0, "application/sdp", mb,
-                          auth_handler, ctx, false,
+                          NULL, ctx, false,
                           offer_handler, answer_handler,
                           progress_handler, establish_handler,
                           NULL, NULL, close_handler, ctx, _byte(nfmt));
@@ -182,6 +188,10 @@ static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
     else
         cstate |= CSTATE_OUT_RING;
 
+    mem_deref(to_uri);
+    mem_deref(to_user);
+    mem_deref(from_uri);
+    mem_deref(from_name);
     return;
 }
 
@@ -334,13 +344,20 @@ out:
 
 - (NSString*) ckey
 {
+
+    char *tmp;
+    int tstamp = (int)[date_create timeIntervalSince1970];
+
+    re_sdprintf(&tmp, "%d@%r->%r", tstamp,
+       cdir ? &local->auri: &remote->auri,
+       cdir ? &remote->auri : &local->auri
+    );
+
     NSString *ret = [NSString stringWithFormat:
-	@"%d@%@->%@",
-       (int)[date_create timeIntervalSince1970],
-       cdir ? app.user.addr : dest.addr,
-       cdir ? dest.addr : app.user.addr
-    ];
+	@"%s", tmp];
     D(@"key: %@", ret);
+
+    mem_deref(tmp);
 
     return ret;
 }

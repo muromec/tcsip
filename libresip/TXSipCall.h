@@ -59,7 +59,6 @@ typedef enum call_dir_t {
 
 @property (readonly)NSInteger cid;
 @property (readonly)NSString *ckey;
-@property (readonly)TXSipUser* dest;
 @property (readonly)call_end_t end_reason;
 @property (readonly)call_dir_t cdir;
 
@@ -84,7 +83,8 @@ typedef enum call_dir_t {
 }
 
 - (void) incoming:(const struct sip_msg *)pMsg;
-- (void) outgoing:(TXSipUser*)pDest;
+- (void) outgoing;
+- (void) acceptSession;
 
 - (void) send;
 - (void) hangup;

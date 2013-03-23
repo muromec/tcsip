@@ -8,15 +8,16 @@
 
 #import <Foundation/Foundation.h>
 @class MailBox;
-@class TXSipUser;
 @class TXSipReg;
+
+struct sip_addr;
 
 @protocol Sip
 @property (readonly) TXSipReg* sreg;
 
 - (void)doCallControl:(NSString*)ckey op:(int)op;
 - (oneway void) setOnline: (int)state;
-- (oneway void) startCallUser: (TXSipUser*)udest;
+- (oneway void) startCallUser: (struct sip_addr*)udest;
 
 @end
 
@@ -31,7 +32,7 @@
 
 - (void)online:(int)state;
 - (void)control:(NSString*)ckey op:(int)op;
-- (void)call:(TXSipUser*)user;
+- (void)call:(NSString*)user name:(NSString*)name;
 - (void)apns:(NSData*)token;
 
 @end

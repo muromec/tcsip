@@ -7,11 +7,11 @@
 //
 
 #import "TXSipIpc.h"
-#import "TXSipUser.h"
 #import "TXSipReg.h"
 #import "MailBox.h"
 #include <msgpack.h>
 #include "strmacro.h"
+#include "tcsipuser.h"
 
 @implementation TXSipIpc
 @synthesize delegate;
@@ -41,13 +41,13 @@
     msgpack_pack_int(pk, op);
 }
 
-- (void)call:(TXSipUser*)dest
+- (void)call:(NSString*)user name:(NSString*)name
 {
     struct msgpack_packer *pk = box.packer;
     msgpack_pack_array(pk, 3);
     push_cstr("sip.call.place");
-    push_str(dest.user);
-    push_str(dest.name);
+    push_str(user);
+    push_str(name);
 }
 
 - (void) apns:(NSData*)token
@@ -75,13 +75,22 @@
         [delegate setOnline: (reg_state)arg->via.i64];
     }
 
+#define shift(__x, __y) ({__x.p = __y->via.raw.ptr;\
+		__x.l = __y->via.raw.size; arg++;})
+
     if(!strncmp(cmd.ptr, "sip.call.place", cmd.size)) {
         arg++;
-        NSString *login = _str(arg->via.raw.ptr, arg->via.raw.size);
-        arg++;
-        TXSipUser* dest = [TXSipUser withName:login];
-        dest.name = _str(arg->via.raw.ptr, arg->via.raw.size);
+        struct sip_addr* dest;
+	struct pl tmp;
+	char *tmp_char;
+	shift(tmp, arg);
+	pl_strdup(&tmp_char, &tmp);;
+        sippuser_by_name(&dest, tmp_char);
+	mem_deref(tmp_char);
+
+	shift(dest->dname, arg);
         [delegate startCallUser:dest];
+        mem_deref(dest);
     }
     if(!strncmp(cmd.ptr, "sip.call.control", cmd.size)) {
         arg++;

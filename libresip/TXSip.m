@@ -13,7 +13,6 @@
 #import "TXSipReg.h"
 #import "TXSipCall.h"
 #import "TXSipMessage.h"
-#import "TXSipAuth.h"
 #import "TXRestApi.h"
 #import "TXUplinks.h"
 #import "ReWrap.h"
@@ -32,6 +31,8 @@
 #include "re_wrap_priv.h"
 #include "sound.h"
 #include <srtp.h>
+
+#include "tcsipuser.h"
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 
@@ -86,9 +87,7 @@ static void exit_handler(void *arg)
 
 
 @implementation TXSip
-@synthesize auth;
 @synthesize uplinks;
-@synthesize user;
 @synthesize sreg;
 - (id) initWithAccount: (id) pAccount
 {
@@ -98,8 +97,10 @@ static void exit_handler(void *arg)
     }
 
     account = pAccount;
-    user = [TXSipUser withName: account.user];
-    user.name = account.name;
+
+    int err;
+    err = sippuser_by_name(&user_c, _byte(account.user));
+    pl_set_str(&user_c->dname, byte(account.name));
 
     report = [[TXSipReport alloc] init];
 
@@ -107,11 +108,10 @@ static void exit_handler(void *arg)
     calls = [[NSMutableArray alloc] init];
     chats = [[NSMutableArray alloc] init];
     
-    auth = [[TXSipAuth alloc] initWithApp: self];
     sreg = [[TXSipReg alloc] initWithApp:self];
     sreg.delegate = report;
     [sreg setInstanceId: account.uuid];
-    [sreg setDest: user];
+    sreg.remote = user_c;
     uplinks = [[TXUplinks alloc] init];
     uplinks.delegate = report;
 
@@ -195,6 +195,7 @@ static void exit_handler(void *arg)
     mem_deref(uac->sock);
     mem_deref(app->tls);
     mem_deref(app);
+    mem_deref(user_c);
 
     free(uac);
 
@@ -232,12 +233,6 @@ static void exit_handler(void *arg)
     [sreg setState: state];
 }
 
-
-- (oneway void) startCall: (NSString*)dest {
-
-    [self startCallUser: [TXSipUser withName: dest]];
-}
-
 - (void)doCallControl:(NSString*)ckey op:(int)op {
     for(TXSipCall* call in calls) {
 	if(![call.ckey isEqualToString:ckey]) continue;
@@ -247,15 +242,16 @@ static void exit_handler(void *arg)
     }
 }
 
-- (oneway void) startCallUser: (TXSipUser*)udest
+- (oneway void) startCallUser: (struct sip_addr*)udest
 {
     if(! sa_isset(&uac->laddr, SA_ADDR)) {
 	D(@"no laddr, cant call");
         return;
     }
     TXSipCall *out_call = [[TXSipCall alloc] initWithApp:self];
-    [out_call outgoing: udest];
-    [out_call setDest: udest];
+    [out_call outgoing];
+    out_call.remote = udest;
+    out_call.local = user_c;
     [out_call setCb: CB(self, callChange:)];
     [out_call waitIce];
     [calls addObject: out_call];
@@ -264,16 +260,17 @@ static void exit_handler(void *arg)
 }
 
 
-- (void) callIncoming: (id)in_call {
+- (void) callIncoming: (TXSipCall*)in_call {
     [in_call setCb: CB(self, callChange:)];
+    in_call.local = user_c;
     [calls addObject: in_call];
+    [in_call acceptSession];
     [report reportCall:in_call];
 
 }
 
 - (void) callChange: (TXSipCall*) call {
-    NSString *ckey = [call ckey];
-    D(@"call changed %@, state %d", ckey, call.cstate);
+
 
     if((call.cstate & CSTATE_ALIVE) == 0) {
         [calls removeObject: call];
@@ -289,9 +286,7 @@ static void exit_handler(void *arg)
 
 - (oneway void) startChat: (NSString*)dest {
     TXSipMessage *out_chat = [[TXSipMessage alloc] initWithApp:self];
-    id udest  = [TXSipUser withName: dest];
-    [out_chat setDest: udest];
-
+    out_chat.remote = user_c;
     [out_chat send];
 
     [chats addObject: out_chat];

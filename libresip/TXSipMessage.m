@@ -35,19 +35,7 @@
 
 - (void) route_response
 {
-    /*
-    if(status != 200) {
-        printf("route failed. what to do?\n");
-        return;
-    }
-    */
 
-    dest = [NSString stringWithFormat:@"<sip:%s:%s>",
-         "host", "5060"];
-
-
-    [self createHandle];
-    mstate = MSTATE_TRY;
 
 }
 

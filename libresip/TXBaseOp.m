@@ -8,10 +8,10 @@
 
 #import "TXSip.h"
 #import "TXBaseOp.h"
+#include "re.h"
 
 @implementation TXBaseOp
 @synthesize authSent;
-@synthesize dest;
 @synthesize cb;
 
 - (id) initWithApp: (TXSip*) pApp
@@ -24,7 +24,6 @@
     uac = [app getUa];
 
     ctx = (__bridge void*)self;
-    auth_ctx = (__bridge void*)app.auth;
 
     [self setup];
     authSent = NO;
@@ -40,6 +39,27 @@
 - (void) createHandle
 {
 
+}
+
+- (void)setRemote:(struct sip_addr*)val {
+    remote = mem_ref(val);
+}
+
+- (struct sip_addr*)remote {
+    return remote;
+}
+
+- (void)setLocal:(struct sip_addr*)val {
+    local = mem_ref(val);
+}
+
+- (struct sip_addr*)local {
+    return local;
+}
+
+- (void)dealloc {
+    if(remote) mem_deref(remote);
+    if(local) mem_deref(local);
 }
 
 @end

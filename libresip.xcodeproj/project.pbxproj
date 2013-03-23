@@ -15,7 +15,6 @@
 		850277D11625B59800AB5038 /* TXBaseOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277BE1625B59700AB5038 /* TXBaseOp.m */; };
 		850277D21625B59800AB5038 /* TXCallMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C01625B59700AB5038 /* TXCallMedia.m */; };
 		850277D41625B59800AB5038 /* TXSip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C41625B59700AB5038 /* TXSip.m */; };
-		850277D51625B59800AB5038 /* TXSipAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C61625B59700AB5038 /* TXSipAuth.m */; };
 		850277D61625B59800AB5038 /* TXSipCall.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C81625B59700AB5038 /* TXSipCall.m */; };
 		850277D71625B59800AB5038 /* TXSipMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CA1625B59800AB5038 /* TXSipMessage.m */; };
 		850277D81625B59800AB5038 /* TXSipReg.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CC1625B59800AB5038 /* TXSipReg.m */; };
@@ -63,6 +62,9 @@
 		8548DF7116FDDC7300494FB9 /* TXSipIpc.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF6F16FDDC7300494FB9 /* TXSipIpc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8548DF7216FDDC7300494FB9 /* TXSipIpc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7016FDDC7300494FB9 /* TXSipIpc.m */; };
 		8548DF7316FDDC7300494FB9 /* TXSipIpc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7016FDDC7300494FB9 /* TXSipIpc.m */; };
+		8548DF7616FDEA3E00494FB9 /* tcsipuser.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7416FDEA3E00494FB9 /* tcsipuser.c */; };
+		8548DF7716FDEA3E00494FB9 /* tcsipuser.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7416FDEA3E00494FB9 /* tcsipuser.c */; };
+		8548DF7816FDEA3E00494FB9 /* tcsipuser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF7516FDEA3E00494FB9 /* tcsipuser.h */; };
 		854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; };
 		855707031629185700407CCC /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707001629185700407CCC /* libspeexdsp.a */; };
 		855707041629185700407CCC /* libspeex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707011629185700407CCC /* libspeex.a */; };
@@ -107,7 +109,6 @@
 		859D3D6D1628D6BC00385248 /* TXBaseOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277BE1625B59700AB5038 /* TXBaseOp.m */; };
 		859D3D6F1628D6BC00385248 /* TXCallMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C01625B59700AB5038 /* TXCallMedia.m */; };
 		859D3D731628D6BC00385248 /* TXSip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C41625B59700AB5038 /* TXSip.m */; };
-		859D3D751628D6BC00385248 /* TXSipAuth.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C61625B59700AB5038 /* TXSipAuth.m */; };
 		859D3D771628D6BC00385248 /* TXSipCall.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C81625B59700AB5038 /* TXSipCall.m */; };
 		859D3D791628D6BC00385248 /* TXSipMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CA1625B59800AB5038 /* TXSipMessage.m */; };
 		859D3D7B1628D6BC00385248 /* TXSipReg.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CC1625B59800AB5038 /* TXSipReg.m */; };
@@ -170,8 +171,6 @@
 		850277C01625B59700AB5038 /* TXCallMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXCallMedia.m; sourceTree = "<group>"; };
 		850277C31625B59700AB5038 /* TXSip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSip.h; sourceTree = "<group>"; };
 		850277C41625B59700AB5038 /* TXSip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSip.m; sourceTree = "<group>"; };
-		850277C51625B59700AB5038 /* TXSipAuth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipAuth.h; sourceTree = "<group>"; };
-		850277C61625B59700AB5038 /* TXSipAuth.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipAuth.m; sourceTree = "<group>"; };
 		850277C71625B59700AB5038 /* TXSipCall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipCall.h; sourceTree = "<group>"; };
 		850277C81625B59700AB5038 /* TXSipCall.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipCall.m; sourceTree = "<group>"; };
 		850277C91625B59800AB5038 /* TXSipMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipMessage.h; sourceTree = "<group>"; };
@@ -213,6 +212,8 @@
 		8548DF6D16FDD6B600494FB9 /* strmacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strmacro.h; sourceTree = "<group>"; };
 		8548DF6F16FDDC7300494FB9 /* TXSipIpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipIpc.h; sourceTree = "<group>"; };
 		8548DF7016FDDC7300494FB9 /* TXSipIpc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipIpc.m; sourceTree = "<group>"; };
+		8548DF7416FDEA3E00494FB9 /* tcsipuser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tcsipuser.c; sourceTree = "<group>"; };
+		8548DF7516FDEA3E00494FB9 /* tcsipuser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcsipuser.h; sourceTree = "<group>"; };
 		855706FF1629185700407CCC /* libre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libre.a; path = deps/libre.a; sourceTree = "<group>"; };
 		855707001629185700407CCC /* libspeexdsp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeexdsp.a; path = deps/libspeexdsp.a; sourceTree = "<group>"; };
 		855707011629185700407CCC /* libspeex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeex.a; path = deps/libspeex.a; sourceTree = "<group>"; };
@@ -480,6 +481,8 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				8548DF7416FDEA3E00494FB9 /* tcsipuser.c */,
+				8548DF7516FDEA3E00494FB9 /* tcsipuser.h */,
 				8548DF6D16FDD6B600494FB9 /* strmacro.h */,
 				85EF252416F3CCEC00068C00 /* cross.h */,
 				8585A26B16527CBB00380B9C /* ajitter.h */,
@@ -497,8 +500,6 @@
 				850277C01625B59700AB5038 /* TXCallMedia.m */,
 				850277C31625B59700AB5038 /* TXSip.h */,
 				850277C41625B59700AB5038 /* TXSip.m */,
-				850277C51625B59700AB5038 /* TXSipAuth.h */,
-				850277C61625B59700AB5038 /* TXSipAuth.m */,
 				850277C71625B59700AB5038 /* TXSipCall.h */,
 				850277C81625B59700AB5038 /* TXSipCall.m */,
 				850277C91625B59800AB5038 /* TXSipMessage.h */,
@@ -804,6 +805,7 @@
 				8520171A16EAE4380020BC02 /* TXUplinks.h in Headers */,
 				85EF252616F3CDE200068C00 /* cross.h in Headers */,
 				8548DF6A16FDD4EA00494FB9 /* TXSipReport.h in Headers */,
+				8548DF7816FDEA3E00494FB9 /* tcsipuser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -894,7 +896,6 @@
 				850277D11625B59800AB5038 /* TXBaseOp.m in Sources */,
 				850277D21625B59800AB5038 /* TXCallMedia.m in Sources */,
 				850277D41625B59800AB5038 /* TXSip.m in Sources */,
-				850277D51625B59800AB5038 /* TXSipAuth.m in Sources */,
 				850277D61625B59800AB5038 /* TXSipCall.m in Sources */,
 				850277D71625B59800AB5038 /* TXSipMessage.m in Sources */,
 				850277D81625B59800AB5038 /* TXSipReg.m in Sources */,
@@ -918,6 +919,7 @@
 				85DBA22016FCC4C500FB7B84 /* TXHttp.m in Sources */,
 				8548DF6B16FDD4EA00494FB9 /* TXSipReport.m in Sources */,
 				8548DF7216FDDC7300494FB9 /* TXSipIpc.m in Sources */,
+				8548DF7616FDEA3E00494FB9 /* tcsipuser.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -935,7 +937,6 @@
 				859D3D6D1628D6BC00385248 /* TXBaseOp.m in Sources */,
 				859D3D6F1628D6BC00385248 /* TXCallMedia.m in Sources */,
 				859D3D731628D6BC00385248 /* TXSip.m in Sources */,
-				859D3D751628D6BC00385248 /* TXSipAuth.m in Sources */,
 				859D3D771628D6BC00385248 /* TXSipCall.m in Sources */,
 				859D3D791628D6BC00385248 /* TXSipMessage.m in Sources */,
 				859D3D7B1628D6BC00385248 /* TXSipReg.m in Sources */,
@@ -954,6 +955,7 @@
 				85DBA22116FCC4C500FB7B84 /* TXHttp.m in Sources */,
 				8548DF6C16FDD4EA00494FB9 /* TXSipReport.m in Sources */,
 				8548DF7316FDDC7300494FB9 /* TXSipIpc.m in Sources */,
+				8548DF7716FDEA3E00494FB9 /* tcsipuser.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

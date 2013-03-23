@@ -11,6 +11,7 @@
 #import "TXSipCall.h"
 #include <msgpack.h>
 #include "strmacro.h"
+#include "re.h"
 
 @implementation TXSipReport 
 @synthesize box;
@@ -70,8 +71,8 @@
     msgpack_pack_int(pk, call.cdir);
     msgpack_pack_int(pk, call.cstate);
     msgpack_pack_int(pk, (int)[call.date_create timeIntervalSince1970]);
-    push_str(call.dest.name);
-    push_str(call.dest.user);
+    push_pl(call.remote->dname);
+    push_pl(call.remote->uri.user);
 }
 
 - (void) reportCallEst:(TXSipCall*)call {

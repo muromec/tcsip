@@ -1,3 +1,4 @@
+
 //
 //  TXSipReg.m
 //  Texr
@@ -122,8 +123,9 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 - (void) send
 {
     int err;
-    const char *uri = _byte(dest.addr);
-    const char *user = _byte(dest.user);
+    char *uri, *user;
+    pl_strdup(&uri, &remote->auri);
+    pl_strdup(&user, &remote->uri.user);
 
     NSString* np = [NSString
         stringWithFormat:@"+sip.instance=\"<urn:uuid:%@>\"",
@@ -138,7 +140,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
     }
 
     err = sipreg_register(&reg, uac->sip, registrar, uri, uri, reg_time, user,
-                          NULL, 0, 1, auth_handler, ctx, false,
+                          NULL, 0, 1, NULL, ctx, false,
                           register_handler, ctx, params, fmt);
 
     D(@"send register %d %d %s", err, reg_time, user);
@@ -149,6 +151,9 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
         rstate |= REG_START;
     }
     D(@"sreg apns token %@", apns_token);
+
+    mem_deref(uri);
+    mem_deref(user);
 }
 
 - (void) response: (int) status phrase:(const char*)phrase
