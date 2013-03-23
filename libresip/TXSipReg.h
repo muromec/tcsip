@@ -23,7 +23,7 @@ enum reg_state {
 typedef enum reg_state reg_state_t;
 
 @protocol RegObserver
-- (void) onlineState: (NSString*)state;
+- (void)reportReg:(reg_state_t)state;
 @end
 
 @protocol Obs
@@ -37,7 +37,7 @@ typedef enum reg_state reg_state_t;
     reg_state_t rstate;
     NSString* instance_id;
     NSString* apns_token;
-    id<RegObserver> obs;
+    id<RegObserver> delegate;
     int reg_time;
     struct tmr reg_tmr;
 }
@@ -53,6 +53,6 @@ typedef enum reg_state reg_state_t;
 - (void) setState: (reg_state) state;
 
 @property NSData* apns_token;
-@property id<RegObserver> obs;
+@property id delegate;
 
 @end

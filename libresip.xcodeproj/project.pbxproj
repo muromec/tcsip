@@ -56,6 +56,13 @@
 		853B2020169F1DE700F423DB /* http.h in Headers */ = {isa = PBXBuildFile; fileRef = 853B201D169F1DE700F423DB /* http.h */; };
 		8545D51A164447CE00DD7533 /* JSONKit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AAE61628BD9400CE9AE6 /* JSONKit.h */; };
 		8545D51F164447E400DD7533 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AAE61628BD9400CE9AE6 /* JSONKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8548DF6A16FDD4EA00494FB9 /* TXSipReport.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF6816FDD4EA00494FB9 /* TXSipReport.h */; };
+		8548DF6B16FDD4EA00494FB9 /* TXSipReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF6916FDD4EA00494FB9 /* TXSipReport.m */; };
+		8548DF6C16FDD4EA00494FB9 /* TXSipReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF6916FDD4EA00494FB9 /* TXSipReport.m */; };
+		8548DF6E16FDD6B600494FB9 /* strmacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF6D16FDD6B600494FB9 /* strmacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8548DF7116FDDC7300494FB9 /* TXSipIpc.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF6F16FDDC7300494FB9 /* TXSipIpc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8548DF7216FDDC7300494FB9 /* TXSipIpc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7016FDDC7300494FB9 /* TXSipIpc.m */; };
+		8548DF7316FDDC7300494FB9 /* TXSipIpc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7016FDDC7300494FB9 /* TXSipIpc.m */; };
 		854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; };
 		855707031629185700407CCC /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707001629185700407CCC /* libspeexdsp.a */; };
 		855707041629185700407CCC /* libspeex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707011629185700407CCC /* libspeex.a */; };
@@ -201,6 +208,11 @@
 		852DA29F16A05CEE00AF5677 /* auth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = auth.c; path = rehttp/auth.c; sourceTree = "<group>"; };
 		853B201C169F1DE700F423DB /* http.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = http.c; path = rehttp/http.c; sourceTree = "<group>"; };
 		853B201D169F1DE700F423DB /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = http.h; path = rehttp/http.h; sourceTree = "<group>"; };
+		8548DF6816FDD4EA00494FB9 /* TXSipReport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipReport.h; sourceTree = "<group>"; };
+		8548DF6916FDD4EA00494FB9 /* TXSipReport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipReport.m; sourceTree = "<group>"; };
+		8548DF6D16FDD6B600494FB9 /* strmacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strmacro.h; sourceTree = "<group>"; };
+		8548DF6F16FDDC7300494FB9 /* TXSipIpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipIpc.h; sourceTree = "<group>"; };
+		8548DF7016FDDC7300494FB9 /* TXSipIpc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipIpc.m; sourceTree = "<group>"; };
 		855706FF1629185700407CCC /* libre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libre.a; path = deps/libre.a; sourceTree = "<group>"; };
 		855707001629185700407CCC /* libspeexdsp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeexdsp.a; path = deps/libspeexdsp.a; sourceTree = "<group>"; };
 		855707011629185700407CCC /* libspeex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeex.a; path = deps/libspeex.a; sourceTree = "<group>"; };
@@ -468,6 +480,7 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				8548DF6D16FDD6B600494FB9 /* strmacro.h */,
 				85EF252416F3CCEC00068C00 /* cross.h */,
 				8585A26B16527CBB00380B9C /* ajitter.h */,
 				8585A26716527CB000380B9C /* ajitter.c */,
@@ -499,6 +512,10 @@
 				850277A41625B53E00AB5038 /* Supporting Files */,
 				858AC77A168DEABF00BA64C9 /* TXKey.h */,
 				858AC77B168DEABF00BA64C9 /* TXKey.m */,
+				8548DF6816FDD4EA00494FB9 /* TXSipReport.h */,
+				8548DF6916FDD4EA00494FB9 /* TXSipReport.m */,
+				8548DF6F16FDDC7300494FB9 /* TXSipIpc.h */,
+				8548DF7016FDDC7300494FB9 /* TXSipIpc.m */,
 			);
 			path = libresip;
 			sourceTree = "<group>";
@@ -773,6 +790,8 @@
 				8545D51F164447E400DD7533 /* JSONKit.h in Headers */,
 				852DA29716A00DE500AF5677 /* ReWrap.h in Headers */,
 				85DBA21F16FCC4C500FB7B84 /* TXHttp.h in Headers */,
+				8548DF6E16FDD6B600494FB9 /* strmacro.h in Headers */,
+				8548DF7116FDDC7300494FB9 /* TXSipIpc.h in Headers */,
 				856150441664B5AC00DBCFD5 /* g711.h in Headers */,
 				856150551664D20200DBCFD5 /* opus.h in Headers */,
 				856150561664D20200DBCFD5 /* opus_custom.h in Headers */,
@@ -784,6 +803,7 @@
 				852DA29E16A01AE400AF5677 /* re_wrap_priv.h in Headers */,
 				8520171A16EAE4380020BC02 /* TXUplinks.h in Headers */,
 				85EF252616F3CDE200068C00 /* cross.h in Headers */,
+				8548DF6A16FDD4EA00494FB9 /* TXSipReport.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -896,6 +916,8 @@
 				852DA2A016A05CEE00AF5677 /* auth.c in Sources */,
 				8520171B16EAE4380020BC02 /* TXUplinks.m in Sources */,
 				85DBA22016FCC4C500FB7B84 /* TXHttp.m in Sources */,
+				8548DF6B16FDD4EA00494FB9 /* TXSipReport.m in Sources */,
+				8548DF7216FDDC7300494FB9 /* TXSipIpc.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -930,6 +952,8 @@
 				852DA2A116A05CEE00AF5677 /* auth.c in Sources */,
 				8520171C16EAE4380020BC02 /* TXUplinks.m in Sources */,
 				85DBA22116FCC4C500FB7B84 /* TXHttp.m in Sources */,
+				8548DF6C16FDD4EA00494FB9 /* TXSipReport.m in Sources */,
+				8548DF7316FDDC7300494FB9 /* TXSipIpc.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

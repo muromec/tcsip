@@ -8,6 +8,8 @@
 
 
 #import "TXSip.h"
+#import "TXSipReport.h"
+#import "TXSipIpc.h"
 #import "TXSipReg.h"
 #import "TXSipCall.h"
 #import "TXSipMessage.h"
@@ -19,6 +21,7 @@
 
 #include <re.h>
 #include <msgpack.h>
+#include "strmacro.h"
 
 #define DEBUG_MODULE "txsip"
 #define DEBUG_LEVEL 5
@@ -86,8 +89,7 @@ static void exit_handler(void *arg)
 @synthesize auth;
 @synthesize uplinks;
 @synthesize user;
-@synthesize mbox;
-@synthesize own_box;
+@synthesize sreg;
 - (id) initWithAccount: (id) pAccount
 {
     self = [super init];
@@ -99,15 +101,19 @@ static void exit_handler(void *arg)
     user = [TXSipUser withName: account.user];
     user.name = account.name;
 
+    report = [[TXSipReport alloc] init];
+
     [self create_ua];
     calls = [[NSMutableArray alloc] init];
     chats = [[NSMutableArray alloc] init];
     
     auth = [[TXSipAuth alloc] initWithApp: self];
     sreg = [[TXSipReg alloc] initWithApp:self];
+    sreg.delegate = report;
     [sreg setInstanceId: account.uuid];
     [sreg setDest: user];
     uplinks = [[TXUplinks alloc] init];
+    uplinks.delegate = report;
 
     return self;
 }
@@ -198,7 +204,7 @@ static void exit_handler(void *arg)
     media_snd_deinit();
 }
 
-- (oneway void) setOnline: (reg_state)state
+- (oneway void) setOnline: (int)state
 {
     int err;
     if(state == REG_OFF) {
@@ -226,90 +232,19 @@ static void exit_handler(void *arg)
     [sreg setState: state];
 }
 
-- (void)obCmd:(msgpack_object)ob
-{
-    msgpack_object *arg;
-    msgpack_object_raw cmd;
-    arg = ob.via.array.ptr;
-
-    if(arg->type != MSGPACK_OBJECT_RAW)
-	    return;
-
-    cmd = arg->via.raw;
-
-    if(!strncmp(cmd.ptr, "sip.online", cmd.size)) {
-        arg++;
-        [self setOnline: (reg_state)arg->via.i64];
-    }
-
-    if(!strncmp(cmd.ptr, "sip.call.place", cmd.size)) {
-        arg++;
-        NSString *login = _str(arg->via.raw.ptr, arg->via.raw.size);
-        arg++;
-        TXSipUser* dest = [TXSipUser withName:login];
-        dest.name = _str(arg->via.raw.ptr, arg->via.raw.size);
-        [self startCallUser:dest];
-    }
-    if(!strncmp(cmd.ptr, "sip.call.control", cmd.size)) {
-        arg++;
-        NSString *ckey = _str(arg->via.raw.ptr, arg->via.raw.size);
-        arg++;
-	int op = (int)arg->via.i64;
-	for(TXSipCall* call in calls) {
-            if(![call.ckey isEqualToString:ckey]) continue;
-
-	    [call control: op];
-	    break;
-	}
-    }
-
-    if(!strncmp(cmd.ptr, "sip.apns", cmd.size)) {
-        arg++;
-	sreg.apns_token = [NSData dataWithBytes:
-		arg->via.raw.ptr
-		length:	arg->via.raw.size];
-    }
-}
-
-- (void)online:(reg_state)state
-{
-    struct msgpack_packer *pk = own_box.packer;
-    msgpack_pack_array(pk, 2);
-    push_cstr("sip.online");
-    msgpack_pack_int(pk, state);
-}
-
-- (void)control:(NSString*)ckey op:(int)op
-{
-    struct msgpack_packer *pk = own_box.packer;
-    msgpack_pack_array(pk, 3);
-    push_cstr("sip.call.control");
-    push_str(ckey);
-    msgpack_pack_int(pk, op);
-}
-
-- (void)call:(TXSipUser*)dest
-{
-    struct msgpack_packer *pk = own_box.packer;
-    msgpack_pack_array(pk, 3);
-    push_cstr("sip.call.place");
-    push_str(dest.user);
-    push_str(dest.name);
-}
-
-- (void) apns:(NSData*)token
-{
-    struct msgpack_packer *pk = own_box.packer;
-    msgpack_pack_array(pk, 2);
-    push_cstr("sip.apns");
-    msgpack_pack_raw(pk, [token length]);
-    msgpack_pack_raw_body(pk, [token bytes], [token length]);
-}
-
 
 - (oneway void) startCall: (NSString*)dest {
 
     [self startCallUser: [TXSipUser withName: dest]];
+}
+
+- (void)doCallControl:(NSString*)ckey op:(int)op {
+    for(TXSipCall* call in calls) {
+	if(![call.ckey isEqualToString:ckey]) continue;
+
+	[call control: op];
+        break;
+    }
 }
 
 - (oneway void) startCallUser: (TXSipUser*)udest
@@ -325,28 +260,14 @@ static void exit_handler(void *arg)
     [out_call waitIce];
     [calls addObject: out_call];
 
-    [self reportCall:out_call];
+    [report reportCall:out_call];
 }
 
-- (void) reportCall:(TXSipCall*)call {
-
-    NSString *ckey = [call ckey];
-
-    msgpack_packer *pk = [mbox packer];
-    msgpack_pack_array(pk, 7);
-    push_cstr("sip.call.add");
-    push_str(ckey);
-    msgpack_pack_int(pk, call.cdir);
-    msgpack_pack_int(pk, call.cstate);
-    msgpack_pack_int(pk, (int)[call.date_create timeIntervalSince1970]);
-    push_str(call.dest.name);
-    push_str(call.dest.user);
-}
 
 - (void) callIncoming: (id)in_call {
     [in_call setCb: CB(self, callChange:)];
     [calls addObject: in_call];
-    [self reportCall:in_call];
+    [report reportCall:in_call];
 
 }
 
@@ -356,21 +277,12 @@ static void exit_handler(void *arg)
 
     if((call.cstate & CSTATE_ALIVE) == 0) {
         [calls removeObject: call];
-
-	msgpack_packer *pk = [mbox packer]; 
-	msgpack_pack_array(pk, 3);
-	push_cstr("sip.call.del");
-        push_str(ckey);
-        msgpack_pack_int(pk, call.end_reason);
+	[report reportCallDrop: call];
 	return;
     }
 
     if(call.cstate & CSTATE_EST) {
-	msgpack_packer *pk = [mbox packer]; 
-	msgpack_pack_array(pk, 2);
-	push_cstr("sip.call.est");
-        push_str(ckey);
-
+	[report reportCallEst:call];
 	return;
     }
 }
@@ -390,19 +302,19 @@ static void exit_handler(void *arg)
     return uac;
 }
 
-- (void)reportReg:(reg_state_t)state
-{
-    msgpack_packer *pk = [mbox packer];
-    msgpack_pack_array(pk, 2);
-    msgpack_pack_raw(pk, 7);
-    msgpack_pack_raw_body(pk, "sip.reg", 7);
-    msgpack_pack_int(pk, state);
-
+- (void)setMbox:(MailBox*)pBox {
+    mbox = pBox;
+    report.box = pBox;
 }
 
-- (oneway void) setRegObserver: (id)obs {
-    //sreg.obs = obs;
-    //uplinks.cb = CB(obs, uplinks:);
+- (TXSipIpc*) ipc:(MailBox*)pBox {
+    TXSipIpc *ipc = [[TXSipIpc alloc] initWithBox:pBox];
+    ipc.delegate = self;
+    return ipc;
+}
+
+- (MailBox*)mbox {
+    return mbox;
 }
 
 @end

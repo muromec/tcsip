@@ -8,13 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
-@class Callback;
+@protocol UpDelegate
+- (void) uplinkUpd: (NSString*)uri state:(NSString*)state;
+- (void) uplinkAdd: (NSString*)uri state:(NSString*)state;
+- (void) uplinkRm: (NSString*)uri ;
+@end
 
 @interface TXUplinks : NSObject {
     NSMutableArray *data;
-    Callback *cb;
+    id<UpDelegate> delegate;
 }
 
-@property id cb;
+@property id delegate;
 
 @end

@@ -10,7 +10,7 @@
 #import "Callback.h"
 
 @implementation TXUplinks
-@synthesize cb;
+@synthesize delegate;
 - (void)report:(NSArray*)report
 {
     data = [self upd: report];
@@ -18,7 +18,6 @@
 
 - (id)upd:(id)report
 {
-    NSMutableArray *rep = [[NSMutableArray alloc] init];
     NSMutableArray *uris = [[NSMutableArray alloc] init];
     NSString *uri, *state;
     for(NSArray *up in report) {
@@ -28,17 +27,16 @@
         [uris addObject: uri];
 
         if([data containsObject:uri]) {
-            [rep addObject: [NSArray arrayWithObjects: uri, @"upd", state, nil]];
+	    [delegate uplinkUpd: uri state: state];
             continue;
         }
-        [rep addObject: [NSArray arrayWithObjects: uri, @"add", state, nil]];
+	[delegate uplinkAdd: uri state:state];
     }
     for(id uri in data) {
         if(![uris containsObject:uri])
-            [rep addObject: [NSArray arrayWithObjects: uri, @"rm", @"nan", nil]];
+	      [delegate uplinkRm:uri];
     }
 
-    [cb response: rep];
     return uris;
 }
 @end

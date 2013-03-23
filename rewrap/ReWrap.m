@@ -11,6 +11,7 @@
 #import "TXSip.h"
 #include <re.h>
 #include "re_wrap_priv.h"
+#include "strmacro.h"
 
 static struct reapp* root_app;
 

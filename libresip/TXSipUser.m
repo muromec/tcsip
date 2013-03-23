@@ -9,6 +9,7 @@
 #import "TXSipUser.h"
 #import "TXSip.h"
 #include <re.h>
+#include "strmacro.h"
 
 
 @implementation TXSipUser

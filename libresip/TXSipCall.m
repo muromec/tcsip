@@ -8,6 +8,7 @@
 #import "TXSip.h"
 #import "TXSipCall.h"
 #import "TXCallMedia.h"
+#include "strmacro.h"
 
 #import "txsip_private.h"
 

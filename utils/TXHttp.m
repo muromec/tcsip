@@ -11,6 +11,7 @@
 #import "TXRestApi.h"
 #import "JSONKit.h"
 #include "http.h"
+#include "strmacro.h"
 
 #define URL(__x) ((NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL,\
    (__bridge CFStringRef)__x,\

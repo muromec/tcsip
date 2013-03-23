@@ -28,9 +28,12 @@ typedef enum {
 @class TXSipReg;
 @class TXUplinks;
 @class MailBox;
+@class TXSipReport;
+@class TXSipIpc;
 
 @interface TXSip : NSObject {
     // sip core and sip services
+    TXSipReport* report;
     uac_t *uac;
     struct reapp *app;
 
@@ -46,7 +49,6 @@ typedef enum {
     NSMutableArray * chats;
 
     MailBox *mbox;
-    MailBox *own_box;
 }
 - (TXSip*) initWithAccount: (id) account;
 
@@ -55,30 +57,22 @@ typedef enum {
 
 - (uac_t*) getUa;
 - (oneway void) close;
-- (void)reportReg:(enum reg_state)state;
 
-// public api
-- (void)online:(reg_state)state;
-- (void)control:(NSString*)ckey op:(int)op;
-- (void)call:(TXSipUser*)user;
-- (void)apns:(NSData*)token;
+- (TXSipIpc*) ipc:(MailBox*)pBox;
 
 @property id auth;
 @property id uplinks;
 @property (readonly) TXSipUser* user;
 @property MailBox* mbox;
-@property MailBox* own_box;
+@property (readonly) TXSipReg* sreg;
 
 @end
 
 TXSip* sip_init();
 
-#define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 
 char* byte(NSString * input);
 
-#define _str(__x, __len) ([[NSString alloc] initWithBytes:__x length:__len encoding:NSASCIIStringEncoding])
-#define _pstr(__pl) (_str(__pl.p, __pl.l))
 
 extern NSDateFormatter *http_df;
 

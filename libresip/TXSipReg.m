@@ -8,10 +8,11 @@
 
 #import "TXSip.h"
 #import "TXSipReg.h"
+#include "strmacro.h"
 
 #include "txsip_private.h"
 
-static const char *registrar = "sip:127.0.0.1";
+static const char *registrar = "sip:sip.texr.net";
 
 void impossible_cb (
    CFSocketRef s,
@@ -84,7 +85,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 }
 
 @implementation TXSipReg
-@synthesize obs;
+@synthesize delegate;
 - (void) setup
 {
     rstate = REG_NONE;
@@ -115,7 +116,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 {
     reg_time++;
     sipreg_expires(reg, reg_time);
-    [app reportReg:REG_TRY];
+    [delegate reportReg:REG_TRY];
 }
 
 - (void) send
@@ -142,9 +143,9 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
     D(@"send register %d %d %s", err, reg_time, user);
     if(err) {
-	[app reportReg:REG_NONE];
+	[delegate reportReg:REG_NONE];
     } else {
-	[app reportReg:REG_TRY];
+	[delegate reportReg:REG_TRY];
         rstate |= REG_START;
     }
     D(@"sreg apns token %@", apns_token);
@@ -156,7 +157,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 
     switch(status) {
     case 200:
-	[app reportReg:REG_ONLINE];
+	[delegate reportReg:REG_ONLINE];
 
 	rstate |= REG_AUTH;
 	rstate |= REG_ONLINE;
@@ -168,7 +169,7 @@ static void register_handler(int err, const struct sip_msg *msg, void *arg)
 	// fallthrough!
     default:
 	rstate &= rstate^REG_ONLINE;
-	[app reportReg:REG_NONE];
+	[delegate reportReg:REG_NONE];
     }
 }
 

@@ -15,6 +15,7 @@
 #import "http.h"
 #import "TXSip.h"
 #include <msgpack.h>
+#include "strmacro.h"
 
 @implementation TXRestApi
 @synthesize ret_box;
