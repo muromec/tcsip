@@ -1,8 +1,6 @@
 #ifndef TX_SOUND_H
 #define TX_SOUND_H
 
-typedef void (*media_cb_t)(void *userdata, char *buffer, UInt32 *got, UInt32 want);
-
 /**
  * The pjmedia_snd_stream struct is referenced in several other pjlib files,
  * but is ultimately defined here in the sound driver.
