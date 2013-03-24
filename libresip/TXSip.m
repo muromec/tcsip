@@ -33,6 +33,7 @@
 
 #include "tcsipuser.h"
 #include "tcsipreg.h"
+#include "tcsipcall.h"
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 
@@ -44,7 +45,7 @@
 #endif
 
 int ui_idiom;
-NSDateFormatter *http_df = NULL;
+const NSDateFormatter *http_df = NULL;
 
 static void setup_df() {
     http_df = [[NSDateFormatter alloc] init];
@@ -106,6 +107,9 @@ static void exit_handler(void *arg)
     [self create_ua];
     calls = [[NSMutableArray alloc] init];
     chats = [[NSMutableArray alloc] init];
+
+    calls_c = mem_zalloc(sizeof(struct list), NULL);
+    list_init(calls_c);
     
     uplinks = [[TXUplinks alloc] init];
     uplinks.delegate = report;
@@ -196,6 +200,8 @@ static void exit_handler(void *arg)
     mem_deref(app);
     mem_deref(user_c);
     mem_deref(sreg_c);
+    list_flush(calls_c);
+    mem_deref(calls_c);
 
     free(uac);
 
@@ -253,6 +259,19 @@ static void exit_handler(void *arg)
 	D(@"no laddr, cant call");
         return;
     }
+
+    int err;
+    struct tcsipcall *call;
+    err = tcsipcall_alloc(&call, uac);
+    tcsipcall_out(call);
+    tcop_users((void*)call, user_c, udest);
+    tcsipcall_handler(call, report_call_change, report.box.packer);
+    tcsipcall_waitice(call);
+
+    tcsipcall_append(call, calls_c);
+    report_call(call, report.box.packer);
+    
+    /*
     TXSipCall *out_call = [[TXSipCall alloc] initWithApp:self];
     [out_call outgoing];
     out_call.remote = udest;
@@ -260,8 +279,9 @@ static void exit_handler(void *arg)
     [out_call setCb: CB(self, callChange:)];
     [out_call waitIce];
     [calls addObject: out_call];
-
     [report reportCall:out_call];
+
+    */
 }
 
 

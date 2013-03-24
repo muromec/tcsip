@@ -67,6 +67,12 @@
 		8548DF7B16FE246300494FB9 /* tcsipreg.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF7916FE246300494FB9 /* tcsipreg.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8548DF7C16FE246300494FB9 /* tcsipreg.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7A16FE246300494FB9 /* tcsipreg.c */; };
 		8548DF7D16FE246300494FB9 /* tcsipreg.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7A16FE246300494FB9 /* tcsipreg.c */; };
+		8548DF8016FEE92F00494FB9 /* tcsipcall.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7E16FEE92E00494FB9 /* tcsipcall.c */; };
+		8548DF8116FEE92F00494FB9 /* tcsipcall.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7E16FEE92E00494FB9 /* tcsipcall.c */; };
+		8548DF8216FEE92F00494FB9 /* tcsipcall.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF7F16FEE92F00494FB9 /* tcsipcall.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8548DF8516FF041700494FB9 /* tcmedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF8316FF041700494FB9 /* tcmedia.h */; };
+		8548DF8616FF041700494FB9 /* tcmedia.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF8416FF041700494FB9 /* tcmedia.c */; };
+		8548DF8716FF041700494FB9 /* tcmedia.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF8416FF041700494FB9 /* tcmedia.c */; };
 		854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; };
 		855707031629185700407CCC /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707001629185700407CCC /* libspeexdsp.a */; };
 		855707041629185700407CCC /* libspeex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707011629185700407CCC /* libspeex.a */; };
@@ -215,6 +221,10 @@
 		8548DF7516FDEA3E00494FB9 /* tcsipuser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcsipuser.h; sourceTree = "<group>"; };
 		8548DF7916FE246300494FB9 /* tcsipreg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcsipreg.h; sourceTree = "<group>"; };
 		8548DF7A16FE246300494FB9 /* tcsipreg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tcsipreg.c; sourceTree = "<group>"; };
+		8548DF7E16FEE92E00494FB9 /* tcsipcall.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tcsipcall.c; sourceTree = "<group>"; };
+		8548DF7F16FEE92F00494FB9 /* tcsipcall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcsipcall.h; sourceTree = "<group>"; };
+		8548DF8316FF041700494FB9 /* tcmedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcmedia.h; sourceTree = "<group>"; };
+		8548DF8416FF041700494FB9 /* tcmedia.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tcmedia.c; sourceTree = "<group>"; };
 		855706FF1629185700407CCC /* libre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libre.a; path = deps/libre.a; sourceTree = "<group>"; };
 		855707001629185700407CCC /* libspeexdsp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeexdsp.a; path = deps/libspeexdsp.a; sourceTree = "<group>"; };
 		855707011629185700407CCC /* libspeex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeex.a; path = deps/libspeex.a; sourceTree = "<group>"; };
@@ -482,6 +492,10 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				8548DF8316FF041700494FB9 /* tcmedia.h */,
+				8548DF8416FF041700494FB9 /* tcmedia.c */,
+				8548DF7E16FEE92E00494FB9 /* tcsipcall.c */,
+				8548DF7F16FEE92F00494FB9 /* tcsipcall.h */,
 				8548DF7916FE246300494FB9 /* tcsipreg.h */,
 				8548DF7A16FE246300494FB9 /* tcsipreg.c */,
 				8548DF7416FDEA3E00494FB9 /* tcsipuser.c */,
@@ -795,6 +809,7 @@
 				8548DF6E16FDD6B600494FB9 /* strmacro.h in Headers */,
 				8548DF7116FDDC7300494FB9 /* TXSipIpc.h in Headers */,
 				8548DF7B16FE246300494FB9 /* tcsipreg.h in Headers */,
+				8548DF8216FEE92F00494FB9 /* tcsipcall.h in Headers */,
 				856150441664B5AC00DBCFD5 /* g711.h in Headers */,
 				856150551664D20200DBCFD5 /* opus.h in Headers */,
 				856150561664D20200DBCFD5 /* opus_custom.h in Headers */,
@@ -808,6 +823,7 @@
 				85EF252616F3CDE200068C00 /* cross.h in Headers */,
 				8548DF6A16FDD4EA00494FB9 /* TXSipReport.h in Headers */,
 				8548DF7816FDEA3E00494FB9 /* tcsipuser.h in Headers */,
+				8548DF8516FF041700494FB9 /* tcmedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -922,6 +938,8 @@
 				8548DF7216FDDC7300494FB9 /* TXSipIpc.m in Sources */,
 				8548DF7616FDEA3E00494FB9 /* tcsipuser.c in Sources */,
 				8548DF7C16FE246300494FB9 /* tcsipreg.c in Sources */,
+				8548DF8016FEE92F00494FB9 /* tcsipcall.c in Sources */,
+				8548DF8616FF041700494FB9 /* tcmedia.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -958,6 +976,8 @@
 				8548DF7316FDDC7300494FB9 /* TXSipIpc.m in Sources */,
 				8548DF7716FDEA3E00494FB9 /* tcsipuser.c in Sources */,
 				8548DF7D16FE246300494FB9 /* tcsipreg.c in Sources */,
+				8548DF8116FEE92F00494FB9 /* tcsipcall.c in Sources */,
+				8548DF8716FF041700494FB9 /* tcmedia.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

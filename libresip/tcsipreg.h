@@ -27,6 +27,8 @@ typedef void(uplink_h)(struct list*, void*arg);
 int tcsipreg_alloc(struct tcsipreg**rp, struct uac *uac);
 
 void tcop_users(struct tcsipreg *op, struct sip_addr *lo, struct sip_addr *re);
+void tcop_lr(struct tcsipreg *op, struct sip_addr **lo, struct sip_addr **re);
+
 void tcsreg_state(struct tcsipreg *reg, enum reg_cmd state);
 void tcsreg_handler(struct tcsipreg *reg, tcsipreg_h rh, void*arg);
 void tcsreg_uhandler(struct tcsipreg *reg, uplink_h uh, void*arg);

@@ -187,6 +187,17 @@ void tcop_users(struct tcsipreg *op, struct sip_addr *lo, struct sip_addr *re)
     }
 }
 
+void tcop_lr(struct tcsipreg *op, struct sip_addr **lo, struct sip_addr **re)
+{
+    if(lo) {
+	*lo = op->local;
+    }
+    if(re) {
+	*re = op->remote;
+    }
+}
+
+
 void tcsreg_handler(struct tcsipreg *reg, tcsipreg_h rh, void *arg)
 {
     if(!reg)

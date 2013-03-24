@@ -25,5 +25,8 @@
 @end
 
 enum reg_state;
+struct tcsipcall;
 void report_reg(enum reg_state state, void*arg);
+void report_call_change(struct tcsipcall* call, void *arg);
+void report_call(struct tcsipcall* call, void *arg);
 

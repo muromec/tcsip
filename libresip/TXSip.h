@@ -19,6 +19,7 @@ enum reg_state;
 struct reapp;
 struct sip_addr;
 struct tcsipreg;
+struct list;
 
 @class TXUplinks;
 @class MailBox;
@@ -40,6 +41,8 @@ struct tcsipreg;
 
     NSMutableArray * calls;
     NSMutableArray * chats;
+
+    struct list *calls_c;
 
     MailBox *mbox;
 }
