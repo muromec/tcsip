@@ -94,10 +94,13 @@
     }
     if(!strncmp(cmd.ptr, "sip.call.control", cmd.size)) {
         arg++;
-        NSString *ckey = _str(arg->via.raw.ptr, arg->via.raw.size);
+        struct pl ckey;
+        ckey.p = arg->via.raw.ptr;
+        ckey.l = arg->via.raw.size;
         arg++;
-	int op = (int)arg->via.i64;
-	[delegate doCallControl:ckey op:op];
+        int op = (int)arg->via.i64;
+
+        [delegate doCallControl:&ckey op:op];
     }
 
     if(!strncmp(cmd.ptr, "sip.apns", cmd.size)) {

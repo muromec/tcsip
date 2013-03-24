@@ -11,11 +11,12 @@
 @class TXSipReg;
 
 struct sip_addr;
+struct pl;
 
 @protocol Sip
 @property (readonly) TXSipReg* sreg;
 
-- (void)doCallControl:(NSString*)ckey op:(int)op;
+- (void)doCallControl:(struct pl*)ckey op:(int)op;
 - (oneway void) setOnline: (int)state;
 - (oneway void) startCallUser: (struct sip_addr*)udest;
 - (void)doApns: (const char*)data length:(size_t)length;

@@ -16,18 +16,18 @@
 
 void report_call_change(struct tcsipcall* call, void *arg) {
     int cstate, reason;
-    char *ckey;
+    struct pl *ckey = tcsipcall_ckey(call);
+
     msgpack_packer *pk = arg;
 
     tcsipcall_dirs(call, NULL, &cstate, &reason, NULL);
-    tcsipcall_ckey(call, &ckey);
 
     if((cstate & CSTATE_ALIVE) == 0) {
         tcsipcall_remove(call); // wrong place for this
 
         msgpack_pack_array(pk, 3);
         push_cstr("sip.call.del");
-        push_cstr(ckey);
+        push_pl((*ckey));
         msgpack_pack_int(pk, reason);
 
 	return;
@@ -36,8 +36,8 @@ void report_call_change(struct tcsipcall* call, void *arg) {
     if(cstate & CSTATE_EST) {
         msgpack_pack_array(pk, 2);
         push_cstr("sip.call.est");
-        push_cstr(ckey);
-
+        push_pl((*ckey));
+ 
 	return;
     }
 
@@ -46,14 +46,13 @@ void report_call_change(struct tcsipcall* call, void *arg) {
 void report_call(struct tcsipcall* call, void *arg) {
     int cdir, cstate, ts;
     struct sip_addr *remote;
-    char *ckey;
+    struct pl *ckey = tcsipcall_ckey(call);
 
     msgpack_packer *pk = arg;
     msgpack_pack_array(pk, 7);
     push_cstr("sip.call.add");
 
-    tcsipcall_ckey(call, &ckey);
-    push_cstr(ckey);
+    push_pl((*ckey));
 
     tcsipcall_dirs(call, &cdir, &cstate, NULL, &ts);
 

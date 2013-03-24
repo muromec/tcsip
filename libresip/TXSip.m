@@ -79,6 +79,15 @@ static void exit_handler(void *arg)
     re_cancel();
 }
 
+bool find_ckey(struct le *le, void *arg)
+{
+    struct tcsipcall *call = le->data;
+    struct pl *ckey = arg, *thiskey;
+
+    thiskey = tcsipcall_ckey(call);
+
+    return !pl_cmp(ckey, thiskey);
+}
 
 @implementation TXSip
 @synthesize uplinks;
@@ -235,14 +244,16 @@ static void exit_handler(void *arg)
     tcsreg_token(sreg_c, (const uint8_t*)data, length);
 }
 
-- (void)doCallControl:(NSString*)ckey op:(int)op {
-    /*
-    for(TXSipCall* call in calls) {
-	if(![call.ckey isEqualToString:ckey]) continue;
+- (void)doCallControl:(struct pl*)ckey op:(int)op {
+    struct le *found;
+    struct tcsipcall *call;
+    found = list_apply(calls_c, true, find_ckey, ckey);
+    if(!found) return;
 
-	[call control: op];
-        break;
-    }*/
+    call = found->data;
+
+    tcsipcall_control(call, op);
+
 }
 
 - (oneway void) startCallUser: (struct sip_addr*)udest

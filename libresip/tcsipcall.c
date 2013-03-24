@@ -421,8 +421,8 @@ void tcsipcall_dirs(struct tcsipcall*call, int *dir, int *state, int *reason, in
     if(ts) *ts = (int)call->ts;
 }
 
-void tcsipcall_ckey(struct tcsipcall*call, char **ckey)
+struct pl* tcsipcall_ckey(struct tcsipcall*call)
 {
-    *ckey = (void*)call->ckey.p;
+    return &call->ckey;
 }
 
