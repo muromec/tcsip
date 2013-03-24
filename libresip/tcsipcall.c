@@ -12,6 +12,9 @@ struct tcsipcall {
     struct sip_addr *local;
     struct le le;
     struct tcmedia *media;
+    struct sip_msg *msg;
+    tcsipcall_h *handler;
+    void *handler_arg;
     struct pl ckey;
     int cdir;
     int cstate;
@@ -21,6 +24,9 @@ struct tcsipcall {
 
 void tcsipcall_activate(struct tcsipcall*call);
 void tcsipcall_hangup(struct tcsipcall*call);
+
+static void dummy_handler(struct tcsipcall*call, void*arg){
+}
 
 void call_destruct(void *arg)
 {
@@ -91,6 +97,7 @@ int tcsipcall_alloc(struct tcsipcall**rp, struct uac *uac)
 	err = -ENOMEM;
 	goto fail;
     }
+    call->handler = dummy_handler;
     call->uac = mem_ref(uac);
 
     *rp = call;
@@ -111,6 +118,7 @@ void tcsipcall_remove(struct tcsipcall*call)
 
 void tcsipcall_out(struct tcsipcall*call)
 {
+    int err;
     struct pl tmp;
     struct timeval now;
 
@@ -121,90 +129,85 @@ void tcsipcall_out(struct tcsipcall*call)
     call->cdir = CALL_OUT;
     gettimeofday(&now, NULL);
     call->ts = now.tv_sec;
+
+    err = tcmedia_alloc(&call->media, call->uac, CALL_OUT);
+    if(err)
+        call->cstate |= CSTATE_ERR;
 }
 
 void tcsipcall_handler(struct tcsipcall*call, tcsipcall_h ch, void*arg)
 {
+    if(!call)
+	return;
+
+    call->handler = ch;
+    call->handler_arg = arg;
 }
 
 void tcsipcall_activate(struct tcsipcall*call) {
-    if(TEST(cstate, CSTATE_FLOW|CSTATE_MEDIA)) {
-	D(@"rtp and media already started, wtf?");
+
+    if(TEST(call->cstate, CSTATE_FLOW|CSTATE_MEDIA)) {
 	return;
     }
 
     /* XXX: move out */
-    DROP(cstate, CSTATE_RING);
-    cstate |= CSTATE_EST;
+    DROP(call->cstate, CSTATE_RING);
+    call->cstate |= CSTATE_EST;
 
-    int ret;
-    ret = [media start];
-    if(ret) {
-        cstate |= CSTATE_ERR;
-        D(@"media failed to start");
+    int err;
+    err = tcmedia_start(call->media);
+    if(err) {
+        call->cstate |= CSTATE_ERR;
         goto out;
     }
     // XXX: assert rtp not null
-    cstate |= CSTATE_FLOW;
-    cstate |= CSTATE_MEDIA;
+    call->cstate |= (CSTATE_FLOW | CSTATE_MEDIA);
 
 out:
-    [self upd];
-
+    call->handler(call, call->handler_arg);
 }
 
 void tcsipcall_hangup(struct tcsipcall*call) {
-    D(@"handgup");
-    if(sess)
-        sess = mem_deref(sess);
+    if(call->sess) call->sess = mem_deref(call->sess);
 
-    if(date_start)
-        date_end = [NSDate date];
+    if(!call->reason && (call->cstate & CSTATE_EST)==CSTATE_EST)
+        call->reason = CEND_OK;
 
-    if(!end_reason && (cstate & CSTATE_EST)==CSTATE_EST)
-        end_reason = CEND_OK;
+    if(!call->reason && (call->cstate & CSTATE_EST)==0)
+        call->reason = CEND_HANG;
 
-    if(!end_reason && (cstate & CSTATE_EST)==0)
-        end_reason = CEND_HANG;
-
-    DROP(cstate, CSTATE_ALIVE);
-    DROP(cstate, CSTATE_EST);
+    DROP(call->cstate, CSTATE_ALIVE);
+    DROP(call->cstate, CSTATE_EST);
     /*
      * Call terminated
      * Remote party dropped something heavy
      * on red button
      * */
 
-    [media stop];
-    media = nil;
+    if(call->media) {
+        tcmedia_stop(call->media);
+        call->media = mem_deref(call->media);
+    }
 
-    /*
-     * TODO: free all frames
-     * TODO: move frames to call context
-     * */
-    [self upd];
-    cb = nil;
-
+    call->handler(call, call->handler_arg);
 }
 void tcsipcall_accept(struct tcsipcall*call)
 {
 
     int err;
     char *my_user;
-    pl_strdup(&my_user, &local->uri.user);
+    pl_strdup(&my_user, &call->local->uri.user);
 
-    err = sipsess_accept(&sess, uac->sock, msg, 180, "Ringing",
+    err = sipsess_accept(&call->sess, call->uac->sock, call->msg, 180, "Ringing",
                          my_user, "application/sdp", NULL,
-                         NULL, ctx, false,
+                         NULL, call, false,
                          offer_handler, answer_handler,
                          establish_handler, NULL, NULL,
-                         close_handler, ctx, NULL);
+                         close_handler, call, NULL);
     if(err)
-        cstate |= CSTATE_ERR;
+        call->cstate |= CSTATE_ERR;
 
     mem_deref(my_user);
-
-
 }
 
 void tcsipcall_control(struct tcsipcall*call, int action)
@@ -218,12 +221,12 @@ void tcsipcall_control(struct tcsipcall*call, int action)
      * */
     switch(action) {
     case CALL_ACCEPT:
-	if(! TEST(cstate, CSTATE_IN_RING))
+	if(! TEST(call->cstate, CSTATE_IN_RING))
 	    return;
 	// 200
-        err = [media offer: msg->mb ret:&mb];
+        err = tcmedia_offer(call->media, call->msg->mb, &mb);
 	if(err) {
-	    DROP(cstate, CSTATE_RING);
+	    DROP(call->cstate, CSTATE_RING);
             err |= CSTATE_ERR;
 	    break;
 	}
@@ -242,40 +245,38 @@ void tcsipcall_control(struct tcsipcall*call, int action)
          * and cannot be used to connect from outside
          *
          * */
-        sa_set_port((struct sa*)&msg->dst, sa_port(&uac->laddr));
+        sa_set_port((struct sa*)&call->msg->dst, sa_port(&call->uac->laddr));
 
-        sipsess_answer(sess, 200, "OK", mb, NULL);
+        sipsess_answer(call->sess, 200, "OK", mb, NULL);
 
-        DROP(cstate, CSTATE_RING);
-	cstate |= CSTATE_EST;
+        DROP(call->cstate, CSTATE_RING);
+	call->cstate |= CSTATE_EST;
 
 	break;
 
     case CALL_REJECT:
     case CALL_BYE:
-	if( TEST(cstate, CSTATE_IN_RING) ) {
-            sipsess_reject(sess, 486, "Reject", NULL);
-	    DROP(cstate, CSTATE_IN_RING);
-            end_reason = CEND_HANG;
+	if( TEST(call->cstate, CSTATE_IN_RING) ) {
+            sipsess_reject(call->sess, 486, "Reject", NULL);
+	    DROP(call->cstate, CSTATE_IN_RING);
+            call->reason = CEND_HANG;
 	}
 
-	if( TEST(cstate, CSTATE_EST) ) {
+	if( TEST(call->cstate, CSTATE_EST) ) {
 	    // bye sent automatically in deref
-	    DROP(cstate, CSTATE_EST);
-            end_reason = CEND_OK;
+	    DROP(call->cstate, CSTATE_EST);
+            call->reason = CEND_OK;
 	}
 
-	if( TEST(cstate, CSTATE_OUT_RING ) ) {
+	if( TEST(call->cstate, CSTATE_OUT_RING ) ) {
 	    // cancel
-	    DROP(cstate, CSTATE_EST);
-            end_reason = CEND_CANCEL;
+	    DROP(call->cstate, CSTATE_EST);
+            call->reason = CEND_CANCEL;
 	}
 
-        [self hangup];
+	tcsipcall_hangup(call);
         break;
 
-    default:
-	NSLog(@"broked call control a:%d cs:%d", action, cstate);
    }
 
 }
@@ -298,15 +299,13 @@ void tcsipcall_send(struct tcsipcall*call)
     else
 	pl_strdup(&from_name, &call->local->uri.user);
 
-    mb = mbuf_alloc(100);
     /*
-    [media offer: &mb];
-
     NSString* nfmt = [NSString stringWithFormat:
             @"Date: %@\r\n",
 	    [http_df stringFromDate:date_create]
     ];
     */
+    tcmedia_get_offer(call->media, &mb);
 
     err = sipsess_connect(&call->sess, call->uac->sock, to_uri, from_name,
                           from_uri, to_user,
@@ -329,9 +328,15 @@ void tcsipcall_send(struct tcsipcall*call)
 
 }
 
+static void iceok(struct tcmedia* media, void*arg)
+{
+    struct tcsipcall*call = arg;
+    tcsipcall_send(call);
+}
+
 void tcsipcall_waitice(struct tcsipcall*call)
 {
-     tcsipcall_send(call);
+     tcmedia_iceok(call->media, iceok, call);
 }
 
 void tcsipcall_dirs(struct tcsipcall*call, int *dir, int *state, int *reason, int *ts)
