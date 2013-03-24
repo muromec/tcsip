@@ -38,6 +38,9 @@ typedef enum call_dir_t {
 
 struct tcsipcall;
 struct uac;
+struct list;
+struct sip_msg;
+
 int tcsipcall_alloc(struct tcsipcall**rp, struct uac *uac);
 void tcsipcall_append(struct tcsipcall*call, struct list* cl);
 void tcsipcall_remove(struct tcsipcall*call);

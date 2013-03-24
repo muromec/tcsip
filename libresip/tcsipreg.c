@@ -3,7 +3,7 @@
 #include "tcsipuser.h"
 #include "txsip_private.h"
 
-#if OS == darwin
+#ifdef __APPLE__
 #include "CoreFoundation/CoreFoundation.h"
 const CFStringRef kCFStreamNetworkServiceType;
 CFStringRef const kCFStreamNetworkServiceTypeVoIP;
@@ -27,7 +27,7 @@ struct tcsipreg {
     void *handler_arg;
     uplink_h* uhandler;
     void *uhandler_arg;
-#if OS == darwin
+#ifdef __APPLE__
     struct tcp_conn *upstream;
     CFReadStreamRef upstream_ref;
 #endif
