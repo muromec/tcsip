@@ -232,7 +232,7 @@ void tcsreg_token(struct tcsipreg *reg, const uint8_t *data, size_t length)
     tmp.l = sizeof(enc_token);
     memset(enc_token, 0, tmp.l);
 
-    base64_encode(data, length, (char*)tmp.p, tmp.l);
+    base64_encode(data, length, (char*)tmp.p, &tmp.l);
 
     if(reg->apns_token.p) mem_deref((void*)reg->apns_token.p);
     pl_dup(&reg->apns_token, &tmp);
