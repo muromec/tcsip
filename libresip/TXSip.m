@@ -258,8 +258,8 @@ static void exit_handler(void *arg)
     int err;
     struct tcsipcall *call;
     err = tcsipcall_alloc(&call, uac);
-    tcsipcall_out(call);
     tcop_users((void*)call, user_c, udest);
+    tcsipcall_out(call);
     tcsipcall_handler(call, report_call_change, report.box.packer);
     tcsipcall_waitice(call);
 
@@ -273,13 +273,13 @@ static void exit_handler(void *arg)
     int err;
     struct tcsipcall *call;
     err = tcsipcall_alloc(&call, uac);
-    err = tcsipcall_incomfing(call, msg);
 
     if(err) {
         mem_deref(call);
         return;
     }
     tcop_users((void*)call, user_c, NULL);
+    err = tcsipcall_incomfing(call, msg);
     tcsipcall_handler(call, report_call_change, report.box.packer);
     tcsipcall_append(call, calls_c);
     tcsipcall_accept(call);

@@ -136,14 +136,27 @@ void tcsipcall_remove(struct tcsipcall*call)
     list_unlink(&call->le);
 }
 
+void tcsipcall_key(struct tcsipcall*call)
+{
+    char *tmp;
+    struct pl ptmp;
+
+    re_sdprintf(&tmp, "%d@%r->%r", call->ts,
+       call->cdir ? &call->local->auri: &call->remote->auri,
+       call->cdir ? &call->remote->auri : &call->local->auri
+    );
+
+    pl_set_str(&ptmp, tmp);
+    pl_dup(&call->ckey, &ptmp);
+
+    mem_deref(tmp);
+
+}
+
 void tcsipcall_out(struct tcsipcall*call)
 {
     int err;
-    struct pl tmp;
     struct timeval now;
-
-    pl_set_str(&tmp, "123");
-    pl_dup(&call->ckey, &tmp);
 
     call->cstate = CSTATE_STOP;
     call->cdir = CALL_OUT;
@@ -153,6 +166,8 @@ void tcsipcall_out(struct tcsipcall*call)
     err = tcmedia_alloc(&call->media, call->uac, CALL_OUT);
     if(err)
         call->cstate |= CSTATE_ERR;
+
+    tcsipcall_key(call);
 }
 
 void tcsipcall_parse_from(struct tcsipcall*call)
@@ -178,10 +193,6 @@ void tcsipcall_parse_date(struct tcsipcall*call)
 int tcsipcall_incomfing(struct tcsipcall*call, const struct sip_msg* msg)
 {
     int err = 0;
-    struct pl tmp;
-
-    pl_set_str(&tmp, "123");
-    pl_dup(&call->ckey, &tmp);
 
     call->cstate = CSTATE_IN_RING;
     call->cdir = CALL_IN;
@@ -194,6 +205,8 @@ int tcsipcall_incomfing(struct tcsipcall*call, const struct sip_msg* msg)
 
     tcsipcall_parse_from(call);
     tcsipcall_parse_date(call);
+
+    tcsipcall_key(call);
 
     return err;
 }
