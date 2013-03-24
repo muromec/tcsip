@@ -65,6 +65,12 @@
 		8548DF8516FF041700494FB9 /* tcmedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF8316FF041700494FB9 /* tcmedia.h */; };
 		8548DF8616FF041700494FB9 /* tcmedia.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF8416FF041700494FB9 /* tcmedia.c */; };
 		8548DF8716FF041700494FB9 /* tcmedia.c in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF8416FF041700494FB9 /* tcmedia.c */; };
+		8548DF8816FF5ABF00494FB9 /* TXSipIpc.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8548DF6F16FDDC7300494FB9 /* TXSipIpc.h */; };
+		8548DF8916FF5AF700494FB9 /* tcsipcall.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8548DF7F16FEE92F00494FB9 /* tcsipcall.h */; };
+		8548DF8A16FF5B0400494FB9 /* strmacro.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8548DF6D16FDD6B600494FB9 /* strmacro.h */; };
+		8548DF8B16FF5B3200494FB9 /* tcsipuser.c in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8548DF7416FDEA3E00494FB9 /* tcsipuser.c */; };
+		8548DF8C16FF5B5D00494FB9 /* tcsipreg.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8548DF7916FE246300494FB9 /* tcsipreg.h */; };
+		8548DF8D16FF5B9900494FB9 /* TXHttp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 85DBA21D16FCC4C500FB7B84 /* TXHttp.h */; };
 		854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; };
 		855707031629185700407CCC /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707001629185700407CCC /* libspeexdsp.a */; };
 		855707041629185700407CCC /* libspeex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 855707011629185700407CCC /* libspeex.a */; };
@@ -134,6 +140,12 @@
 			dstPath = "include/${PRODUCT_NAME}";
 			dstSubfolderSpec = 16;
 			files = (
+				8548DF8D16FF5B9900494FB9 /* TXHttp.h in CopyFiles */,
+				8548DF8C16FF5B5D00494FB9 /* tcsipreg.h in CopyFiles */,
+				8548DF8B16FF5B3200494FB9 /* tcsipuser.c in CopyFiles */,
+				8548DF8A16FF5B0400494FB9 /* strmacro.h in CopyFiles */,
+				8548DF8916FF5AF700494FB9 /* tcsipcall.h in CopyFiles */,
+				8548DF8816FF5ABF00494FB9 /* TXSipIpc.h in CopyFiles */,
 				852DA29B16A00ED800AF5677 /* ReWrap.h in CopyFiles */,
 				8545D51A164447CE00DD7533 /* JSONKit.h in CopyFiles */,
 				854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */,
