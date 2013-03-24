@@ -10,8 +10,6 @@
 #import "TXSip.h"
 #import "TXSipReport.h"
 #import "TXSipIpc.h"
-#import "TXSipCall.h"
-#import "TXSipMessage.h"
 #import "TXRestApi.h"
 #import "TXUplinks.h"
 #import "ReWrap.h"
@@ -100,8 +98,6 @@ static void exit_handler(void *arg)
     report = [[TXSipReport alloc] init];
 
     [self create_ua];
-    calls = [[NSMutableArray alloc] init];
-    chats = [[NSMutableArray alloc] init];
 
     calls_c = mem_zalloc(sizeof(struct list), NULL);
     list_init(calls_c);
@@ -240,12 +236,13 @@ static void exit_handler(void *arg)
 }
 
 - (void)doCallControl:(NSString*)ckey op:(int)op {
+    /*
     for(TXSipCall* call in calls) {
 	if(![call.ckey isEqualToString:ckey]) continue;
 
 	[call control: op];
         break;
-    }
+    }*/
 }
 
 - (oneway void) startCallUser: (struct sip_addr*)udest
@@ -288,25 +285,10 @@ static void exit_handler(void *arg)
 
 - (void) callChange: (TXSipCall*) call {
 
-
-    if((call.cstate & CSTATE_ALIVE) == 0) {
-        [calls removeObject: call];
-	[report reportCallDrop: call];
-	return;
-    }
-
-    if(call.cstate & CSTATE_EST) {
-	[report reportCallEst:call];
-	return;
-    }
 }
 
 - (oneway void) startChat: (NSString*)dest {
-    TXSipMessage *out_chat = [[TXSipMessage alloc] initWithApp:self];
-    out_chat.remote = user_c;
-    [out_chat send];
 
-    [chats addObject: out_chat];
 }
 
 - (uac_t*) getUa

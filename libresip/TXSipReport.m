@@ -8,7 +8,6 @@
 
 #import "TXSipReport.h"
 #import "MailBox.h"
-#import "TXSipCall.h"
 #include <msgpack.h>
 #include "strmacro.h"
 #include "re.h"
@@ -117,27 +116,5 @@ void report_reg(enum reg_state state, void*arg) {
 {
     msgpack_packer *pk = [box packer];
     report_reg(state, pk);
-}
-
-- (void) reportCall:(TXSipCall*)call {
-}
-
-- (void) reportCallEst:(TXSipCall*)call {
-    NSString *ckey = [call ckey];
-
-    msgpack_packer *pk = [box packer]; 
-    msgpack_pack_array(pk, 2);
-    push_cstr("sip.call.est");
-    push_str(ckey);
-}
-
-- (void) reportCallDrop:(TXSipCall*)call {
-    NSString *ckey = [call ckey];
-
-    msgpack_packer *pk = [box packer]; 
-    msgpack_pack_array(pk, 3);
-    push_cstr("sip.call.del");
-    push_str(ckey);
-    msgpack_pack_int(pk, call.end_reason);
 }
 @end

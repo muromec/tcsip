@@ -16,9 +16,6 @@
 }
 
 - (id) initWithBox:(MailBox*)pBox;
-- (void) reportCall:(TXSipCall*)call;
-- (void) reportCallDrop:(TXSipCall*)call;
-- (void) reportCallEst:(TXSipCall*)call;
 
 @property MailBox *box;
 

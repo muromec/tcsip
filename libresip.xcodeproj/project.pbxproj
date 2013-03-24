@@ -12,11 +12,7 @@
 		850277A91625B53E00AB5038 /* libresip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277A81625B53E00AB5038 /* libresip.m */; };
 		850277CF1625B59800AB5038 /* sound_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277B91625B59700AB5038 /* sound_utils.c */; };
 		850277D01625B59800AB5038 /* sound.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277BB1625B59700AB5038 /* sound.c */; };
-		850277D11625B59800AB5038 /* TXBaseOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277BE1625B59700AB5038 /* TXBaseOp.m */; };
-		850277D21625B59800AB5038 /* TXCallMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C01625B59700AB5038 /* TXCallMedia.m */; };
 		850277D41625B59800AB5038 /* TXSip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C41625B59700AB5038 /* TXSip.m */; };
-		850277D61625B59800AB5038 /* TXSipCall.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C81625B59700AB5038 /* TXSipCall.m */; };
-		850277D71625B59800AB5038 /* TXSipMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CA1625B59800AB5038 /* TXSipMessage.m */; };
 		850277D91625B59800AB5038 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		850277E11625B5C300AB5038 /* MailBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277DE1625B5C300AB5038 /* MailBox.m */; };
 		8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8E1628ADF700CE9AE6 /* TXAccount.m */; };
@@ -45,10 +41,6 @@
 		852DA29E16A01AE400AF5677 /* re_wrap_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 852DA29D16A01AE400AF5677 /* re_wrap_priv.h */; };
 		852DA2A016A05CEE00AF5677 /* auth.c in Sources */ = {isa = PBXBuildFile; fileRef = 852DA29F16A05CEE00AF5677 /* auth.c */; };
 		852DA2A116A05CEE00AF5677 /* auth.c in Sources */ = {isa = PBXBuildFile; fileRef = 852DA29F16A05CEE00AF5677 /* auth.c */; };
-		8536A06B1634D6A2007543B4 /* TXSipCall.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277C71625B59700AB5038 /* TXSipCall.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8536A0751634D6C4007543B4 /* TXSipCall.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277C71625B59700AB5038 /* TXSipCall.h */; };
-		8536A0761634D6D1007543B4 /* TXBaseOp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; };
-		8536A0A21634D807007543B4 /* TXBaseOp.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277BD1625B59700AB5038 /* TXBaseOp.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		853B201E169F1DE700F423DB /* http.c in Sources */ = {isa = PBXBuildFile; fileRef = 853B201C169F1DE700F423DB /* http.c */; };
 		853B201F169F1DE700F423DB /* http.c in Sources */ = {isa = PBXBuildFile; fileRef = 853B201C169F1DE700F423DB /* http.c */; };
 		853B2020169F1DE700F423DB /* http.h in Headers */ = {isa = PBXBuildFile; fileRef = 853B201D169F1DE700F423DB /* http.h */; };
@@ -114,11 +106,7 @@
 		859D3D661628D6BC00385248 /* TXAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8E1628ADF700CE9AE6 /* TXAccount.m */; };
 		859D3D681628D6BC00385248 /* sound_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277B91625B59700AB5038 /* sound_utils.c */; };
 		859D3D6A1628D6BC00385248 /* sound.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277BB1625B59700AB5038 /* sound.c */; };
-		859D3D6D1628D6BC00385248 /* TXBaseOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277BE1625B59700AB5038 /* TXBaseOp.m */; };
-		859D3D6F1628D6BC00385248 /* TXCallMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C01625B59700AB5038 /* TXCallMedia.m */; };
 		859D3D731628D6BC00385248 /* TXSip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C41625B59700AB5038 /* TXSip.m */; };
-		859D3D771628D6BC00385248 /* TXSipCall.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C81625B59700AB5038 /* TXSipCall.m */; };
-		859D3D791628D6BC00385248 /* TXSipMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CA1625B59800AB5038 /* TXSipMessage.m */; };
 		859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		859D3D7E1628D6D300385248 /* TXAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		859D3D831628D79200385248 /* TXRestApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -149,8 +137,6 @@
 				852DA29B16A00ED800AF5677 /* ReWrap.h in CopyFiles */,
 				8545D51A164447CE00DD7533 /* JSONKit.h in CopyFiles */,
 				854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */,
-				8536A0761634D6D1007543B4 /* TXBaseOp.h in CopyFiles */,
-				8536A0751634D6C4007543B4 /* TXSipCall.h in CopyFiles */,
 				852716F61628FB7200C4B8DD /* MailBox.h in CopyFiles */,
 				8527169E1628FA6500C4B8DD /* TXSipUser.h in CopyFiles */,
 				8527169D1628FA5400C4B8DD /* TXSip.h in CopyFiles */,
@@ -172,16 +158,8 @@
 		850277BA1625B59700AB5038 /* sound_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sound_utils.h; sourceTree = "<group>"; };
 		850277BB1625B59700AB5038 /* sound.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sound.c; sourceTree = "<group>"; };
 		850277BC1625B59700AB5038 /* sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
-		850277BD1625B59700AB5038 /* TXBaseOp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXBaseOp.h; sourceTree = "<group>"; };
-		850277BE1625B59700AB5038 /* TXBaseOp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXBaseOp.m; sourceTree = "<group>"; };
-		850277BF1625B59700AB5038 /* TXCallMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXCallMedia.h; sourceTree = "<group>"; };
-		850277C01625B59700AB5038 /* TXCallMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXCallMedia.m; sourceTree = "<group>"; };
 		850277C31625B59700AB5038 /* TXSip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSip.h; sourceTree = "<group>"; };
 		850277C41625B59700AB5038 /* TXSip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSip.m; sourceTree = "<group>"; };
-		850277C71625B59700AB5038 /* TXSipCall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipCall.h; sourceTree = "<group>"; };
-		850277C81625B59700AB5038 /* TXSipCall.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipCall.m; sourceTree = "<group>"; };
-		850277C91625B59800AB5038 /* TXSipMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipMessage.h; sourceTree = "<group>"; };
-		850277CA1625B59800AB5038 /* TXSipMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipMessage.m; sourceTree = "<group>"; };
 		850277CD1625B59800AB5038 /* TXSipUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipUser.h; sourceTree = "<group>"; };
 		850277CE1625B59800AB5038 /* TXSipUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipUser.m; sourceTree = "<group>"; };
 		850277DD1625B5C300AB5038 /* MailBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MailBox.h; path = utils/MailBox.h; sourceTree = "<group>"; };
@@ -511,16 +489,8 @@
 				850277BA1625B59700AB5038 /* sound_utils.h */,
 				850277BB1625B59700AB5038 /* sound.c */,
 				850277BC1625B59700AB5038 /* sound.h */,
-				850277BD1625B59700AB5038 /* TXBaseOp.h */,
-				850277BE1625B59700AB5038 /* TXBaseOp.m */,
-				850277BF1625B59700AB5038 /* TXCallMedia.h */,
-				850277C01625B59700AB5038 /* TXCallMedia.m */,
 				850277C31625B59700AB5038 /* TXSip.h */,
 				850277C41625B59700AB5038 /* TXSip.m */,
-				850277C71625B59700AB5038 /* TXSipCall.h */,
-				850277C81625B59700AB5038 /* TXSipCall.m */,
-				850277C91625B59800AB5038 /* TXSipMessage.h */,
-				850277CA1625B59800AB5038 /* TXSipMessage.m */,
 				850277CD1625B59800AB5038 /* TXSipUser.h */,
 				850277CE1625B59800AB5038 /* TXSipUser.m */,
 				850277A61625B53E00AB5038 /* libresip.h */,
@@ -801,8 +771,6 @@
 				85FF742F16291027005C64D5 /* TXSip.h in Headers */,
 				85FF74301629103B005C64D5 /* TXSipUser.h in Headers */,
 				85FF745C162910DD005C64D5 /* MailBox.h in Headers */,
-				8536A0A21634D807007543B4 /* TXBaseOp.h in Headers */,
-				8536A06B1634D6A2007543B4 /* TXSipCall.h in Headers */,
 				8545D51F164447E400DD7533 /* JSONKit.h in Headers */,
 				852DA29716A00DE500AF5677 /* ReWrap.h in Headers */,
 				85DBA21F16FCC4C500FB7B84 /* TXHttp.h in Headers */,
@@ -911,11 +879,7 @@
 				850277A91625B53E00AB5038 /* libresip.m in Sources */,
 				850277CF1625B59800AB5038 /* sound_utils.c in Sources */,
 				850277D01625B59800AB5038 /* sound.c in Sources */,
-				850277D11625B59800AB5038 /* TXBaseOp.m in Sources */,
-				850277D21625B59800AB5038 /* TXCallMedia.m in Sources */,
 				850277D41625B59800AB5038 /* TXSip.m in Sources */,
-				850277D61625B59800AB5038 /* TXSipCall.m in Sources */,
-				850277D71625B59800AB5038 /* TXSipMessage.m in Sources */,
 				850277D91625B59800AB5038 /* TXSipUser.m in Sources */,
 				850277E11625B5C300AB5038 /* MailBox.m in Sources */,
 				8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */,
@@ -954,11 +918,7 @@
 				859D3D661628D6BC00385248 /* TXAccount.m in Sources */,
 				859D3D681628D6BC00385248 /* sound_utils.c in Sources */,
 				859D3D6A1628D6BC00385248 /* sound.c in Sources */,
-				859D3D6D1628D6BC00385248 /* TXBaseOp.m in Sources */,
-				859D3D6F1628D6BC00385248 /* TXCallMedia.m in Sources */,
 				859D3D731628D6BC00385248 /* TXSip.m in Sources */,
-				859D3D771628D6BC00385248 /* TXSipCall.m in Sources */,
-				859D3D791628D6BC00385248 /* TXSipMessage.m in Sources */,
 				859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */,
 				8585A26916527CB000380B9C /* ajitter.c in Sources */,
 				8584068A1656934C00BE8EB6 /* rtp_io.c in Sources */,

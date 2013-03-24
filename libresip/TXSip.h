@@ -40,9 +40,6 @@ struct list;
     TXUplinks *uplinks;
     struct sip_addr *user_c;
 
-    NSMutableArray * calls;
-    NSMutableArray * chats;
-
     struct list *calls_c;
 
     MailBox *mbox;
