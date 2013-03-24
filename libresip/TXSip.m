@@ -69,13 +69,8 @@ static void connect_handler(const struct sip_msg *msg, void *arg)
 {
     D(@"incoming connect");
     TXSip* sip = (__bridge id)arg;
+    [sip callIncoming: msg];
 
-    TXSipCall* in_call = [[TXSipCall alloc] initWithApp:sip];
-    [in_call incoming: msg];
-    if(in_call.cstate & CSTATE_ERR)
-        return;
-
-    [sip callIncoming: in_call];
 }
 
 /* called when all sip transactions are completed */
@@ -270,28 +265,25 @@ static void exit_handler(void *arg)
 
     tcsipcall_append(call, calls_c);
     report_call(call, report.box.packer);
-    
-    /*
-    TXSipCall *out_call = [[TXSipCall alloc] initWithApp:self];
-    [out_call outgoing];
-    out_call.remote = udest;
-    out_call.local = user_c;
-    [out_call setCb: CB(self, callChange:)];
-    [out_call waitIce];
-    [calls addObject: out_call];
-    [report reportCall:out_call];
-
-    */
 }
 
 
-- (void) callIncoming: (TXSipCall*)in_call {
-    [in_call setCb: CB(self, callChange:)];
-    in_call.local = user_c;
-    [calls addObject: in_call];
-    [in_call acceptSession];
-    [report reportCall:in_call];
+- (void) callIncoming: (const struct sip_msg *)msg
+{
+    int err;
+    struct tcsipcall *call;
+    err = tcsipcall_alloc(&call, uac);
+    err = tcsipcall_incomfing(call, msg);
 
+    if(err) {
+        mem_deref(call);
+        return;
+    }
+    tcop_users((void*)call, user_c, NULL);
+    tcsipcall_handler(call, report_call_change, report.box.packer);
+    tcsipcall_append(call, calls_c);
+    tcsipcall_accept(call);
+    report_call(call, report.box.packer);
 }
 
 - (void) callChange: (TXSipCall*) call {

@@ -14,6 +14,7 @@
 
 struct uac;
 typedef struct uac uac_t;
+struct sip_msg;
 enum reg_state;
 
 struct reapp;
@@ -49,7 +50,7 @@ struct list;
 - (TXSip*) initWithAccount: (id) account;
 
 // for callback
-- (void) callIncoming: (id)in_call;
+- (void) callIncoming: (const struct sip_msg *)msg;
 
 - (uac_t*) getUa;
 - (oneway void) close;

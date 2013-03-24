@@ -45,6 +45,10 @@ void tcsipcall_remove(struct tcsipcall*call);
 typedef void(tcsipcall_h)(struct tcsipcall*call, void*arg);
 
 void tcsipcall_out(struct tcsipcall*call);
+int tcsipcall_incomfing(struct tcsipcall*call, const struct sip_msg* msg);
+
+void tcsipcall_accept(struct tcsipcall*call);
+
 void tcsipcall_handler(struct tcsipcall*call, tcsipcall_h ch, void*arg);
 void tcsipcall_waitice(struct tcsipcall*call);
 

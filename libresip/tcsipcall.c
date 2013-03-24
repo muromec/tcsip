@@ -86,6 +86,26 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     tcsipcall_hangup(call);
 }
 
+static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
+			  void *arg)
+{
+	int *stamp = arg;
+	char *ret;
+	struct tm tv;
+	struct pl tmp;
+	pl_dup(&tmp, &hdr->val);
+	ret = strptime(tmp.p, "%a, %d %b %Y %H:%M:%S GMT", &tv);
+
+	mem_deref((void*)tmp.p);
+
+	if(ret) {
+	    *stamp = (int)timegm(&tv);
+	    return false;
+	}
+
+	return true;
+}
+
 
 int tcsipcall_alloc(struct tcsipcall**rp, struct uac *uac)
 {
@@ -133,6 +153,49 @@ void tcsipcall_out(struct tcsipcall*call)
     err = tcmedia_alloc(&call->media, call->uac, CALL_OUT);
     if(err)
         call->cstate |= CSTATE_ERR;
+}
+
+void tcsipcall_parse_from(struct tcsipcall*call)
+{
+    call->remote = mem_ref((void*)&call->msg->from);
+}
+
+void tcsipcall_parse_date(struct tcsipcall*call)
+{
+    int timestamp = 0;
+    struct timeval now;
+
+    sip_msg_hdr_apply(call->msg, true, SIP_HDR_DATE, find_date, &timestamp);
+    if(timestamp)
+	call->ts = timestamp;
+    else {
+        gettimeofday(&now, NULL);
+        call->ts = now.tv_sec;
+    }
+}
+
+
+int tcsipcall_incomfing(struct tcsipcall*call, const struct sip_msg* msg)
+{
+    int err = 0;
+    struct pl tmp;
+
+    pl_set_str(&tmp, "123");
+    pl_dup(&call->ckey, &tmp);
+
+    call->cstate = CSTATE_IN_RING;
+    call->cdir = CALL_IN;
+
+    call->msg = mem_ref((void*)msg);
+
+    err = tcmedia_alloc(&call->media, call->uac, CALL_IN);
+    if(err)
+        call->cstate |= CSTATE_ERR;
+
+    tcsipcall_parse_from(call);
+    tcsipcall_parse_date(call);
+
+    return err;
 }
 
 void tcsipcall_handler(struct tcsipcall*call, tcsipcall_h ch, void*arg)
@@ -288,7 +351,6 @@ void tcsipcall_send(struct tcsipcall*call)
 
     char *to_uri, *to_user;
     char *from_uri, *from_name;
-    char *fmt = NULL;
 
     pl_strdup(&to_uri, &call->remote->auri);
     pl_strdup(&to_user, &call->remote->uri.user);
@@ -299,12 +361,11 @@ void tcsipcall_send(struct tcsipcall*call)
     else
 	pl_strdup(&from_name, &call->local->uri.user);
 
-    /*
-    NSString* nfmt = [NSString stringWithFormat:
-            @"Date: %@\r\n",
-	    [http_df stringFromDate:date_create]
-    ];
-    */
+    char date[100];
+    struct tm *tv;
+    tv = gmtime(&call->ts);
+
+    strftime(date, sizeof(date), "Date: %a, %d %b %Y %H:%M:%S GMT\r\n", tv);
     tcmedia_get_offer(call->media, &mb);
 
     err = sipsess_connect(&call->sess, call->uac->sock, to_uri, from_name,
@@ -313,7 +374,7 @@ void tcsipcall_send(struct tcsipcall*call)
                           NULL, call, false,
                           offer_handler, answer_handler,
                           progress_handler, establish_handler,
-                          NULL, NULL, close_handler, call, fmt);
+                          NULL, NULL, close_handler, call, date);
     mem_deref(mb); /* free SDP buffer */
 
     if(err)
