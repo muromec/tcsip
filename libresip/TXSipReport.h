@@ -23,3 +23,7 @@
 @property MailBox *box;
 
 @end
+
+enum reg_state;
+void report_reg(enum reg_state state, void*arg);
+

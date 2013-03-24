@@ -10,7 +10,6 @@
 #import "TXSip.h"
 #import "TXSipReport.h"
 #import "TXSipIpc.h"
-#import "TXSipReg.h"
 #import "TXSipCall.h"
 #import "TXSipMessage.h"
 #import "TXRestApi.h"
@@ -33,6 +32,7 @@
 #include <srtp.h>
 
 #include "tcsipuser.h"
+#include "tcsipreg.h"
 
 #define _byte(_x) ([_x cStringUsingEncoding:NSASCIIStringEncoding])
 
@@ -88,7 +88,6 @@ static void exit_handler(void *arg)
 
 @implementation TXSip
 @synthesize uplinks;
-@synthesize sreg;
 - (id) initWithAccount: (id) pAccount
 {
     self = [super init];
@@ -108,12 +107,13 @@ static void exit_handler(void *arg)
     calls = [[NSMutableArray alloc] init];
     chats = [[NSMutableArray alloc] init];
     
-    sreg = [[TXSipReg alloc] initWithApp:self];
-    sreg.delegate = report;
-    [sreg setInstanceId: account.uuid];
-    sreg.remote = user_c;
     uplinks = [[TXUplinks alloc] init];
     uplinks.delegate = report;
+
+    err = tcsipreg_alloc(&sreg_c, uac);
+    tcop_users(sreg_c, user_c, user_c);
+    tcsreg_set_instance(sreg_c, _byte(account.uuid));
+    tcsreg_uhandler(sreg_c, uplink_upd, (__bridge void*)uplinks);
 
     return self;
 }
@@ -186,7 +186,6 @@ static void exit_handler(void *arg)
 {
 
     D(@"close sip instance");
-    sreg = nil;
     
     sipsess_close_all(uac->sock);
     sip_transp_flush(uac->sip);
@@ -196,6 +195,7 @@ static void exit_handler(void *arg)
     mem_deref(app->tls);
     mem_deref(app);
     mem_deref(user_c);
+    mem_deref(sreg_c);
 
     free(uac);
 
@@ -230,7 +230,12 @@ static void exit_handler(void *arg)
             dnsc_srv_set(app->dnsc, app->nsv, app->nsc);
         }
     }
-    [sreg setState: state];
+    tcsreg_state(sreg_c, state);
+}
+
+- (void)doApns: (const char*)data length:(size_t)length
+{
+    tcsreg_token(sreg_c, (const uint8_t*)data, length);
 }
 
 - (void)doCallControl:(NSString*)ckey op:(int)op {
@@ -300,6 +305,8 @@ static void exit_handler(void *arg)
 - (void)setMbox:(MailBox*)pBox {
     mbox = pBox;
     report.box = pBox;
+
+    tcsreg_handler(sreg_c, report_reg, pBox.packer);
 }
 
 - (TXSipIpc*) ipc:(MailBox*)pBox {

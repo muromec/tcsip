@@ -18,14 +18,8 @@ enum reg_state;
 
 struct reapp;
 struct sip_addr;
+struct tcsipreg;
 
-typedef enum {
-    REG_OFF,
-    REG_BG,
-    REG_FG
-} reg_state;
-
-@class TXSipReg;
 @class TXUplinks;
 @class MailBox;
 @class TXSipReport;
@@ -40,7 +34,7 @@ typedef enum {
     // move invite listener to separate class
     TXAccount *account;
 
-    TXSipReg *sreg;
+    struct tcsipreg *sreg_c;
     TXUplinks *uplinks;
     struct sip_addr *user_c;
 
@@ -61,7 +55,6 @@ typedef enum {
 
 @property id uplinks;
 @property MailBox* mbox;
-@property (readonly) TXSipReg* sreg;
 
 @end
 

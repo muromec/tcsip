@@ -18,4 +18,11 @@ struct uac {
     struct dnsc *dnsc;
 };
 
+struct uplink {
+    struct le le;
+    struct pl uri;
+    bool ok;
+};
+
+
 #endif

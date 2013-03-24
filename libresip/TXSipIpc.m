@@ -7,11 +7,11 @@
 //
 
 #import "TXSipIpc.h"
-#import "TXSipReg.h"
 #import "MailBox.h"
 #include <msgpack.h>
 #include "strmacro.h"
 #include "tcsipuser.h"
+#include "re.h"
 
 @implementation TXSipIpc
 @synthesize delegate;
@@ -72,7 +72,7 @@
 
     if(!strncmp(cmd.ptr, "sip.online", cmd.size)) {
         arg++;
-        [delegate setOnline: (reg_state)arg->via.i64];
+        [delegate setOnline: (int)arg->via.i64];
     }
 
 #define shift(__x, __y) ({__x.p = __y->via.raw.ptr;\
@@ -102,8 +102,7 @@
 
     if(!strncmp(cmd.ptr, "sip.apns", cmd.size)) {
         arg++;
-	delegate.sreg.apns_token = [NSData dataWithBytes:
-		arg->via.raw.ptr
+	[delegate doApns: arg->via.raw.ptr
 		length:	arg->via.raw.size];
     }
 }

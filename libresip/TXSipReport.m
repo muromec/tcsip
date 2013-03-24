@@ -12,6 +12,14 @@
 #include <msgpack.h>
 #include "strmacro.h"
 #include "re.h"
+#include "tcsipreg.h"
+
+void report_reg(enum reg_state state, void*arg) {
+    msgpack_packer *pk = arg;
+    msgpack_pack_array(pk, 2);
+    push_cstr("sip.reg");
+    msgpack_pack_int(pk, state);
+}
 
 @implementation TXSipReport 
 @synthesize box;
@@ -24,24 +32,23 @@
     return self;
 }
 
-- (void) uplinkUpd: (NSString*)uri state:(NSString*)state
+- (void) uplinkUpd: (NSString*)uri state:(int)state
 {
     msgpack_packer *pk = [box packer];
     msgpack_pack_array(pk, 4);
     push_cstr("sip.up");
     msgpack_pack_int(pk, 2);
     push_str(uri);
-    push_str(state);
+    msgpack_pack_int(pk, state);
 }
-- (void) uplinkAdd: (NSString*)uri state:(NSString*)state
+- (void) uplinkAdd: (NSString*)uri state:(int)state
 {
     msgpack_packer *pk = [box packer];
     msgpack_pack_array(pk, 4);
     push_cstr("sip.up");
     msgpack_pack_int(pk, 1);
     push_str(uri);
-    push_str(state);
-
+    msgpack_pack_int(pk, state);
 }
 - (void) uplinkRm: (NSString*)uri
 {
@@ -55,9 +62,7 @@
 - (void)reportReg:(int)state
 {
     msgpack_packer *pk = [box packer];
-    msgpack_pack_array(pk, 2);
-    push_cstr("sip.reg");
-    msgpack_pack_int(pk, state);
+    report_reg(state, pk);
 }
 
 - (void) reportCall:(TXSipCall*)call {
