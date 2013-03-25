@@ -1,5 +1,3 @@
-#include <libkern/OSAtomic.h>
-
 #ifndef AJITTER
 #define AJITTER
 

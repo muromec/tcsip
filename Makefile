@@ -19,8 +19,8 @@ objects += g711/g711.o
 
 DEP = deps-armlinux
 
-static = $(DEP)/libre.a  $(DEP)libsrtp.a $(DEP)libopus.a
+static = $(DEP)/libre.a  $(DEP)/libsrtp.a $(DEP)/libopus.a
 
 
-cli: cli.o $(objects) lib*.a
+cli: cli.o $(objects) $(DEP)/lib*.a
 	gcc cli.o -o cli libresip/*.o g711/*.o $(static) -lm -lpthread -lcrypto -lssl -lz -lspeex -lresolv -lasound
