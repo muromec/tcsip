@@ -4,6 +4,8 @@
 #include "txsip_private.h"
 #include "tcmedia.h"
 #include <sys/time.h>
+#include <time.h>
+
 
 struct tcsipcall {
     struct uac *uac;
