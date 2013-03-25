@@ -59,6 +59,23 @@
     msgpack_pack_raw_body(pk, [token bytes], [token length]);
 }
 
+- (void) uuid:(NSString*)uuid
+{
+    struct msgpack_packer *pk = box.packer;
+    msgpack_pack_array(pk, 2);
+    push_cstr("sip.uuid");
+    push_str(uuid);
+}
+
+- (void)me:(NSString*)login name:(NSString*)name
+{
+    struct msgpack_packer *pk = box.packer;
+    msgpack_pack_array(pk, 3);
+    push_cstr("sip.me");
+    push_str(login);
+    push_str(name);
+}
+
 - (void)obCmd:(msgpack_object)ob
 {
     msgpack_object *arg;
@@ -108,8 +125,25 @@
 	[delegate doApns: arg->via.raw.ptr
 		length:	arg->via.raw.size];
     }
+
+    if(!strncmp(cmd.ptr, "sip.uuid", cmd.size)) {
+        arg++;
+        struct pl uuid;
+        uuid.p = arg->via.raw.ptr;
+        uuid.l = arg->via.raw.size;
+        [delegate doUUID: &uuid];
+    }
+
+    if(!strncmp(cmd.ptr, "sip.me", cmd.size)) {
+        arg++;
+        struct pl login, name;
+        login.p = arg->via.raw.ptr;
+        login.l = arg->via.raw.size;
+        arg ++;
+        name.p = arg->via.raw.ptr;
+        name.l = arg->via.raw.size;
+        [delegate setLocal:&login name:&name];
+    }
 }
-
-
 
 @end

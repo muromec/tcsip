@@ -20,6 +20,8 @@ struct pl;
 - (oneway void) setOnline: (int)state;
 - (oneway void) startCallUser: (struct sip_addr*)udest;
 - (void)doApns: (const char*)data length:(size_t)length;
+- (void)doUUID: (struct pl*)uuid;
+- (void)setLocal:(struct pl*)login name:(struct pl*)name;
 
 @end
 
@@ -36,5 +38,7 @@ struct pl;
 - (void)control:(NSString*)ckey op:(int)op;
 - (void)call:(NSString*)user name:(NSString*)name;
 - (void)apns:(NSData*)token;
+- (void)uuid:(NSString*)uuid;
+- (void)me:(NSString*)login name:(NSString*)name;
 
 @end

@@ -91,18 +91,12 @@ bool find_ckey(struct le *le, void *arg)
 
 @implementation TXSip
 @synthesize uplinks;
-- (id) initWithAccount: (id) pAccount
+- (id) init
 {
     self = [super init];
     if (!self || self < 0) {
         return self;
     }
-
-    account = pAccount;
-
-    int err;
-    err = sippuser_by_name(&user_c, _byte(account.user));
-    pl_set_str(&user_c->dname, byte(account.name));
 
     report = [[TXSipReport alloc] init];
 
@@ -113,11 +107,6 @@ bool find_ckey(struct le *le, void *arg)
     
     uplinks = [[TXUplinks alloc] init];
     uplinks.delegate = report;
-
-    err = tcsipreg_alloc(&sreg_c, uac);
-    tcop_users(sreg_c, user_c, user_c);
-    tcsreg_set_instance(sreg_c, _byte(account.uuid));
-    tcsreg_uhandler(sreg_c, uplink_upd, (__bridge void*)uplinks);
 
     return self;
 }
@@ -136,27 +125,21 @@ bool find_ckey(struct le *le, void *arg)
     void *_app = [ReWrap app];
     app = mem_alloc(sizeof(struct reapp), NULL);
     memcpy(app, _app, sizeof(struct reapp));
+    app->tls = NULL;
 
     /* create SIP stack instance */
     err = sip_alloc(&uac->sip, app->dnsc, 32, 32, 32,
                 USER_AGENT, exit_handler, NULL);
 
     uac->dnsc = app->dnsc;
-    NSBundle *b = [NSBundle mainBundle];
-    NSString *ca_cert = [b pathForResource:@"CA" ofType: @"cert"];
-    if(!ca_cert)
-        ca_cert = @"cert/CA.cert";
 
-    NSString *cert = [account cert];
-    err = tls_alloc(&app->tls, TLS_METHOD_SSLV23, cert ? _byte(cert) : NULL, NULL);
-    tls_add_ca(app->tls, _byte(ca_cert));
-	
-    [self listen_laddr];
 }
 
 - (void)listen_laddr
 {
     int err;
+
+    if(!app->tls) return;
 
     /* fetch local IP address */
     sa_init(&uac->laddr, AF_UNSPEC);
@@ -236,12 +219,93 @@ bool find_ckey(struct le *le, void *arg)
             dnsc_srv_set(app->dnsc, app->nsv, app->nsc);
         }
     }
-    tcsreg_state(sreg_c, state);
+    if(!sreg_c && user_c && state != REG_OFF) {
+        err = tcsipreg_alloc(&sreg_c, uac);
+        if(err) return;
+        tcop_users(sreg_c, user_c, user_c);
+
+        if(uac->instance_id.l)
+            tcsreg_set_instance_pl(sreg_c, &uac->instance_id);
+
+        tcsreg_uhandler(sreg_c, uplink_upd, (__bridge void*)uplinks);
+
+        if(report.box)
+            tcsreg_handler(sreg_c, report_reg, report.box.packer);
+    }
+
+    if(sreg_c)
+        tcsreg_state(sreg_c, state);
 }
 
 - (void)doApns: (const char*)data length:(size_t)length
 {
     tcsreg_token(sreg_c, (const uint8_t*)data, length);
+}
+
+- (void)doUUID: (struct pl*)uuid
+{
+    if(sreg_c)
+        tcsreg_set_instance_pl(sreg_c, uuid);
+
+    if(uac->instance_id.l) mem_deref((void*)uac->instance_id.p);
+    pl_dup(&uac->instance_id, uuid);
+}
+
+- (void)setLocal:(struct pl*)login name:(struct pl*)name
+{
+    int err;
+    struct pl tmpl;
+    pl_dup(&tmpl, login);
+    if(user_c) user_c = mem_deref(user_c);
+
+    err = sippuser_by_name(&user_c, tmpl.p);
+    if(name) pl_dup(&user_c->dname, name);
+
+    mem_deref((void*)tmpl.p);
+
+    [self recreateTls];
+}
+
+- (void)recreateTls
+{
+    int err;
+    char *certpath, *capath=NULL;
+    char *home = getenv("HOME"), *bundle = NULL;
+    char path[2048];
+
+#if __APPLE__
+    CFBundleRef mbdl = CFBundleGetMainBundle();
+    if(!mbdl) goto afail;
+
+    CFURLRef url = CFBundleCopyBundleURL(mbdl);
+    if (!CFURLGetFileSystemRepresentation(url, TRUE, (UInt8 *)path, sizeof(path)))
+    {
+        goto afail1;
+    }
+    bundle = path;
+afail1:
+    CFRelease(url);
+afail:
+#endif
+
+    if(bundle) {
+        re_sdprintf(&capath, "%s/Contents/Resources/CA.cert", bundle);
+    }
+
+    if(home) {
+        re_sdprintf(&certpath, "%s/Library/Texr/%r.cert",
+                home, &user_c->uri.user);
+
+    } else {
+        re_sdprintf(&certpath, "./%r.cert",
+                &user_c->uri.user);
+    }
+
+    if(app->tls) app->tls = mem_deref(app->tls);
+
+    err = tls_alloc(&app->tls, TLS_METHOD_SSLV23, certpath, NULL);
+    if(capath)
+        tls_add_ca(app->tls, capath);
 }
 
 - (void)doCallControl:(struct pl*)ckey op:(int)op {
@@ -311,7 +375,8 @@ bool find_ckey(struct le *le, void *arg)
     mbox = pBox;
     report.box = pBox;
 
-    tcsreg_handler(sreg_c, report_reg, pBox.packer);
+    if(sreg_c)
+        tcsreg_handler(sreg_c, report_reg, pBox.packer);
 }
 
 - (TXSipIpc*) ipc:(MailBox*)pBox {

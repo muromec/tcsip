@@ -44,7 +44,6 @@ struct list;
 
     MailBox *mbox;
 }
-- (TXSip*) initWithAccount: (id) account;
 
 // for callback
 - (void) callIncoming: (const struct sip_msg *)msg;
