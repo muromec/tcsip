@@ -6,6 +6,10 @@
 //#define DBG(x) (printf x);
 #define DBG(x) {}
 
+#if __linux__
+#include <sys/param.h>
+#define min(a,b) MIN(a,b)
+#else
 #define min(a,b) ({ \
     typeof(a) _a_temp_; \
     typeof(b) _b_temp_; \
@@ -13,13 +17,15 @@
     _b_temp_ = (b); \
     _a_temp_ = _a_temp_ < _b_temp_ ? _a_temp_ : _b_temp_; \
     })
+#endif
 
-#if 0
-#define bset(val, bn) (val |= (1<<bn))
-#define bdrop(val, bn) (val &= val ^ (1<<bn))
-#else
+#if __APPLE__
+#include <libkern/OSAtomic.h>
 #define bset(val, bn) OSAtomicXor32Barrier(1<<bn, (unsigned int*)&val)
 #define bdrop(val, bn) OSAtomicXor32Barrier(1<<bn, (unsigned int*)&val)
+#else
+#define bset(val, bn) (val |= (1<<bn))
+#define bdrop(val, bn) (val &= val ^ (1<<bn))
 #endif
 
 ajitter * ajitter_init(int chunk_size)

@@ -7,8 +7,6 @@
 #include "CoreFoundation/CoreFoundation.h"
 const CFStringRef kCFStreamNetworkServiceType;
 CFStringRef const kCFStreamNetworkServiceTypeVoIP;
-#else
-#error
 #endif
 
 static const char *registrar = "sip:sip.texr.net";
@@ -246,6 +244,7 @@ void tcsreg_token(struct tcsipreg *reg, const uint8_t *data, size_t length)
 
 void tcsreg_voip(struct tcsipreg *reg, struct tcp_conn *conn)
 {
+#if __APPLE__
     if(conn == reg->upstream)
        return;
 
@@ -266,6 +265,7 @@ void tcsreg_voip(struct tcsipreg *reg, struct tcp_conn *conn)
 
     reg->upstream = conn;
     reg->upstream_ref = read_stream;
+#endif
 }
 
 void uplink_de(void *arg)

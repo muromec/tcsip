@@ -6,8 +6,11 @@
  * but is ultimately defined here in the sound driver.
  * So we're allowed to put any information we may need in it.
 **/
+
+#if __APPLE__
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/AudioServices.h>
+#endif
 #include <speex/speex_resampler.h>
 #include "ajitter.h"
 
@@ -28,18 +31,19 @@ struct pjmedia_snd_stream
 	media_dir_t dir;
 	unsigned clock_rate;
 	
+#if __APPLE__
 	AudioUnit out_unit;
 	AudioUnit in_unit;
 	AudioStreamBasicDescription streamDesc;
+        AudioBufferList *inputBufferList;                                                                               
+#endif
 	
 	SpeexResamplerState *resampler;
-
-	AudioBufferList *inputBufferList;
 
 	ajitter *record_jitter;
 	ajitter *play_jitter;
 
-	Boolean isActive;
+	int isActive;
 };
 
 int media_snd_open_player(unsigned clock_rate,
