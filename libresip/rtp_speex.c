@@ -1,5 +1,9 @@
 #include "rtp_io.h"
 
+#if __linux__
+#include "asound.h"
+#endif
+
 typedef struct _rtp_send_speex_ctx {
     int magic;
     srtp_t srtp_out;
@@ -40,13 +44,20 @@ void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct m
 
     speex_bits_read_from(&arg->dec_bits, (char*)mbuf_buf(mb), len);
 
+   ajitter_packet _ajp;
     ajitter_packet * ajp;
-    ajp = ajitter_put_ptr(arg->play_jitter);
-    speex_decode_int(arg->dec_state, &arg->dec_bits, (spx_int16_t*)ajp->data);
+char _buf[1000];
+ajp = &_ajp;
+ajp->data = _buf;
+//    ajp = ajitter_put_ptr(arg->play_jitter);
+    int err = speex_decode_int(arg->dec_state, &arg->dec_bits, (spx_int16_t*)ajp->data);
     ajp->left = arg->frame_size;
     ajp->off = 0;
+    if(err!=0) printf("decode err %d\n", err);
+    media_write(arg->play_jitter, ajp->data, ajp->left/2 );
 
-    ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+
+ //   ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
 }
 
 void rtp_send_io(void *varg)
@@ -57,12 +68,17 @@ void rtp_send_io(void *varg)
         return;
 
     struct mbuf *mb = arg->mb;
+static fake = 0;
+char _obuf[1000];
     char *obuf;
 restart:
-    obuf = ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
+    //obuf = ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
+obuf = _obuf;
     if(!obuf)
         goto timer;
 
+fake ++;
+if(fake > 10) return;
     len = speex_encode_int(arg->enc_state, (spx_int16_t*)obuf, &arg->enc_bits);
 
     mb->pos = RTP_HEADER_SIZE;

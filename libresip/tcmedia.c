@@ -1,11 +1,15 @@
 #include "re.h"
 #include "ajitter.h"
 #include "txsip_private.h"
-#include "sound.h"
 #include "rtp_io.h"
 #include <srtp.h>
 #include "tcsipcall.h"
 #include "tcmedia.h"
+
+#include "sound.h"
+#if __linux__
+#include "asound.h"
+#endif
 
 #define O_LIM (320*12)
 
@@ -481,13 +485,19 @@ int tcmedia_start(struct tcmedia*media)
 
     if(!media->media) {
         // XXX: use audio, video, chat flags
+#if __APPLE__
         ok = media_snd_open(DIR_BI, 8000, O_LIM, &media->media);
         if(ok!=0)
             return -1;
+#endif
+#if __linux__
+        ok = media_open(&media->media);
+re_printf("open: %p\n", media->media);
+#endif
     }
 
     rtp_send_ctx *send_ctx = rtp_send_init(media->fmt);
-    send_ctx->record_jitter = media->media->record_jitter;
+    //send_ctx->record_jitter = media->media->record_jitter;
     send_ctx->rtp = media->rtp;
     send_ctx->pt = media->pt;
     send_ctx->srtp_out = media->srtp_out;
@@ -498,13 +508,16 @@ int tcmedia_start(struct tcmedia*media)
     // set recv side
     rtp_recv_ctx * recv_ctx = rtp_recv_init(media->fmt);
     recv_ctx->srtp_in = media->srtp_in;
-    recv_ctx->play_jitter = media->media->play_jitter;
+    recv_ctx->play_jitter = (void*)media->media;//->play_jitter;
 
     media->recv_io_arg.ctx = recv_ctx;
     media->recv_io_arg.handler = rtp_recv_func(media->fmt);
 
+#if __APPLE__
     ok = media_snd_stream_start(media->media);
+#endif
     rtp_send_start(media->send_io_ctx);
+re_printf("send start\n");
 
     return 0;
 }
@@ -524,8 +537,10 @@ void tcmedia_stop(struct tcmedia *media)
     }
 
     if(media->media) {
+#if __APPLE__
         media_snd_stream_stop(media->media);
 	media_snd_stream_close(media->media);
+#endif
 	media->media = NULL;
     }
 

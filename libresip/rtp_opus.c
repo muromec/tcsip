@@ -1,6 +1,11 @@
 #include "rtp_io.h"
 #include "opus.h"
 
+#if __linux__
+#include "asound.h"
+#endif
+
+
 typedef struct {
     int magic;
     srtp_t srtp_out;
@@ -36,29 +41,35 @@ void rtp_recv_opus(const struct sa *src, const struct rtp_header *hdr, struct mb
     if(len<0)
 	    return;
 
-    ajitter_packet * ajp;
-    ajp = ajitter_put_ptr(arg->play_jitter);
+    ajitter_packet _ajp;
+    ajitter_packet * ajp = &_ajp;
+    //ajp = ajitter_put_ptr(arg->play_jitter);
     unsigned char *inb = mbuf_buf(mb);
     len = opus_decode(arg->dec, inb, len, (short*)ajp->data, 160, 0);
     ajp->left = len * 2;
     ajp->off = 0;
 
-    ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+    //ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+    media_write(arg->play_jitter, ajp->data, ajp->left );
 
+re_printf("write %p %d\n", arg->play_jitter, ajp->left );
 }
 
 void rtp_send_opus(void *varg)
 {
     int len = 0, err=0;
+re_printf("send opus\n");
     rtp_send_opus_ctx * arg = varg;
     if(arg->magic != 0x1ee1F00D)
         return;
 
     struct mbuf *mb = arg->mb;
     unsigned char *obuf;
+short __buf[1000];
     short *ibuf;
 restart:
-    ibuf = (short*)ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
+    //ibuf = (short*)ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
+ibuf = &__buf[0];
 
     if(!ibuf)
         goto timer;
