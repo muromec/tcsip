@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "Callback.h"
-#import "TXAccount.h" // XXX: depends out!
 
 #include <string.h>
 
@@ -32,9 +31,6 @@ struct list;
     TXSipReport* report;
     uac_t *uac;
     struct reapp *app;
-
-    // move invite listener to separate class
-    TXAccount *account;
 
     struct tcsipreg *sreg_c;
     TXUplinks *uplinks;
