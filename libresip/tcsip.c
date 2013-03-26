@@ -91,7 +91,9 @@ void sipc_destruct(void *arg)
     tmr_debug();
     mem_debug();
 
+#if __APPLE__
     media_snd_deinit();
+#endif
 }
 int tcsip_alloc(struct tcsip**rp, int mode, void *rarg)
 {
@@ -134,7 +136,9 @@ static void create_ua(struct tcsip*sip)
 
     int err; /* errno return values */
     struct uac *uac = sip->uac;
+#if __APPLE__
     err = media_snd_init();
+#endif
     err = srtp_init();
 
     err = dns_srv_get(NULL, 0, uac->nsv, &uac->nsc);
