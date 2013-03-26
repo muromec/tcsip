@@ -33,6 +33,14 @@ typedef struct _rtp_recv_speex_ctx {
     int frame_size;
 } rtp_recv_speex_ctx;
 
+void send_stats(int rbytes, int nbytes){
+    static int cc = 0, rb = 0, nb = 0;
+    cc++;
+    rb += rbytes;
+    nb += nbytes;
+    if((cc%100)==0) printf("send[%d] by %d/%d bytes %d/%d\n", cc, rbytes, nbytes, rb, nb);
+}
+
 void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg)
 {
     rtp_recv_speex_ctx * arg = varg;
@@ -44,20 +52,29 @@ void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct m
 
     speex_bits_read_from(&arg->dec_bits, (char*)mbuf_buf(mb), len);
 
-   ajitter_packet _ajp;
     ajitter_packet * ajp;
+
+#if __linux__
 char _buf[1000];
+ajitter_packet _ajp;
 ajp = &_ajp;
 ajp->data = _buf;
-//    ajp = ajitter_put_ptr(arg->play_jitter);
+#endif
+
+#if __APPLE__
+    ajp = ajitter_put_ptr(arg->play_jitter);
+#endif
     int err = speex_decode_int(arg->dec_state, &arg->dec_bits, (spx_int16_t*)ajp->data);
     ajp->left = arg->frame_size;
     ajp->off = 0;
     if(err!=0) printf("decode err %d\n", err);
+#if __linux__
     media_write(arg->play_jitter, ajp->data, ajp->left/2 );
+#endif
 
-
- //   ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+#if __APPLE__
+   ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+#endif
 }
 
 void rtp_send_io(void *varg)
@@ -68,17 +85,26 @@ void rtp_send_io(void *varg)
         return;
 
     struct mbuf *mb = arg->mb;
-static fake = 0;
+
+#if __linux__
+static int fake = 0;
 char _obuf[1000];
+#endif
+
     char *obuf;
 restart:
-    //obuf = ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
-obuf = _obuf;
+
+#if __APPLE__
+    obuf = ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
     if(!obuf)
         goto timer;
+#endif
 
-fake ++;
-if(fake > 10) return;
+#if __linux__
+    obuf = _obuf;
+    fake ++;
+    if(fake > 10) return;
+#endif
     len = speex_encode_int(arg->enc_state, (spx_int16_t*)obuf, &arg->enc_bits);
 
     mb->pos = RTP_HEADER_SIZE;
@@ -91,6 +117,8 @@ if(fake > 10) return;
     mb->pos = 0;
 
     rtp_p(arg->srtp_out, mb);
+
+    send_stats(arg->frame_size, len);
 
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 

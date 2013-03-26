@@ -1,6 +1,7 @@
 #include "re.h"
 #include "tcsipuser.h"
 #include "tcsipreg.h"
+#include "tcsipcall.h"
 #include <stdio.h>
 
 #define USER_AGENT "Linux re"
@@ -19,6 +20,16 @@ static void exit_handler(void *arg)
 {
     re_printf("stop sip\n");
 }
+
+static void *current_call = NULL;
+
+static void signal_handler(int sig)
+{
+    if(current_call) tcsipcall_control(current_call, CALL_BYE);
+    current_call = NULL;
+    re_cancel();
+}
+
 static void connect_handler(const struct sip_msg *msg, void *arg)
 {
 }
@@ -26,6 +37,9 @@ static void connect_handler(const struct sip_msg *msg, void *arg)
 int main(int argc, char *argv[]) {
     libre_init();
     srtp_init();
+#if __APPLE__
+    media_snd_init();
+#endif
 
     int err;
     struct sip_addr *user_c, *dest;
@@ -80,7 +94,9 @@ int main(int argc, char *argv[]) {
     tcsipcall_out(call);
     tcsipcall_waitice(call);
 
-    re_main(NULL);
+    current_call = call;
+
+    re_main(signal_handler);
 
     re_printf("user %r\n", &user_c->auri);
 

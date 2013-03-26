@@ -41,35 +41,55 @@ void rtp_recv_opus(const struct sa *src, const struct rtp_header *hdr, struct mb
     if(len<0)
 	    return;
 
+    ajitter_packet * ajp;
+#if __linux__
     ajitter_packet _ajp;
-    ajitter_packet * ajp = &_ajp;
-    //ajp = ajitter_put_ptr(arg->play_jitter);
+    ajp	= &_ajp;
+#endif
+
+#if __APPLE__
+    ajp = ajitter_put_ptr(arg->play_jitter);
+#endif
+
     unsigned char *inb = mbuf_buf(mb);
     len = opus_decode(arg->dec, inb, len, (short*)ajp->data, 160, 0);
     ajp->left = len * 2;
     ajp->off = 0;
 
-    //ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
-    media_write(arg->play_jitter, ajp->data, ajp->left );
+#if __APPLE__
+    ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+#endif
 
-re_printf("write %p %d\n", arg->play_jitter, ajp->left );
+#if __linux__
+    media_write(arg->play_jitter, ajp->data, ajp->left );
+#endif
+
 }
 
 void rtp_send_opus(void *varg)
 {
     int len = 0, err=0;
-re_printf("send opus\n");
     rtp_send_opus_ctx * arg = varg;
     if(arg->magic != 0x1ee1F00D)
         return;
 
     struct mbuf *mb = arg->mb;
     unsigned char *obuf;
-short __buf[1000];
+#if __linux__
+    short __buf[1000];
+    static int fake = 0;
+#endif
     short *ibuf;
 restart:
-    //ibuf = (short*)ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
-ibuf = &__buf[0];
+#if __APPLE__
+    ibuf = (short*)ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
+#endif
+
+#if __linux__
+    ibuf = &__buf[0];
+    fake ++;
+    if(fake > 10) return;
+#endif
 
     if(!ibuf)
         goto timer;

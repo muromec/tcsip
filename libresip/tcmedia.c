@@ -492,12 +492,13 @@ int tcmedia_start(struct tcmedia*media)
 #endif
 #if __linux__
         ok = media_open(&media->media);
-re_printf("open: %p\n", media->media);
 #endif
     }
 
     rtp_send_ctx *send_ctx = rtp_send_init(media->fmt);
-    //send_ctx->record_jitter = media->media->record_jitter;
+#if __APPLE__
+    send_ctx->record_jitter = media->media->record_jitter;
+#endif
     send_ctx->rtp = media->rtp;
     send_ctx->pt = media->pt;
     send_ctx->srtp_out = media->srtp_out;
@@ -508,7 +509,12 @@ re_printf("open: %p\n", media->media);
     // set recv side
     rtp_recv_ctx * recv_ctx = rtp_recv_init(media->fmt);
     recv_ctx->srtp_in = media->srtp_in;
-    recv_ctx->play_jitter = (void*)media->media;//->play_jitter;
+#if __linux__
+    recv_ctx->play_jitter = (void*)media->media;
+#endif
+#if __APPLE__
+    recv_ctx->play_jitter = (void*)media->media->play_jitter;
+#endif
 
     media->recv_io_arg.ctx = recv_ctx;
     media->recv_io_arg.handler = rtp_recv_func(media->fmt);
