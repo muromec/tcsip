@@ -8,7 +8,6 @@
 #include <re_dbg.h>
 
 #include "txsip_private.h"
-#include "re_wrap_priv.h"
 #include "sound.h"
 #include <srtp.h>
 
@@ -30,7 +29,6 @@ int ui_idiom;
 struct tcsip {
 
     struct uac *uac;
-    struct reapp *app;
 
     struct tcsipreg *sreg_c;
     struct tcuplinks *uplinks_c;
@@ -40,6 +38,7 @@ struct tcsip {
 
     int rmode;
     void* rarg;
+    void *xdnsc; // XXX we have two dns clients
 };
 
 void tcsip_call_incoming(struct tcsip* sip, const struct sip_msg *msg);
@@ -58,7 +57,6 @@ static void connect_handler(const struct sip_msg *msg, void *arg)
 static void exit_handler(void *arg)
 {
     /* stop libre main loop */
-    re_cancel();
 }
 
 bool find_ckey(struct le *le, void *arg)
@@ -75,15 +73,13 @@ void sipc_destruct(void *arg)
 {
     struct tcsip *sip = arg;
     struct uac *uac = sip->uac;
-    struct reapp *app = sip->app;
 
     sipsess_close_all(uac->sock);
     sip_transp_flush(uac->sip);
     sip_close(uac->sip, 1);
     mem_deref(uac->sip);
     mem_deref(uac->sock);
-    mem_deref(app->tls);
-    mem_deref(app);
+    mem_deref(uac->tls);
     mem_deref(sip->user_c);
     mem_deref(sip->sreg_c);
     list_flush(sip->calls_c);
@@ -97,7 +93,7 @@ void sipc_destruct(void *arg)
 
     media_snd_deinit();
 }
-int tcsip_alloc(struct tcsip**rp, void *_app, int mode, void *rarg)
+int tcsip_alloc(struct tcsip**rp, int mode, void *rarg)
 {
     int err = 0;
 
@@ -107,12 +103,10 @@ int tcsip_alloc(struct tcsip**rp, void *_app, int mode, void *rarg)
         err = -ENOMEM;
 	goto fail;
     }
+
+    sip->uac = mem_zalloc(sizeof(struct uac), NULL);
     sip->rarg = rarg;
     sip->rmode = mode;
-
-    sip->app = mem_alloc(sizeof(struct reapp), NULL);
-    memcpy(sip->app, _app, sizeof(struct reapp));
-    sip->app->tls = NULL;
 
     sip_init(sip);
 
@@ -139,13 +133,13 @@ static void create_ua(struct tcsip*sip)
 {
 
     int err; /* errno return values */
+    struct uac *uac = sip->uac;
     err = media_snd_init();
     err = srtp_init();
 
-    sip->uac = malloc(sizeof(struct uac));
-    memset(sip->uac, 0, sizeof(struct uac));
+    err = dns_srv_get(NULL, 0, uac->nsv, &uac->nsc);
 
-    sip->uac->dnsc = sip->app->dnsc;
+    err = dnsc_alloc(&uac->dnsc, NULL, uac->nsv, uac->nsc);
 
     /* create SIP stack instance */
     err = sip_alloc(&sip->uac->sip, sip->uac->dnsc, 32, 32, 32,
@@ -156,9 +150,8 @@ void listen_laddr(struct tcsip*sip)
 {
     int err;
     struct uac *uac = sip->uac;
-    struct reapp *app = sip->app;
 
-    if(!sip || !sip->app->tls) return;
+    if(!sip || !uac->tls) return;
 
     /* fetch local IP address */
     sa_init(&uac->laddr, AF_UNSPEC);
@@ -180,7 +173,7 @@ void listen_laddr(struct tcsip*sip)
     sa_set_port(&uac->laddr, port);
 	
     /* add supported SIP transports */
-    err |= sip_transp_add(uac->sip, SIP_TRANSP_TLS, &uac->laddr, app->tls);
+    err |= sip_transp_add(uac->sip, SIP_TRANSP_TLS, &uac->laddr, uac->tls);
 	
     /* create SIP session socket */
     err = sipsess_listen(&uac->sock, uac->sip, 32, connect_handler, sip);
@@ -192,7 +185,6 @@ void listen_laddr(struct tcsip*sip)
 void tcsip_set_online(struct tcsip *sip, int state)
 {
     struct uac *uac = sip->uac;
-    struct reapp *app = sip->app;
 
     int err;
     if(state == REG_OFF) {
@@ -200,19 +192,21 @@ void tcsip_set_online(struct tcsip *sip, int state)
         if(uac->sock)
             uac->sock = mem_deref(uac->sock);
         sa_init(&uac->laddr, AF_UNSPEC);
-        sa_init(app->nsv, AF_UNSPEC);
-        app->nsc = 1;
+        sa_init(uac->nsv, AF_UNSPEC);
+	uac->nsc = 1;
     } else {
         if(!uac->sock)
 	    listen_laddr(sip);
 
-        if(!app->nsc || !sa_isset(app->nsv, SA_ADDR)) {
-            err = dns_srv_get(NULL, 0, app->nsv, &app->nsc);
+        if(!uac->nsc || !sa_isset(uac->nsv, SA_ADDR)) {
+            err = dns_srv_get(NULL, 0, uac->nsv, &uac->nsc);
             if(err) {
-                sa_set_str(app->nsv, "8.8.8.8", 53);
-                app->nsc = 1;
+                sa_set_str(uac->nsv, "8.8.8.8", 53);
+                uac->nsc = 1;
             }
-            dnsc_srv_set(app->dnsc, app->nsv, app->nsc);
+            dnsc_srv_set(uac->dnsc, uac->nsv, uac->nsc);
+	    if(sip->xdnsc)
+                dnsc_srv_set(sip->xdnsc, uac->nsv, uac->nsc);
         }
     }
     if(!sip->sreg_c && sip->user_c && state != REG_OFF) {
@@ -263,8 +257,8 @@ void tcsip_local(struct tcsip* sip, struct pl* login, struct pl* name)
 void tcsip_recreate_tls(struct tcsip *sip)
 {
     int err;
-    struct reapp *app = sip->app;
     struct sip_addr *user_c = sip->user_c;
+    struct uac *uac = sip->uac;
     char *certpath, *capath=NULL;
     char *home = getenv("HOME"), *bundle = NULL;
     char path[2048];
@@ -297,14 +291,14 @@ afail:
                 &user_c->uri.user);
     }
 
-    if(app->tls) app->tls = mem_deref(app->tls);
+    if(uac->tls) uac->tls = mem_deref(uac->tls);
 
-    err = tls_alloc(&app->tls, TLS_METHOD_SSLV23, certpath, NULL);
+    err = tls_alloc(&uac->tls, TLS_METHOD_SSLV23, certpath, NULL);
     if(err) {
 	    re_printf("fuck\n");
     }
     if(capath)
-        tls_add_ca(app->tls, capath);
+        tls_add_ca(uac->tls, capath);
 }
 
 void tcsip_call_control(struct tcsip*sip, struct pl* ckey, int op)
@@ -364,4 +358,9 @@ void tcsip_call_incoming(struct tcsip* sip, const struct sip_msg *msg)
 
     tcsipcall_handler(call, report_call_change, sip->rarg);
     report_call(call, sip->rarg);
+}
+
+void tcsip_xdns(struct tcsip* sip, void *arg)
+{
+    if(sip) sip->xdnsc = arg;
 }
