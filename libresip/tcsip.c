@@ -141,6 +141,7 @@ static void create_ua(struct tcsip*sip)
 #endif
     err = srtp_init();
 
+    uac->nsc = sizeof(uac->nsv) / sizeof(uac->nsv[0]);
     err = dns_srv_get(NULL, 0, uac->nsv, &uac->nsc);
 
     err = dnsc_alloc(&uac->dnsc, NULL, uac->nsv, uac->nsc);
