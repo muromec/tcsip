@@ -1,18 +1,11 @@
-//
-//  TXSipReport.m
-//  libresip
-//
-//  Created by Ilya Petrov on 3/23/13.
-//  Copyright (c) 2013 enodev. All rights reserved.
-//
+#include "tcreport.h"
 
-#import "TXSipReport.h"
-#import "MailBox.h"
-#include <msgpack.h>
 #include "strmacro.h"
 #include "re.h"
 #include "tcsipreg.h"
 #include "tcsipcall.h"
+#include "txsip_private.h"
+#include <msgpack.h>
 
 void report_call_change(struct tcsipcall* call, void *arg) {
     int cstate, reason;
@@ -73,47 +66,12 @@ void report_reg(enum reg_state state, void*arg) {
     msgpack_pack_int(pk, state);
 }
 
-@implementation TXSipReport 
-@synthesize box;
-- (id) initWithBox:(MailBox*)pBox {
-    self = [super init];
-    if(!self) return self;
-
-    box = pBox;
-
-    return self;
-}
-
-- (void) uplinkUpd: (NSString*)uri state:(int)state
-{
-    msgpack_packer *pk = [box packer];
-    msgpack_pack_array(pk, 4);
+void report_up(struct uplink *up, int op, void*arg) {
+    msgpack_packer *pk = arg;
+    msgpack_pack_array(pk, op ? 4 : 3);
     push_cstr("sip.up");
-    msgpack_pack_int(pk, 2);
-    push_str(uri);
-    msgpack_pack_int(pk, state);
+    msgpack_pack_int(pk, op);
+    push_pl(up->uri);
+    if(op)
+	msgpack_pack_int(pk, up->ok);
 }
-- (void) uplinkAdd: (NSString*)uri state:(int)state
-{
-    msgpack_packer *pk = [box packer];
-    msgpack_pack_array(pk, 4);
-    push_cstr("sip.up");
-    msgpack_pack_int(pk, 1);
-    push_str(uri);
-    msgpack_pack_int(pk, state);
-}
-- (void) uplinkRm: (NSString*)uri
-{
-    msgpack_packer *pk = [box packer];
-    msgpack_pack_array(pk, 3);
-    push_cstr("sip.up");
-    msgpack_pack_int(pk, 0);
-    push_str(uri);
-}
-
-- (void)reportReg:(int)state
-{
-    msgpack_packer *pk = [box packer];
-    report_reg(state, pk);
-}
-@end

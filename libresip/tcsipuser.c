@@ -12,6 +12,13 @@ void static user_destruct(void *arg) {
 }
 
 int sippuser_by_name(struct sip_addr **addrp, const char *user) {
+
+    struct pl tmp;
+    pl_set_str(&tmp, user);
+    return sippuser_by_name_pl(addrp, &tmp);
+}
+
+int sippuser_by_name_pl(struct sip_addr **addrp, struct pl *user) {
     int err = 0;
 
     char *tmp;
@@ -19,7 +26,7 @@ int sippuser_by_name(struct sip_addr **addrp, const char *user) {
     struct sip_addr *ret;
     void **mem;
 
-    err = re_sdprintf(&tmp, "sip:%s@texr.net", user);
+    err = re_sdprintf(&tmp, "sip:%r@texr.net", user);
     if(err!=0)
        goto err;
 

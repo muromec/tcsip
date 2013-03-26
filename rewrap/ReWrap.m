@@ -8,7 +8,6 @@
 
 #import "ReWrap.h"
 #import "MailBox.h"
-#import "TXSip.h"
 #include <re.h>
 #include "re_wrap_priv.h"
 #include "strmacro.h"

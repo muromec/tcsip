@@ -13,26 +13,14 @@
 struct sip_addr;
 struct pl;
 
-@protocol Sip
-@property (readonly) TXSipReg* sreg;
-
-- (void)doCallControl:(struct pl*)ckey op:(int)op;
-- (oneway void) setOnline: (int)state;
-- (oneway void) startCallUser: (struct sip_addr*)udest;
-- (void)doApns: (const char*)data length:(size_t)length;
-- (void)doUUID: (struct pl*)uuid;
-- (void)setLocal:(struct pl*)login name:(struct pl*)name;
-
-@end
-
 @interface TXSipIpc : NSObject {
     MailBox *box;
-    id<Sip> delegate;
+    void *harg;
 }
 
 - (id) initWithBox:(MailBox*)pBox;
 
-@property id delegate;
+@property void* harg;
 
 - (void)online:(int)state;
 - (void)control:(NSString*)ckey op:(int)op;

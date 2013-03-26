@@ -7,14 +7,16 @@
 //
 
 #import "TXSipIpc.h"
+#include "tcsip.h"
 #import "MailBox.h"
 #include <msgpack.h>
 #include "strmacro.h"
 #include "tcsipuser.h"
 #include "re.h"
+#include "tcreport.h"
 
 @implementation TXSipIpc
-@synthesize delegate;
+@synthesize harg;
 - (id) initWithBox:(MailBox*)pBox {
     self = [super init];
     if(!self) return self;
@@ -89,7 +91,7 @@
 
     if(!strncmp(cmd.ptr, "sip.online", cmd.size)) {
         arg++;
-        [delegate setOnline: (int)arg->via.i64];
+        tcsip_set_online(harg, (int)arg->via.i64);
     }
 
 #define shift(__x, __y) ({__x.p = __y->via.raw.ptr;\
@@ -106,7 +108,7 @@
 	mem_deref(tmp_char);
 
 	shift(dest->dname, arg);
-        [delegate startCallUser:dest];
+        tcsip_start_call(harg, dest);
         mem_deref(dest);
     }
     if(!strncmp(cmd.ptr, "sip.call.control", cmd.size)) {
@@ -117,13 +119,12 @@
         arg++;
         int op = (int)arg->via.i64;
 
-        [delegate doCallControl:&ckey op:op];
+        tcsip_call_control(harg, &ckey, op);
     }
 
     if(!strncmp(cmd.ptr, "sip.apns", cmd.size)) {
         arg++;
-	[delegate doApns: arg->via.raw.ptr
-		length:	arg->via.raw.size];
+        tcsip_apns(harg, arg->via.raw.ptr, arg->via.raw.size);
     }
 
     if(!strncmp(cmd.ptr, "sip.uuid", cmd.size)) {
@@ -131,7 +132,7 @@
         struct pl uuid;
         uuid.p = arg->via.raw.ptr;
         uuid.l = arg->via.raw.size;
-        [delegate doUUID: &uuid];
+        tcsip_uuid(harg, &uuid);
     }
 
     if(!strncmp(cmd.ptr, "sip.me", cmd.size)) {
@@ -142,7 +143,7 @@
         arg ++;
         name.p = arg->via.raw.ptr;
         name.l = arg->via.raw.size;
-        [delegate setLocal:&login name:&name];
+        tcsip_local(harg, &login, &name);
     }
 }
 

@@ -12,7 +12,6 @@
 		850277A91625B53E00AB5038 /* libresip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277A81625B53E00AB5038 /* libresip.m */; };
 		850277CF1625B59800AB5038 /* sound_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277B91625B59700AB5038 /* sound_utils.c */; };
 		850277D01625B59800AB5038 /* sound.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277BB1625B59700AB5038 /* sound.c */; };
-		850277D41625B59800AB5038 /* TXSip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C41625B59700AB5038 /* TXSip.m */; };
 		850277D91625B59800AB5038 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		850277E11625B5C300AB5038 /* MailBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277DE1625B5C300AB5038 /* MailBox.m */; };
 		8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8E1628ADF700CE9AE6 /* TXAccount.m */; };
@@ -22,16 +21,21 @@
 		8507AAE91628BEB100CE9AE6 /* TXAccount.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; };
 		8507AAEA1628BED400CE9AE6 /* Callback.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AA931628AEEF00CE9AE6 /* Callback.h */; };
 		8517ADFE168B98D500EEFE37 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8517ADFD168B98D500EEFE37 /* MobileCoreServices.framework */; };
-		8520171A16EAE4380020BC02 /* TXUplinks.h in Headers */ = {isa = PBXBuildFile; fileRef = 8520171816EAE4380020BC02 /* TXUplinks.h */; };
-		8520171B16EAE4380020BC02 /* TXUplinks.m in Sources */ = {isa = PBXBuildFile; fileRef = 8520171916EAE4380020BC02 /* TXUplinks.m */; };
-		8520171C16EAE4380020BC02 /* TXUplinks.m in Sources */ = {isa = PBXBuildFile; fileRef = 8520171916EAE4380020BC02 /* TXUplinks.m */; };
+		851E85131700F64A0054989F /* tcuplinks.c in Sources */ = {isa = PBXBuildFile; fileRef = 851E85111700F64A0054989F /* tcuplinks.c */; };
+		851E85141700F64A0054989F /* tcuplinks.c in Sources */ = {isa = PBXBuildFile; fileRef = 851E85111700F64A0054989F /* tcuplinks.c */; };
+		851E85151700F64A0054989F /* tcuplinks.h in Headers */ = {isa = PBXBuildFile; fileRef = 851E85121700F64A0054989F /* tcuplinks.h */; };
+		851E851817016ED80054989F /* tcreport.c in Sources */ = {isa = PBXBuildFile; fileRef = 851E851617016ED80054989F /* tcreport.c */; };
+		851E851917016ED80054989F /* tcreport.c in Sources */ = {isa = PBXBuildFile; fileRef = 851E851617016ED80054989F /* tcreport.c */; };
+		851E851A17016ED80054989F /* tcreport.h in Headers */ = {isa = PBXBuildFile; fileRef = 851E851717016ED80054989F /* tcreport.h */; };
+		851E851D170177440054989F /* tcsip.c in Sources */ = {isa = PBXBuildFile; fileRef = 851E851B170177440054989F /* tcsip.c */; };
+		851E851E170177440054989F /* tcsip.c in Sources */ = {isa = PBXBuildFile; fileRef = 851E851B170177440054989F /* tcsip.c */; };
+		851E851F170177440054989F /* tcsip.h in Headers */ = {isa = PBXBuildFile; fileRef = 851E851C170177440054989F /* tcsip.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8523A5CB1650E3220071C23F /* libsrtp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8523A5CA1650E3220071C23F /* libsrtp.a */; };
 		8523A5CD1650E3520071C23F /* libsrtp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8523A5CA1650E3220071C23F /* libsrtp.a */; };
 		852716921628F35B00C4B8DD /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716911628F35B00C4B8DD /* SystemConfiguration.framework */; };
 		852716941628F39A00C4B8DD /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716931628F39A00C4B8DD /* libresolv.dylib */; };
 		8527169A1628F3B200C4B8DD /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 852716991628F3B200C4B8DD /* libz.dylib */; };
 		8527169B1628F48D00C4B8DD /* Callback.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AA931628AEEF00CE9AE6 /* Callback.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8527169D1628FA5400C4B8DD /* TXSip.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277C31625B59700AB5038 /* TXSip.h */; };
 		8527169E1628FA6500C4B8DD /* TXSipUser.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277CD1625B59800AB5038 /* TXSipUser.h */; };
 		852716F61628FB7200C4B8DD /* MailBox.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 850277DD1625B5C300AB5038 /* MailBox.h */; };
 		852DA29716A00DE500AF5677 /* ReWrap.h in Headers */ = {isa = PBXBuildFile; fileRef = 852DA29516A00DE500AF5677 /* ReWrap.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -46,9 +50,6 @@
 		853B2020169F1DE700F423DB /* http.h in Headers */ = {isa = PBXBuildFile; fileRef = 853B201D169F1DE700F423DB /* http.h */; };
 		8545D51A164447CE00DD7533 /* JSONKit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8507AAE61628BD9400CE9AE6 /* JSONKit.h */; };
 		8545D51F164447E400DD7533 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AAE61628BD9400CE9AE6 /* JSONKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8548DF6A16FDD4EA00494FB9 /* TXSipReport.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF6816FDD4EA00494FB9 /* TXSipReport.h */; };
-		8548DF6B16FDD4EA00494FB9 /* TXSipReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF6916FDD4EA00494FB9 /* TXSipReport.m */; };
-		8548DF6C16FDD4EA00494FB9 /* TXSipReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF6916FDD4EA00494FB9 /* TXSipReport.m */; };
 		8548DF6E16FDD6B600494FB9 /* strmacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF6D16FDD6B600494FB9 /* strmacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8548DF7116FDDC7300494FB9 /* TXSipIpc.h in Headers */ = {isa = PBXBuildFile; fileRef = 8548DF6F16FDDC7300494FB9 /* TXSipIpc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8548DF7216FDDC7300494FB9 /* TXSipIpc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8548DF7016FDDC7300494FB9 /* TXSipIpc.m */; };
@@ -112,7 +113,6 @@
 		859D3D661628D6BC00385248 /* TXAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8E1628ADF700CE9AE6 /* TXAccount.m */; };
 		859D3D681628D6BC00385248 /* sound_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277B91625B59700AB5038 /* sound_utils.c */; };
 		859D3D6A1628D6BC00385248 /* sound.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277BB1625B59700AB5038 /* sound.c */; };
-		859D3D731628D6BC00385248 /* TXSip.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277C41625B59700AB5038 /* TXSip.m */; };
 		859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		859D3D7E1628D6D300385248 /* TXAccount.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AA8F1628ADF700CE9AE6 /* TXAccount.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		859D3D831628D79200385248 /* TXRestApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -128,7 +128,6 @@
 		85EF252616F3CDE200068C00 /* cross.h in Headers */ = {isa = PBXBuildFile; fileRef = 85EF252416F3CCEC00068C00 /* cross.h */; };
 		85FF742516290A60005C64D5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742316290A60005C64D5 /* libcrypto.a */; };
 		85FF742616290A60005C64D5 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742416290A60005C64D5 /* libssl.a */; };
-		85FF742F16291027005C64D5 /* TXSip.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277C31625B59700AB5038 /* TXSip.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85FF74301629103B005C64D5 /* TXSipUser.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277CD1625B59800AB5038 /* TXSipUser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85FF745C162910DD005C64D5 /* MailBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 850277DD1625B5C300AB5038 /* MailBox.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
@@ -151,7 +150,6 @@
 				854BB43C1643D46200825D0C /* TXRestApi.h in CopyFiles */,
 				852716F61628FB7200C4B8DD /* MailBox.h in CopyFiles */,
 				8527169E1628FA6500C4B8DD /* TXSipUser.h in CopyFiles */,
-				8527169D1628FA5400C4B8DD /* TXSip.h in CopyFiles */,
 				8507AAEA1628BED400CE9AE6 /* Callback.h in CopyFiles */,
 				8507AAE91628BEB100CE9AE6 /* TXAccount.h in CopyFiles */,
 				850277A71625B53E00AB5038 /* libresip.h in CopyFiles */,
@@ -170,8 +168,6 @@
 		850277BA1625B59700AB5038 /* sound_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sound_utils.h; sourceTree = "<group>"; };
 		850277BB1625B59700AB5038 /* sound.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sound.c; sourceTree = "<group>"; };
 		850277BC1625B59700AB5038 /* sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
-		850277C31625B59700AB5038 /* TXSip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSip.h; sourceTree = "<group>"; };
-		850277C41625B59700AB5038 /* TXSip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSip.m; sourceTree = "<group>"; };
 		850277CD1625B59800AB5038 /* TXSipUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipUser.h; sourceTree = "<group>"; };
 		850277CE1625B59800AB5038 /* TXSipUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipUser.m; sourceTree = "<group>"; };
 		850277DD1625B5C300AB5038 /* MailBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MailBox.h; path = utils/MailBox.h; sourceTree = "<group>"; };
@@ -188,8 +184,12 @@
 		8517ADF9168B986E00EEFE37 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		8517ADFB168B989600EEFE37 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		8517ADFD168B98D500EEFE37 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		8520171816EAE4380020BC02 /* TXUplinks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXUplinks.h; path = utils/TXUplinks.h; sourceTree = "<group>"; };
-		8520171916EAE4380020BC02 /* TXUplinks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TXUplinks.m; path = utils/TXUplinks.m; sourceTree = "<group>"; };
+		851E85111700F64A0054989F /* tcuplinks.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tcuplinks.c; sourceTree = "<group>"; };
+		851E85121700F64A0054989F /* tcuplinks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcuplinks.h; sourceTree = "<group>"; };
+		851E851617016ED80054989F /* tcreport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tcreport.c; sourceTree = "<group>"; };
+		851E851717016ED80054989F /* tcreport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcreport.h; sourceTree = "<group>"; };
+		851E851B170177440054989F /* tcsip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tcsip.c; sourceTree = "<group>"; };
+		851E851C170177440054989F /* tcsip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcsip.h; sourceTree = "<group>"; };
 		8523A5CA1650E3220071C23F /* libsrtp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsrtp.a; path = deps/libsrtp.a; sourceTree = "<group>"; };
 		852716911628F35B00C4B8DD /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
 		852716931628F39A00C4B8DD /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/usr/lib/libresolv.dylib; sourceTree = DEVELOPER_DIR; };
@@ -202,8 +202,6 @@
 		852DA29F16A05CEE00AF5677 /* auth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = auth.c; path = rehttp/auth.c; sourceTree = "<group>"; };
 		853B201C169F1DE700F423DB /* http.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = http.c; path = rehttp/http.c; sourceTree = "<group>"; };
 		853B201D169F1DE700F423DB /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = http.h; path = rehttp/http.h; sourceTree = "<group>"; };
-		8548DF6816FDD4EA00494FB9 /* TXSipReport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipReport.h; sourceTree = "<group>"; };
-		8548DF6916FDD4EA00494FB9 /* TXSipReport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipReport.m; sourceTree = "<group>"; };
 		8548DF6D16FDD6B600494FB9 /* strmacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strmacro.h; sourceTree = "<group>"; };
 		8548DF6F16FDDC7300494FB9 /* TXSipIpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSipIpc.h; sourceTree = "<group>"; };
 		8548DF7016FDDC7300494FB9 /* TXSipIpc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipIpc.m; sourceTree = "<group>"; };
@@ -482,6 +480,12 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				851E851B170177440054989F /* tcsip.c */,
+				851E851C170177440054989F /* tcsip.h */,
+				851E851617016ED80054989F /* tcreport.c */,
+				851E851717016ED80054989F /* tcreport.h */,
+				851E85111700F64A0054989F /* tcuplinks.c */,
+				851E85121700F64A0054989F /* tcuplinks.h */,
 				8548DF8316FF041700494FB9 /* tcmedia.h */,
 				8548DF8416FF041700494FB9 /* tcmedia.c */,
 				8548DF7E16FEE92E00494FB9 /* tcsipcall.c */,
@@ -501,8 +505,6 @@
 				850277BA1625B59700AB5038 /* sound_utils.h */,
 				850277BB1625B59700AB5038 /* sound.c */,
 				850277BC1625B59700AB5038 /* sound.h */,
-				850277C31625B59700AB5038 /* TXSip.h */,
-				850277C41625B59700AB5038 /* TXSip.m */,
 				850277CD1625B59800AB5038 /* TXSipUser.h */,
 				850277CE1625B59800AB5038 /* TXSipUser.m */,
 				850277A61625B53E00AB5038 /* libresip.h */,
@@ -510,8 +512,6 @@
 				850277A41625B53E00AB5038 /* Supporting Files */,
 				858AC77A168DEABF00BA64C9 /* TXKey.h */,
 				858AC77B168DEABF00BA64C9 /* TXKey.m */,
-				8548DF6816FDD4EA00494FB9 /* TXSipReport.h */,
-				8548DF6916FDD4EA00494FB9 /* TXSipReport.m */,
 				8548DF6F16FDDC7300494FB9 /* TXSipIpc.h */,
 				8548DF7016FDDC7300494FB9 /* TXSipIpc.m */,
 			);
@@ -529,8 +529,6 @@
 		850277DB1625B5A400AB5038 /* util */ = {
 			isa = PBXGroup;
 			children = (
-				8520171816EAE4380020BC02 /* TXUplinks.h */,
-				8520171916EAE4380020BC02 /* TXUplinks.m */,
 				8507AAA71628B6BC00CE9AE6 /* TXRestApi.h */,
 				8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */,
 				8507AA921628AEEF00CE9AE6 /* Callback.m */,
@@ -780,7 +778,6 @@
 				859D3D7E1628D6D300385248 /* TXAccount.h in Headers */,
 				859D3D831628D79200385248 /* TXRestApi.h in Headers */,
 				8527169B1628F48D00C4B8DD /* Callback.h in Headers */,
-				85FF742F16291027005C64D5 /* TXSip.h in Headers */,
 				85FF74301629103B005C64D5 /* TXSipUser.h in Headers */,
 				85FF745C162910DD005C64D5 /* MailBox.h in Headers */,
 				8545D51F164447E400DD7533 /* JSONKit.h in Headers */,
@@ -790,6 +787,7 @@
 				8548DF7116FDDC7300494FB9 /* TXSipIpc.h in Headers */,
 				8548DF7B16FE246300494FB9 /* tcsipreg.h in Headers */,
 				8548DF8216FEE92F00494FB9 /* tcsipcall.h in Headers */,
+				851E851F170177440054989F /* tcsip.h in Headers */,
 				856150441664B5AC00DBCFD5 /* g711.h in Headers */,
 				856150551664D20200DBCFD5 /* opus.h in Headers */,
 				856150561664D20200DBCFD5 /* opus_custom.h in Headers */,
@@ -799,11 +797,11 @@
 				858AC77C168DEABF00BA64C9 /* TXKey.h in Headers */,
 				853B2020169F1DE700F423DB /* http.h in Headers */,
 				852DA29E16A01AE400AF5677 /* re_wrap_priv.h in Headers */,
-				8520171A16EAE4380020BC02 /* TXUplinks.h in Headers */,
 				85EF252616F3CDE200068C00 /* cross.h in Headers */,
-				8548DF6A16FDD4EA00494FB9 /* TXSipReport.h in Headers */,
 				8548DF7816FDEA3E00494FB9 /* tcsipuser.h in Headers */,
 				8548DF8516FF041700494FB9 /* tcmedia.h in Headers */,
+				851E85151700F64A0054989F /* tcuplinks.h in Headers */,
+				851E851A17016ED80054989F /* tcreport.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -891,7 +889,6 @@
 				850277A91625B53E00AB5038 /* libresip.m in Sources */,
 				850277CF1625B59800AB5038 /* sound_utils.c in Sources */,
 				850277D01625B59800AB5038 /* sound.c in Sources */,
-				850277D41625B59800AB5038 /* TXSip.m in Sources */,
 				850277D91625B59800AB5038 /* TXSipUser.m in Sources */,
 				850277E11625B5C300AB5038 /* MailBox.m in Sources */,
 				8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */,
@@ -908,14 +905,15 @@
 				853B201E169F1DE700F423DB /* http.c in Sources */,
 				852DA29816A00DE500AF5677 /* ReWrap.m in Sources */,
 				852DA2A016A05CEE00AF5677 /* auth.c in Sources */,
-				8520171B16EAE4380020BC02 /* TXUplinks.m in Sources */,
 				85DBA22016FCC4C500FB7B84 /* TXHttp.m in Sources */,
-				8548DF6B16FDD4EA00494FB9 /* TXSipReport.m in Sources */,
 				8548DF7216FDDC7300494FB9 /* TXSipIpc.m in Sources */,
 				8548DF7616FDEA3E00494FB9 /* tcsipuser.c in Sources */,
 				8548DF7C16FE246300494FB9 /* tcsipreg.c in Sources */,
 				8548DF8016FEE92F00494FB9 /* tcsipcall.c in Sources */,
 				8548DF8616FF041700494FB9 /* tcmedia.c in Sources */,
+				851E85131700F64A0054989F /* tcuplinks.c in Sources */,
+				851E851817016ED80054989F /* tcreport.c in Sources */,
+				851E851D170177440054989F /* tcsip.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -930,7 +928,6 @@
 				859D3D661628D6BC00385248 /* TXAccount.m in Sources */,
 				859D3D681628D6BC00385248 /* sound_utils.c in Sources */,
 				859D3D6A1628D6BC00385248 /* sound.c in Sources */,
-				859D3D731628D6BC00385248 /* TXSip.m in Sources */,
 				859D3D7D1628D6BC00385248 /* TXSipUser.m in Sources */,
 				8585A26916527CB000380B9C /* ajitter.c in Sources */,
 				8584068A1656934C00BE8EB6 /* rtp_io.c in Sources */,
@@ -942,14 +939,15 @@
 				853B201F169F1DE700F423DB /* http.c in Sources */,
 				852DA29916A00DE500AF5677 /* ReWrap.m in Sources */,
 				852DA2A116A05CEE00AF5677 /* auth.c in Sources */,
-				8520171C16EAE4380020BC02 /* TXUplinks.m in Sources */,
 				85DBA22116FCC4C500FB7B84 /* TXHttp.m in Sources */,
-				8548DF6C16FDD4EA00494FB9 /* TXSipReport.m in Sources */,
 				8548DF7316FDDC7300494FB9 /* TXSipIpc.m in Sources */,
 				8548DF7716FDEA3E00494FB9 /* tcsipuser.c in Sources */,
 				8548DF7D16FE246300494FB9 /* tcsipreg.c in Sources */,
 				8548DF8116FEE92F00494FB9 /* tcsipcall.c in Sources */,
 				8548DF8716FF041700494FB9 /* tcmedia.c in Sources */,
+				851E85141700F64A0054989F /* tcuplinks.c in Sources */,
+				851E851917016ED80054989F /* tcreport.c in Sources */,
+				851E851E170177440054989F /* tcsip.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -13,9 +13,18 @@
 #import "ReWrap.h"
 #import "re.h"
 #import "http.h"
-#import "TXSip.h"
 #include <msgpack.h>
 #include "strmacro.h"
+#include "tcreport.h"
+
+const NSDateFormatter *http_df = NULL;
+
+static void setup_df() {
+    http_df = [[NSDateFormatter alloc] init];
+    http_df.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+    http_df.dateFormat = @"EEE',' dd MMM yyyy HH':'mm':'ss 'GMT'";
+    http_df.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+}
 
 @implementation TXRestApi
 @synthesize ret_box;
@@ -25,6 +34,8 @@
 
     httpc = mem_ref(app);
     rq = [[NSMutableArray alloc] init];
+
+    if(!http_df) setup_df();
 
     return self;
 }

@@ -6,9 +6,9 @@
 //  Copyright (c) 2013 enodev. All rights reserved.
 //
 
-#import "TXSip.h"
 #import "TXHttp.h"
 #import "TXRestApi.h"
+#import "Callback.h"
 #import "JSONKit.h"
 #include "http.h"
 #include "strmacro.h"
@@ -18,6 +18,16 @@
     NULL,\
     CFSTR("!*'();:@&=+$,/?%#[]"),\
     kCFStringEncodingUTF8)))
+
+char* byte(NSString * input){
+      int len = (int)[input lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+
+      char *toReturn = (char *)malloc((sizeof(char) * len) +1);
+
+      strcpy(toReturn,[input cStringUsingEncoding:NSUTF8StringEncoding]);
+
+      return toReturn;
+}
 
 static void http_ret(struct request *req, int code, void *arg) {
 
