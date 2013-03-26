@@ -139,8 +139,9 @@ void tcsreg_send(struct tcsipreg *reg) {
     pl_strdup(&uri, &reg->remote->auri);
     pl_strdup(&user, &reg->remote->uri.user);
 
-    char *params, *fmt=NULL;
-    re_sdprintf(&params, "+sip.instance=\"<urn:uuid:%r>\"",
+    char *params=NULL, *fmt=NULL;
+    if(reg->instance_id.l)
+        re_sdprintf(&params, "+sip.instance=\"<urn:uuid:%r>\"",
                 &reg->instance_id);
 
     if(reg->apns_token.l) {
@@ -219,6 +220,11 @@ void tcsreg_set_instance(struct tcsipreg *reg, const char* instance_id)
     struct pl tmp;
     pl_set_str(&tmp, instance_id);
     pl_dup(&reg->instance_id, &tmp);
+}
+
+void tcsreg_set_instance_pl(struct tcsipreg *reg, struct pl* instance_id)
+{
+    pl_dup(&reg->instance_id, instance_id);
 }
 
 void tcsreg_token(struct tcsipreg *reg, const uint8_t *data, size_t length)

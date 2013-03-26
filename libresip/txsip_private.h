@@ -16,6 +16,7 @@ struct uac {
     struct sa laddr;
     struct sipsess_sock *sock;
     struct dnsc *dnsc;
+    struct pl instance_id;
 };
 
 struct uplink {

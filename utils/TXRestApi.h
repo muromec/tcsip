@@ -28,3 +28,6 @@ struct httpc;
 @property MailBox* ret_box;
 
 @end
+
+extern const NSDateFormatter *http_df;
+

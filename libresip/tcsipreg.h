@@ -34,6 +34,7 @@ void tcsreg_handler(struct tcsipreg *reg, tcsipreg_h rh, void*arg);
 void tcsreg_uhandler(struct tcsipreg *reg, uplink_h uh, void*arg);
 
 void tcsreg_set_instance(struct tcsipreg *reg, const char* instance_id);
+void tcsreg_set_instance_pl(struct tcsipreg *reg, struct pl* instance_id);
 void tcsreg_token(struct tcsipreg *reg, const uint8_t *data, size_t length);
 
 #endif
