@@ -11,6 +11,11 @@
 #include "asound.h"
 #endif
 
+#define DEBUG_MODULE "tcmedia"
+#define DEBUG_LEVEL 5
+#include <re_dbg.h>
+
+
 #define O_LIM (320*12)
 
 struct tcmedia {
@@ -50,13 +55,13 @@ struct tcmedia {
 };
 
 void tcmedia_stun(struct tcmedia*media, const struct sa* srv);
-void tcmedia_gather(struct tcmedia*media, int err, const char* reason);
 void tcmedia_conn_check(struct tcmedia*media, bool update, int err);
 void tcmedia_upd(struct tcmedia*media);
 void tcmedia_chdst(struct tcmedia*media);
-void tcmedia_formats(struct tcmedia*media);
-void tcmedia_setup_srtp(struct tcmedia*media);
+int tcmedia_formats(struct tcmedia*media);
+int tcmedia_setup_srtp(struct tcmedia*media);
 void tcmedia_set_format(struct tcmedia*media, char* fmt_name);
+static void gather_handler(int err, uint16_t scode, const char *reason, void *arg);
 
 void media_de(void*arg)
 {
@@ -87,13 +92,13 @@ bool sdp_crypto(const char *name, const char *value, void *arg)
         return false;
 
     if(key.l!=40) {
-        printf("invalid base64 key len %ld\n", key.l);
+        DEBUG_WARNING("invalid base64 key len %ld\n", key.l);
         return false;
     }
 
     base64_decode(key.p, key.l, srtp_in_key, &klen);
     if(klen!=30) {
-        printf("invalid key len %ld\n", klen);
+        DEBUG_WARNING("invalid key len %ld\n", klen);
         return false;
     }
 
@@ -104,12 +109,12 @@ bool sdp_crypto(const char *name, const char *value, void *arg)
 static void rtcp_recv_io(const struct sa *src, struct rtcp_msg *msg,
 			   void *arg)
 {
-    re_printf("rtcp handler %J\n", src);
+    DEBUG_INFO("rtcp handler %J\n", src);
 }
 
 static bool candidate_handler(struct le *le, void *arg)
 {
-	re_printf("candidate %p %H\n", arg, ice_cand_encode, le->data);
+	DEBUG_INFO("candidate %p %H\n", arg, ice_cand_encode, le->data);
 	return 0 != sdp_media_set_lattr(arg, false, ice_attr_cand, "%H",
 					ice_cand_encode, le->data);
 }
@@ -131,7 +136,7 @@ static bool if_handler(const char *ifname, const struct sa *sa, void *arg)
     if (sa_is_loopback(sa) || sa_is_linklocal(sa))
             return false;
 
-    re_printf("interface %s %J\n", ifname, sa);
+    DEBUG_INFO("interface %s %J\n", ifname, sa);
 
     lprio = 0;
     err = icem_cand_add(icem, 1, lprio, ifname, sa);
@@ -144,19 +149,13 @@ static void dns_handler(int err, const struct sa *srv, void *arg)
 {
    struct tcmedia *media = arg;
 
-   re_printf("dns handler %d %J\n", err, srv);
+   DEBUG_INFO("dns handler %d %J\n", err, srv);
    if(err)
        return;
 
    tcmedia_stun(media, srv);
 }
 
-static void gather_handler(int err, uint16_t scode, const char *reason,
-			   void *arg)
-{
-   struct tcmedia *media = arg;
-   tcmedia_gather(media, err, reason);
-}
 static void conncheck_handler(int err, bool update, void *arg)
 {
    struct tcmedia *media = arg;
@@ -176,7 +175,7 @@ void tcmedia_gencname(struct tcmedia*media)
     i=20;
     base64_encode(rbytes, i, media->msid, &olen); 
     media->msid[olen] = '\0';
-    re_printf("cname: %s, msid(%ld) %s\n", media->cname, olen, media->msid);
+    DEBUG_INFO("cname: %s, msid(%ld) %s\n", media->cname, olen, media->msid);
 }
 
 void tcmedia_genssrc(struct tcmedia*media)
@@ -262,9 +261,12 @@ int tcmedia_setup(struct tcmedia*media, call_dir_t dir)
     return err;
 }
 
-void tcmedia_gather(struct tcmedia*media, int err, const char* reason)
+static void gather_handler(int err, uint16_t scode, const char *reason,
+			   void *arg)
 {
-    re_printf("gather %J\n",
+    struct tcmedia *media = arg;
+
+    DEBUG_INFO("gather %J\n",
             icem_cand_default(media->icem, 1),
             icem_cand_default(media->icem, 2)
     );
@@ -276,12 +278,6 @@ void tcmedia_gather(struct tcmedia*media, int err, const char* reason)
 
 void tcmedia_conn_check(struct tcmedia*media, bool update, int err)
 {
-    re_printf("conncheck complete %d\n", err);
-
-    re_printf("check %J, %J\n",
-            icem_selected_laddr(media->icem, 1),
-            icem_selected_laddr(media->icem, 2));
-
     if(err==0) {
 	tcmedia_chdst(media);
     }
@@ -314,10 +310,9 @@ void tcmedia_stun(struct tcmedia*media, const struct sa* srv)
     net_if_apply(if_handler, media->icem);
 
     err = icem_gather_srflx(media->icem, srv);
-    re_printf("media start %d %J\n", err, srv);;
 }
 
-void tcmedia_setup_srtp(struct tcmedia*media)
+int tcmedia_setup_srtp(struct tcmedia*media)
 {
     int err;
 
@@ -333,7 +328,10 @@ void tcmedia_setup_srtp(struct tcmedia*media)
     in_policy.rtcp.sec_serv = sec_serv_none;
 
     err = srtp_create(&media->srtp_in, &in_policy);
-    printf("srtp create %d\n", err);
+    if(err) {
+        DEBUG_WARNING("strtp create failed %d\n", err);
+	goto fail;
+    }
 
     crypto_policy_set_rtp_default(&out_policy.rtp);
     crypto_policy_set_rtcp_default(&out_policy.rtcp);
@@ -345,8 +343,9 @@ void tcmedia_setup_srtp(struct tcmedia*media)
     out_policy.rtcp.sec_serv = sec_serv_none;
 
     err = srtp_create(&media->srtp_out, &out_policy);
-    printf("srtp create %d\n", err);
 
+fail:
+    return err;
 }
 
 int tcmedia_alloc(struct tcmedia** rp, struct uac*uac, call_dir_t cdir)
@@ -381,9 +380,9 @@ int tcmedia_offer(struct tcmedia*media, struct mbuf *offer, struct mbuf**ret)
         goto out;
     }
 
-    tcmedia_formats(media);
+    err |= tcmedia_formats(media);
 
-    err = sdp_encode(ret, media->sdp, false);
+    err |= sdp_encode(ret, media->sdp, false);
 out:
     return err;
 }
@@ -408,9 +407,9 @@ out:
     return err;
 }
 
-void tcmedia_formats(struct tcmedia*media)
+int tcmedia_formats(struct tcmedia*media)
 {
-
+    int err = 0;
     const struct sdp_format *rfmt = NULL, *_rfmt = NULL;
     const struct sdp_media *md = NULL;
     const struct list *list;
@@ -427,13 +426,15 @@ void tcmedia_formats(struct tcmedia*media)
     }
 
     if (!rfmt) {
-        re_printf("no common media format found\n");
-        return;
+        DEBUG_INFO("no common media format found\n");
+	err = -EINVAL;
+	goto fail;
     }
 
     if(md == media->sdp_media_s || md == media->sdp_media_sf) {
         (void)sdp_media_rattr_apply(md, "crypto", sdp_crypto, media->srtp_in_key);
-	tcmedia_setup_srtp(media);
+	err = tcmedia_setup_srtp(media);
+	if(err) goto fail;
     }
 
     sdp_media_rattr_apply(md, NULL, media_attr_handler, media->icem);
@@ -442,11 +443,15 @@ void tcmedia_formats(struct tcmedia*media)
     icem_verify_support(media->icem, 1, media->dst);
 
     sdp_media_raddr_rtcp(md, &media->rtcp_dst);
-    re_printf("rtcp dest %J\n", &media->rtcp_dst);
+    DEBUG_INFO("rtcp dest %J\n", &media->rtcp_dst);
     icem_verify_support(media->icem, 2, &media->rtcp_dst);
 
     tcmedia_set_format(media, rfmt->name);
     media->pt = rfmt->pt;
+
+    return 0;
+fail:
+    return err;
 }
 
 
@@ -469,7 +474,7 @@ void tcmedia_chdst(struct tcmedia*media)
 
     sa_cpy(media->dst, ice_dst1);
 
-    re_printf("change dst ice dst %J (%J) and %J\n", ice_dst1, media->dst, ice_dst2);
+    DEBUG_INFO("change dst ice dst %J (%J) and %J\n", ice_dst1, media->dst, ice_dst2);
 
     rtcp_start(media->rtp, media->cname, ice_dst2);
 }
@@ -523,7 +528,6 @@ int tcmedia_start(struct tcmedia*media)
     ok = media_snd_stream_start(media->media);
 #endif
     rtp_send_start(media->send_io_ctx);
-re_printf("send start\n");
 
     return 0;
 }

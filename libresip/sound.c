@@ -45,6 +45,7 @@
 #define REC_CH 94
 
 #define PJ_LOG(x, y) ({})
+#define ERRP(...) fprintf(stderr, "sound: " __VA_ARGS__)
 
 static AudioComponent component = NULL;
 
@@ -130,7 +131,7 @@ void session_int_cb(void *userData, uint32_t interruptionState)
 {
 #if MANAGE_AUDIO_SESSION
 
-        printf("session interrupted\n");
+        MSG("session interrupted\n");
 	if(interruptionState == kAudioSessionBeginInterruption)
 	{
 		PJ_LOG(3, (THIS_FILE, "interruptionListenerCallback: kAudioSessionBeginInterruption"));
@@ -401,7 +402,7 @@ int media_snd_init()
 	
 	if(component == NULL)
 	{
-		printf("Unable to find voice unit audio component!");
+		ERRP("Unable to find voice unit audio component!");
 		return -1;
 	}
 	
@@ -592,7 +593,7 @@ int media_snd_open(media_dir_t dir,
 			status = AudioComponentInstanceNew(component, &snd_strm->out_unit);
 		}
 	}
-	printf("instanced components dir %d  in: 0x%lx (%d), out: 0x%lx (%d)\n",
+	MSG("instanced components dir %d  in: 0x%lx (%d), out: 0x%lx (%d)",
 			dir,
 			(long)snd_strm->in_unit, theDefaultInputDeviceID,
 			(long)snd_strm->out_unit, theDefaultOutputDeviceID);
@@ -658,7 +659,7 @@ int media_snd_open(media_dir_t dir,
 		MSG("input format ok");
 
 		snd_strm->resampler = speex_resampler_init(1, in_srate, clock_rate, 4, &status);
-		printf("created resampler: %d %lx\n", status, (long)snd_strm->resampler );
+		MSG("created resampler: %d %lx", status, (long)snd_strm->resampler );
 		if(!snd_strm->resampler) {
 			goto err_out_resampler;
 		}

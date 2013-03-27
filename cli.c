@@ -47,7 +47,6 @@ int main(int argc, char *argv[]) {
 
     net_default_source_addr_get(AF_INET, &uac.laddr);
     sa_set_port(&uac.laddr, 0);
-    re_printf("addr %J\n", &uac.laddr);
 
     if(argc<2) {
         printf("provide certificate path\n");
@@ -64,7 +63,6 @@ int main(int argc, char *argv[]) {
 
     err = dns_srv_get(NULL, 0, uac.nsv, &uac.nsc);
 
-    re_printf("nsv %J %d %d\n", uac.nsv, uac.nsc, err);
     if(uac.nsc==0) {
         uac.nsc = 1;
         sa_set_str(uac.nsv, "8.8.8.8", 53);
@@ -79,11 +77,7 @@ int main(int argc, char *argv[]) {
     err = sip_transp_add(uac.sip, SIP_TRANSP_TLS, &uac.laddr,
           uac.tls);
 
-    re_printf("transport add %J\n", &uac.laddr);
-
     err = sipsess_listen(&uac.sock, uac.sip, 32, connect_handler, NULL);
-
-    re_printf("sock %r\n", uac.sock);
 
     err = sippuser_by_name(&user_c, argv[2]);
     err = sippuser_by_name(&dest, argv[3]);
@@ -96,9 +90,9 @@ int main(int argc, char *argv[]) {
 
     current_call = call;
 
+    re_printf("call %r\n", &dest->auri);
     re_main(signal_handler);
 
-    re_printf("user %r\n", &user_c->auri);
 
     mem_deref(uac.sip);
     mem_deref(uac.dnsc);

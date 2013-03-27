@@ -42,8 +42,6 @@ void call_destruct(void *arg)
 
 static int offer_handler(struct mbuf **mbp, const struct sip_msg *msg,
 			 void *arg) {
-    re_printf("sdp offer\n");
-
     struct tcsipcall *call = arg;
     return tcmedia_offer(call->media, msg->mb, mbp);
 }
@@ -51,7 +49,6 @@ static int offer_handler(struct mbuf **mbp, const struct sip_msg *msg,
 /* called when an SDP answer is received */
 static int answer_handler(const struct sip_msg *msg, void *arg)
 {
-    re_printf("sdp answer\n");
     struct tcsipcall *call = arg;
     tcmedia_answer(call->media, msg->mb);
 

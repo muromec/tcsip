@@ -16,7 +16,13 @@ int set_voice_proc(AudioUnit unit, UInt32 agc, UInt32 quality);
 int set_format(AudioUnit unit, int bus, int samplerate);
 int set_cb(AudioUnit unit, int bus, void *cb, void *user);
 
-#define MSG(m) printf(m"\n")
+#if DEBUG || SOUND_DEBUG
+#define MSG(...) {\
+	fprintf(stderr, "sound: "__VA_ARGS__);\
+	fprintf(stderr, "\n");}
+#else
+#define MSG(...) {}
+#endif
 
 #define ERR(msg) {\
 	if(status != noErr) {\
