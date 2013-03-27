@@ -53,7 +53,7 @@ static Boolean poppingSoundWorkaround;
 
 // Static pointer to the stream that gets created when the sound driver is open.
 // The sole purpose of this pointer is to get access to the stream from within the audio session interruption callback.
-static struct pjmedia_snd_stream *snd_strm_instance = NULL;
+static struct apple_sound *snd_strm_instance = NULL;
 
 #if MANAGE_AUDIO_SESSION
   static bool audio_session_initialized = 0;
@@ -185,7 +185,7 @@ static OSStatus MyOutputBusRenderCallack(void                       *inRefCon,
                                          UInt32                      inNumberFrames,
                                          AudioBufferList            *ioData)
 {
-	struct pjmedia_snd_stream *snd_strm = (struct pjmedia_snd_stream *)inRefCon;
+	struct apple_sound *snd_strm = (struct apple_sound *)inRefCon;
 
 	UInt32 audioBufferSize = ioData->mBuffers[0].mDataByteSize;
 	char *audioBuffer = (char *)(ioData->mBuffers[0].mData);
@@ -232,7 +232,7 @@ static OSStatus MyInputBusInputCallback(void                       *inRefCon,
 {
 	
 	// The AudioUnit callbacks operate on a different real-time thread
-	struct pjmedia_snd_stream *snd_strm = (struct pjmedia_snd_stream *)inRefCon;
+	struct apple_sound *snd_strm = (struct apple_sound *)inRefCon;
 	
 	AudioBufferList *abl = snd_strm->inputBufferList;
 
@@ -271,7 +271,7 @@ static OSStatus MyInputBusInputCallbackRS(void                       *inRefCon,
 {
 
 	// The AudioUnit callbacks operate on a different real-time thread
-	struct pjmedia_snd_stream *snd_strm = (struct pjmedia_snd_stream *)inRefCon;
+	struct apple_sound *snd_strm = (struct apple_sound *)inRefCon;
 
 	AudioBufferList *abl = snd_strm->inputBufferList;
 
@@ -308,25 +308,6 @@ err:
 	return -1;
 }
 
-// Order of calls from PJSIP:
-// 
-// SIP application is launched
-// - pjmedia_snd_init
-// 
-// VoIP call started
-// - pjmedia_snd_open
-// - pjmedia_snd_stream_start
-// - pjmedia_snd_stream_get_info
-// - pjmedia_snd_get_dev_info
-// 
-// VoIP call stopped
-// - ???
-// 
-// SIP application terminated
-// - pjmedia_snd_stream_stop
-// - pjmedia_snd_stream_close
-// - pjmedia_snd_deinit
-
 /**
  * Init the sound library.
  * 
@@ -339,10 +320,8 @@ err:
  * Parameters:
  * factory - A memory pool factory.
 **/
-int media_snd_init()
+int apple_sound_init()
 {
-	PJ_LOG(5, (THIS_FILE, "pjmedia_snd_init"));
-	
 	// Initialize audio session for iPhone
 	initializeAudioSession();
 	
@@ -412,10 +391,8 @@ int media_snd_init()
 /**
  * Deinitialize sound library.
 **/
-int media_snd_deinit(void)
+int apple_sound_deinit(void)
 {
-	PJ_LOG(5, (THIS_FILE, "pjmedia_snd_deinit"));
-	
 	// Remove reference to the memory pool factory.
 	// We check this variable in other parts of the code to see if we've been initialized.
 	//snd_pool_factory = NULL;
@@ -427,85 +404,6 @@ int media_snd_deinit(void)
 }
 
 /**
- * This method is called by PJSIP to get the number of devices detected by our driver.
-**/
-int pjmedia_snd_get_dev_count()
-{
-	PJ_LOG(5, (THIS_FILE, "pjmedia_snd_get_dev_count"));
-	
-	// Only one device
-	return 1;
-}
-
-
-/**
- * Create a unidirectional audio stream for capturing audio samples from the sound device.
- * This is a half-duplex method, as opposed to the full-duplex pjmedia_snd_open().
- * 
- * Parameters:
- * index
- *    Device index, or -1 to let the library choose the first available device.
- * clock_rate
- *    Sound device's clock rate to set.
- * samples_per_frame
- *    Number of samples per frame.
- * bits_per_sample
- *    Set the number of bits per sample.
- *    The normal value for this parameter is 16 bits per sample.
- * rec_cb
- *    Callback to handle captured audio samples.
- *    User data to be associated with the stream.
- * p_snd_strm
- *    Pointer to receive the stream instance.
- * 
- * Returns:
- * PJ_SUCCESS on success.
-**/
-int media_snd_open_rec(unsigned clock_rate,
-                  struct pjmedia_snd_stream **p_snd_strm)
-{
-	PJ_LOG(5, (THIS_FILE, "pjmedia_snd_open_rec"));
-	
-	return media_snd_open(DIR_CAP, clock_rate, 0, p_snd_strm);
-}
-
-/**
- * Create a unidirectional audio stream for playing audio samples to the sound device.
- * This is a half-duplex method, as opposed to the full-duplex pjmedia_snd_open().
- * 
- * Parameters:
- * index
- *    Device index, or -1 to let the library choose the first available device.
- * clock_rate
- *    Sound device's clock rate to set.
- * samples_per_frame
- *    Number of samples per frame.
- * bits_per_sample
- *    Set the number of bits per sample.
- *    The normal value for this parameter is 16 bits per sample.
- * play_cb 
- *    Callback to be called when the sound player needs more audio samples to play.
- * user_data
- *    User data to be associated with the stream.
- * p_snd_strm
- *    Pointer to receive the stream instance.
- *
- * Returns:
- * PJ_SUCCESS on success.
-**/
-int media_snd_open_player(unsigned clock_rate,
-				int render_ring_size,
-                     struct pjmedia_snd_stream **p_snd_strm)
-{
-	PJ_LOG(5, (THIS_FILE, "pjmedia_snd_open_player"));
-	
-	return media_snd_open(DIR_PLAY,
-	                        clock_rate,
-				render_ring_size,
-	                        p_snd_strm);
-}
-
-/**
  * Create sound stream for both capturing audio and audio playback, from the same device.
  * This is the recommended way to create simultaneous recorder and player streams (instead of
  * creating separate capture and playback streams), because it works on backends that
@@ -514,7 +412,7 @@ int media_snd_open_player(unsigned clock_rate,
  * This method is invoked when a call is started.
  * At this point we should setup our AudioQueue.
  * There's no need to start the audio session or audio queue yet though.
- * We can wait until pjmedia_snd_stream_start for that stuff.
+ * We can wait until apple_sound_start for that stuff.
  * 
  * Parameters:
  * rec_id
@@ -529,24 +427,24 @@ int media_snd_open_player(unsigned clock_rate,
  * Returns:
  * PJ_SUCCESS on success.
 **/
-int media_snd_open(media_dir_t dir,
+int apple_sound_open(media_dir_t dir,
     unsigned clock_rate,
     int render_ring_size,
-    struct pjmedia_snd_stream **p_snd_strm)
+    struct apple_sound **p_snd_strm)
 {
 	OSStatus status;
 	
 	// Sound stream structure that we'll allocate and populate.
 	// When we're done, we'll make the p_snd_strm paramter point to it.
-	struct pjmedia_snd_stream *snd_strm;
+	struct apple_sound *snd_strm;
 	
 	// Allocate snd_stream structure to hold all of our "instance" variables
-	snd_strm = malloc(sizeof(struct pjmedia_snd_stream));
+	snd_strm = malloc(sizeof(struct apple_sound));
 	
 	// Store our passed instance variables
 	
-	// Remember: The snd_strm variable is a pointer to a pjmedia_snd_stream struct.
-	// The pjmedia_snd_stream struct is defined at the top of this file.
+	// Remember: The snd_strm variable is a pointer to a apple_sound struct.
+	// The apple_sound struct is defined at the top of this file.
 	
 	snd_strm->clock_rate        = clock_rate;
 	snd_strm->isActive          = false;
@@ -734,10 +632,8 @@ err_out_ring:
  * It is only called for the first call?
  * Subsequent phone calls do not invoke this method?
 **/
-int media_snd_stream_start(struct pjmedia_snd_stream *snd_strm)
+int apple_sound_start(struct apple_sound *snd_strm)
 {
-	PJ_LOG(5, (THIS_FILE, "pjmedia_snd_stream_start"));
-	
 	// Make note of the stream starting
 	snd_strm->isActive = true;
 	
@@ -763,7 +659,7 @@ int media_snd_stream_start(struct pjmedia_snd_stream *snd_strm)
  * This method is only called when the PJSIP application is shutting down.
  * It is not called when a phone call is ended?
 **/
-int media_snd_stream_stop(struct pjmedia_snd_stream *snd_strm)
+int apple_sound_stop(struct apple_sound *snd_strm)
 {
 	// Stop the audio unit
 	if(snd_strm->out_unit) {
@@ -786,7 +682,7 @@ int media_snd_stream_stop(struct pjmedia_snd_stream *snd_strm)
 /**
  * Destroy the stream.
 **/
-int media_snd_stream_close(struct pjmedia_snd_stream *snd_strm)
+int apple_sound_close(struct apple_sound *snd_strm)
 {
 	if(snd_strm->out_unit)
 	{

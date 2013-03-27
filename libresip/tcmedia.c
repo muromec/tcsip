@@ -6,9 +6,13 @@
 #include "tcsipcall.h"
 #include "tcmedia.h"
 
+#if __APPLE__
 #include "sound.h"
+#define sound_t apple_sound
+#endif
 #if __linux__
 #include "asound.h"
+#define sound_t alsa_sound
 #endif
 
 #define DEBUG_MODULE "tcmedia"
@@ -22,7 +26,7 @@ struct tcmedia {
     struct uac *uac;
     struct sa *laddr;
 
-    struct pjmedia_snd_stream *media;
+    struct sound_t *sound;
     struct rtp_sock *rtp;
     struct ice* ice;
     struct icem* icem;
@@ -488,22 +492,20 @@ int tcmedia_start(struct tcmedia*media)
     icem_update(media->icem);
     ice_conncheck_start(media->ice);
 
-    if(!media->media) {
+    if(!media->sound) {
         // XXX: use audio, video, chat flags
 #if __APPLE__
-        ok = media_snd_open(DIR_BI, 8000, O_LIM, &media->media);
-        if(ok!=0)
-            return -1;
+        ok = apple_sound_open(DIR_BI, 8000, O_LIM, &media->sound);
 #endif
 #if __linux__
-        ok = media_open(&media->media);
+        ok = media_open(&media->sound);
 #endif
+        if(ok!=0)
+            return -1;
     }
 
     rtp_send_ctx *send_ctx = rtp_send_init(media->fmt);
-#if __APPLE__
-    send_ctx->record_jitter = media->media->record_jitter;
-#endif
+    send_ctx->record_jitter = media->sound->record_jitter;
     send_ctx->rtp = media->rtp;
     send_ctx->pt = media->pt;
     send_ctx->srtp_out = media->srtp_out;
@@ -514,18 +516,13 @@ int tcmedia_start(struct tcmedia*media)
     // set recv side
     rtp_recv_ctx * recv_ctx = rtp_recv_init(media->fmt);
     recv_ctx->srtp_in = media->srtp_in;
-#if __linux__
-    recv_ctx->play_jitter = (void*)media->media;
-#endif
-#if __APPLE__
-    recv_ctx->play_jitter = (void*)media->media->play_jitter;
-#endif
+    recv_ctx->play_jitter = (void*)media->sound->play_jitter;
 
     media->recv_io_arg.ctx = recv_ctx;
     media->recv_io_arg.handler = rtp_recv_func(media->fmt);
 
 #if __APPLE__
-    ok = media_snd_stream_start(media->media);
+    ok = apple_sound_start(media->sound);
 #endif
     rtp_send_start(media->send_io_ctx);
 
@@ -546,12 +543,12 @@ void tcmedia_stop(struct tcmedia *media)
         media->send_io_ctx = NULL;
     }
 
-    if(media->media) {
+    if(media->sound) {
 #if __APPLE__
-        media_snd_stream_stop(media->media);
-	media_snd_stream_close(media->media);
+        apple_sound_stop(media->sound);
+	apple_sound_close(media->sound);
 #endif
-	media->media = NULL;
+	media->sound = NULL;
     }
 
 

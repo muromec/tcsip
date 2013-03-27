@@ -2,7 +2,7 @@
 #define TX_SOUND_H
 
 /**
- * The pjmedia_snd_stream struct is referenced in several other pjlib files,
+ * The apple_sound struct is referenced in several other pjlib files,
  * but is ultimately defined here in the sound driver.
  * So we're allowed to put any information we may need in it.
 **/
@@ -26,8 +26,11 @@ media_dir_t;
 #define IF_PLAY(dir) if(dir & DIR_CAP)
 #define IF_SEP(dir) if(dir & DIR_SEP)
 
-struct pjmedia_snd_stream
+struct apple_sound
 {
+	ajitter *record_jitter;
+	ajitter *play_jitter;
+
 	media_dir_t dir;
 	unsigned clock_rate;
 	
@@ -40,30 +43,20 @@ struct pjmedia_snd_stream
 	
 	SpeexResamplerState *resampler;
 
-	ajitter *record_jitter;
-	ajitter *play_jitter;
-
 	int isActive;
 };
 
-int media_snd_open_player(unsigned clock_rate,
-				int render_ring_size,
-                     struct pjmedia_snd_stream **p_snd_strm);
-
-int media_snd_open_rec(unsigned clock_rate,
-                  struct pjmedia_snd_stream **p_snd_strm);
-
-int media_snd_open(media_dir_t dir,
+int apple_sound_open(media_dir_t dir,
     unsigned clock_rate,
     int render_ring_size,
-    struct pjmedia_snd_stream **p_snd_strm);
+    struct apple_sound **p_snd_strm);
 
-int media_snd_stream_start(struct pjmedia_snd_stream *snd_strm);
-int media_snd_stream_stop(struct pjmedia_snd_stream *snd_strm);
-int media_snd_stream_close(struct pjmedia_snd_stream *snd_strm);
+int apple_sound_start(struct apple_sound *snd_strm);
+int apple_sound_stop(struct apple_sound *snd_strm);
+int apple_sound_close(struct apple_sound *snd_strm);
 
-int media_snd_init();
-int media_snd_deinit(void);
+int apple_sound_init();
+int apple_sound_deinit(void);
 
 void session_int_cb(void *userData, uint32_t interruptionState);
 

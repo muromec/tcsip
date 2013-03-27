@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     libre_init();
     srtp_init();
 #if __APPLE__
-    media_snd_init();
+    apple_sound_init();
 #endif
 
     int err;
