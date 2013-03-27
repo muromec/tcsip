@@ -88,8 +88,8 @@ void media_write(snd_pcm_t* pcm_handle, char*buf, int len)
 int pcm;
 pcm = snd_pcm_writei(pcm_handle, buf, len);
 
+if(pcm == -EPIPE) return snd_pcm_prepare(pcm_handle);
 if(pcm != len) printf("fail %d\n", pcm);
-if(pcm == -EPIPE) snd_pcm_prepare(pcm_handle);
 
 }
 
