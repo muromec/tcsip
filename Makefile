@@ -36,7 +36,7 @@ objects += cli.o
 CC := gcc
 
 cli: $(objects) $(LIBS-static)
-	$(CC) -o cli $(LIBS) $(objects)
+	$(CC) $(objects) $(LIBS-static) $(LIBS) -o $@
 
 clean:
 	rm -f $(objects)
