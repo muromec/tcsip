@@ -38,8 +38,14 @@ void send_stats(int rbytes, int nbytes){
     cc++;
     rb += rbytes;
     nb += nbytes;
-    if((cc%100)==0) printf("send[%d] by %d/%d bytes %d/%d\n", cc, rbytes, nbytes, rb, nb);
+    if((cc%100)==0) fprintf(stderr, "send[%d] by %d/%d bytes %d/%d\n", cc, rbytes, nbytes, rb, nb);
 }
+
+#if DEBUG
+#define dsend_stats(__r, __n) send_stats(__r, __n)
+#else
+#define dsend_stats(__r, __n) {}
+#endif
 
 void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg)
 {
@@ -118,7 +124,7 @@ restart:
 
     rtp_p(arg->srtp_out, mb);
 
-    send_stats(arg->frame_size, len);
+    dsend_stats(arg->frame_size, len);
 
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 
