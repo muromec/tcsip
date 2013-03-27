@@ -60,27 +60,13 @@ void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct m
 
     ajitter_packet * ajp;
 
-#if __linux__
-char _buf[1000];
-ajitter_packet _ajp;
-ajp = &_ajp;
-ajp->data = _buf;
-#endif
-
-#if __APPLE__
     ajp = ajitter_put_ptr(arg->play_jitter);
-#endif
     int err = speex_decode_int(arg->dec_state, &arg->dec_bits, (spx_int16_t*)ajp->data);
     ajp->left = arg->frame_size;
     ajp->off = 0;
     if(err!=0) printf("decode err %d\n", err);
-#if __linux__
-    media_write(arg->play_jitter, ajp->data, ajp->left/2 );
-#endif
 
-#if __APPLE__
-   ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
-#endif
+    ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
 }
 
 void rtp_send_io(void *varg)

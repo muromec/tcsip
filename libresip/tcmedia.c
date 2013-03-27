@@ -524,6 +524,9 @@ int tcmedia_start(struct tcmedia*media)
 #if __APPLE__
     ok = apple_sound_start(media->sound);
 #endif
+#if __linux__
+    ok = alsa_sound_start(media->sound);
+#endif
     rtp_send_start(media->send_io_ctx);
 
     return 0;

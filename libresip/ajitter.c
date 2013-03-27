@@ -47,6 +47,7 @@ ajitter * ajitter_init(int chunk_size)
 	aj->last = 0;
 	aj->csize = chunk_size;
 	aj->out_have = 0;
+	aj->handler = NULL;
 	memset(&aj->time[0], 0, sizeof(int) * AJD);
 
 	ajitter_packet *pkt;
@@ -99,6 +100,8 @@ void ajitter_put_done(ajitter *aj, int idx, double time) {
 	aj->last = time;
 	bset(aj->used, idx);
 	DBG(("jitter put done %d %f used %x\n", idx, time, aj->used));
+
+	if(aj->handler) aj->handler(aj->handler_arg);
 
 }
 
@@ -171,6 +174,12 @@ char * ajitter_get_chunk(ajitter *aj, int size, int *ts) {
 		return 0;
 
 	return aj->out_buffer;
+}
+
+void ajitter_set_handler(ajitter *aj, aj_h handler, void *arg)
+{
+	aj->handler = handler;
+	aj->handler_arg = arg;
 }
 
 void ajitter_destroy(ajitter *aj)

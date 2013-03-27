@@ -42,27 +42,15 @@ void rtp_recv_opus(const struct sa *src, const struct rtp_header *hdr, struct mb
 	    return;
 
     ajitter_packet * ajp;
-#if __linux__
-    ajitter_packet _ajp;
-    ajp	= &_ajp;
-#endif
 
-#if __APPLE__
     ajp = ajitter_put_ptr(arg->play_jitter);
-#endif
 
     unsigned char *inb = mbuf_buf(mb);
     len = opus_decode(arg->dec, inb, len, (short*)ajp->data, 160, 0);
     ajp->left = len * 2;
     ajp->off = 0;
 
-#if __APPLE__
     ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
-#endif
-
-#if __linux__
-    media_write(arg->play_jitter, ajp->data, ajp->left );
-#endif
 
 }
 
