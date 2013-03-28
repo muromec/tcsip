@@ -22,10 +22,12 @@ struct tcsipcall {
     int cstate;
     int reason;
     time_t ts;
+    struct tmr tmr;
 };
 
 void tcsipcall_activate(struct tcsipcall*call);
 void tcsipcall_hangup(struct tcsipcall*call);
+static void media_event(struct tcmedia* media, enum media_e event, int earg, void*arg);
 
 static void dummy_handler(struct tcsipcall*call, void*arg){
 }
@@ -167,6 +169,8 @@ void tcsipcall_out(struct tcsipcall*call)
         call->cstate |= CSTATE_ERR;
 
     tcsipcall_key(call);
+
+    tcmedia_handler(call->media, media_event, call);
 }
 
 void tcsipcall_parse_from(struct tcsipcall*call)
@@ -206,6 +210,8 @@ int tcsipcall_incomfing(struct tcsipcall*call, const struct sip_msg* msg)
     tcsipcall_parse_date(call);
 
     tcsipcall_key(call);
+
+    tcmedia_handler(call->media, media_event, call);
 
     return err;
 }
@@ -401,15 +407,21 @@ void tcsipcall_send(struct tcsipcall*call)
 
 }
 
-static void iceok(struct tcmedia* media, void*arg)
+static void media_event(struct tcmedia* media, enum media_e event, int earg, void*arg)
 {
     struct tcsipcall*call = arg;
-    tcsipcall_send(call);
-}
-
-void tcsipcall_waitice(struct tcsipcall*call)
-{
-     tcmedia_iceok(call->media, iceok, call);
+    switch(event) {
+    case MEDIA_ICE_OK:
+        if(call->cdir == CALL_OUT)
+            tcsipcall_send(call);
+        break;
+    case MEDIA_KA_WARN:
+        re_printf("no sound for %d secs\n", earg);
+        break;
+    case MEDIA_KA_FAIL:
+        tmr_start(&call->tmr, 100, (tmr_h*)tcsipcall_hangup, call);
+        break;
+    }
 }
 
 void tcsipcall_dirs(struct tcsipcall*call, int *dir, int *state, int *reason, int *ts)

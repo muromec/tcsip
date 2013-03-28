@@ -5,6 +5,7 @@
 #include <srtp.h>
 #include "tcsipcall.h"
 #include "tcmedia.h"
+#include <sys/time.h>
 
 #define O_LIM (320*12)
 
@@ -40,7 +41,7 @@ struct tcmedia {
     struct icem* icem;
     struct stun_dns *stun_dns;
 
-    struct tmr rtp_tmr;
+    struct tmr ka_tmr;
 
     void *send_io_ctx;
     rtp_recv_arg recv_io_arg;
@@ -62,8 +63,8 @@ struct tcmedia {
     int pt;
     int fmt;
 
-    icehandler *ice_h;
-    void *ice_arg;
+    media_h *media_h;
+    void *marg;
 };
 
 void tcmedia_stun(struct tcmedia*media, const struct sa* srv);
@@ -204,12 +205,12 @@ void tcmedia_genssrc(struct tcmedia*media)
 
 }
 
-void tcmedia_iceok(struct tcmedia* media, icehandler ih, void*arg)
+void tcmedia_handler(struct tcmedia* media, media_h hdl, void*arg)
 {
     if(!media) return;
 
-    media->ice_h = ih;
-    media->ice_arg = arg; 
+    media->media_h = hdl;
+    media->marg = arg; 
 }
 
 int tcmedia_setup(struct tcmedia*media, call_dir_t dir)
@@ -283,8 +284,8 @@ static void gather_handler(int err, uint16_t scode, const char *reason,
             icem_cand_default(media->icem, 2)
     );
     tcmedia_upd(media);
-    if(media->ice_h) {
-        media->ice_h(media, media->ice_arg);
+    if(media->media_h) {
+        media->media_h(media, MEDIA_ICE_OK, 0, media->marg);
     }
 }
 
@@ -491,6 +492,26 @@ void tcmedia_chdst(struct tcmedia*media)
     rtcp_start(media->rtp, media->cname, ice_dst2);
 }
 
+static void ka_handler(void *arg)
+{
+    struct tcmedia *media = arg;
+    struct timeval tv;
+    int ret, delt;
+    rtp_recv_ctx *rctx = media->recv_io_arg.ctx;
+    if(!rctx) goto timer;
+
+    ret = gettimeofday(&tv, NULL);
+    if(ret) goto timer;
+
+    delt = (int)tv.tv_sec - rctx->last_read;
+    if(delt < 5)
+	goto timer;
+        
+    media->media_h(media, (delt<15) ? MEDIA_KA_WARN : MEDIA_KA_FAIL, delt, media->marg);
+
+timer:
+    tmr_start(&media->ka_tmr, 5000, ka_handler, media);
+}
 
 int tcmedia_start(struct tcmedia*media)
 {
@@ -528,6 +549,8 @@ int tcmedia_start(struct tcmedia*media)
 
     rtp_send_start(media->send_io_ctx);
 
+    tmr_start(&media->ka_tmr, 5000, ka_handler, media);
+
     return 0;
 }
 
@@ -561,4 +584,7 @@ void tcmedia_stop(struct tcmedia *media)
 
     if(media->srtp_out)
         srtp_dealloc(media->srtp_out);
+
+    tmr_cancel(&media->ka_tmr);
+
 }

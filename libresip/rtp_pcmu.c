@@ -1,5 +1,6 @@
 #include "g711.h"
 #include "rtp_io.h"
+#include <sys/time.h>
 
 typedef struct {
     int magic;
@@ -22,6 +23,7 @@ typedef struct {
     srtp_t srtp_in;
     ajitter *play_jitter;
     fmt_t fmt;
+    int last_read;
     // codec
     int frame_size;
 } rtp_recv_pcmu_ctx;
@@ -35,6 +37,7 @@ rtp_recv_ctx * rtp_recv_pcmu_init()
     ctx->frame_size = 320;
     ctx->magic = 0x1ab1D00F;
     ctx->fmt = FMT_PCMU;
+    ctx->last_read = 0;
     return (rtp_recv_ctx*)ctx;
 }
 
@@ -109,6 +112,10 @@ void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mb
     ajp->off = 0;
 
     ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
+
+    struct timeval tv;
+    if(!gettimeofday(&tv, NULL))
+        arg->last_read = (int)tv.tv_sec;
 }
 
 rtp_send_ctx* rtp_send_pcmu_init() {

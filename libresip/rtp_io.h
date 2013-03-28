@@ -33,6 +33,7 @@ typedef struct {
     srtp_t srtp_in;
     ajitter *play_jitter;
     fmt_t fmt;
+    int last_read;
 } rtp_recv_ctx;
 
 rtp_send_ctx* rtp_send_init(fmt_t fmt);

@@ -332,8 +332,6 @@ void tcsip_start_call(struct tcsip* sip, struct sip_addr*udest)
     tcop_users((void*)call, sip->user_c, udest);
     tcsipcall_out(call);
 
-    tcsipcall_waitice(call);
-
     tcsipcall_append(call, sip->calls_c);
     if(!sip->rarg)
 	return;

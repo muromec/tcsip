@@ -1,10 +1,6 @@
 #include "rtp_io.h"
 #include "opus.h"
-
-#if __linux__
-#include "asound.h"
-#endif
-
+#include <sys/time.h>
 
 typedef struct {
     int magic;
@@ -28,6 +24,7 @@ typedef struct {
     srtp_t srtp_in;
     ajitter *play_jitter;
     fmt_t fmt;
+    int last_read;
     // codec
     OpusDecoder *dec;
 } rtp_recv_opus_ctx;
@@ -52,6 +49,9 @@ void rtp_recv_opus(const struct sa *src, const struct rtp_header *hdr, struct mb
 
     ajitter_put_done(arg->play_jitter, ajp->idx, (double)hdr->seq);
 
+    struct timeval tv;
+    if(!gettimeofday(&tv, NULL))
+        arg->last_read = (int)tv.tv_sec;
 }
 
 void rtp_send_opus(void *varg)
@@ -125,6 +125,7 @@ rtp_recv_ctx * rtp_recv_opus_init()
     ctx->srtp_in = NULL;
     ctx->play_jitter = NULL;
     ctx->fmt = FMT_OPUS;
+    ctx->last_read = 0;
     size = opus_decoder_get_size(1);
     ctx->dec = malloc(size);
     err = opus_decoder_init(ctx->dec, 8000, 1);
