@@ -34,6 +34,20 @@ static void connect_handler(const struct sip_msg *msg, void *arg)
 {
 }
 
+void call_change(struct tcsipcall* call, void *arg)
+{
+    int cstate;
+
+    tcsipcall_dirs(call, NULL, &cstate, NULL, NULL);
+
+    if((cstate & CSTATE_ALIVE) == 0) {
+        re_printf("call ended\n");
+        tcsipcall_remove(call); // wrong place for this
+	current_call = NULL;
+	re_cancel();
+    }
+}
+
 int main(int argc, char *argv[]) {
     libre_init();
     srtp_init();
@@ -86,13 +100,12 @@ int main(int argc, char *argv[]) {
     err = tcsipcall_alloc(&call, &uac); 
     tcop_users((void*)call, user_c, dest);
     tcsipcall_out(call);
-    tcsipcall_waitice(call);
+    tcsipcall_handler(call, call_change, NULL);
 
     current_call = call;
 
     re_printf("call %r\n", &dest->auri);
     re_main(signal_handler);
-
 
     mem_deref(uac.sip);
     mem_deref(uac.dnsc);
