@@ -110,5 +110,5 @@ void alsa_sound_close(struct alsa_sound*snd)
 {
 	snd_pcm_drain(snd->play_handle);
 	snd_pcm_close(snd->play_handle);
-	free(snd);
+	mem_deref(snd);
 }
