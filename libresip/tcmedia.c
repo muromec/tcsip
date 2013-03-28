@@ -119,12 +119,6 @@ bool sdp_crypto(const char *name, const char *value, void *arg)
 
 }
 
-static void rtcp_recv_io(const struct sa *src, struct rtcp_msg *msg,
-			   void *arg)
-{
-    DEBUG_INFO("rtcp handler %J\n", src);
-}
-
 static bool candidate_handler(struct le *le, void *arg)
 {
 	DEBUG_INFO("candidate %p %H\n", arg, ice_cand_encode, le->data);

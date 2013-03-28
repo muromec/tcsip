@@ -1,5 +1,9 @@
 #include "rtp_io.h"
 
+#define DEBUG_MODULE "rtp_io"
+#define DEBUG_LEVEL 5
+#include <re_dbg.h>
+
 void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
         struct mbuf *mb, void *varg)
 {
@@ -13,7 +17,7 @@ void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
 void rtcp_recv_io(const struct sa *src, struct rtcp_msg *msg,
 			   void *arg)
 {
-    re_printf("rtcp io addr %J %r\n", src, msg);
+    DEBUG_INFO("rtcp io addr %J %r\n", src, msg);
 }
 
 void rtp_p(srtp_t srtp, struct mbuf *mb)

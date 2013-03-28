@@ -46,6 +46,9 @@ typedef void (rtp_send_h)(void *varg);
 void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
         struct mbuf *mb, void *varg);
 
+void rtcp_recv_io(const struct sa *src, struct rtcp_msg *msg,
+			   void *arg);
+
 rtp_recv_ctx* rtp_recv_init(fmt_t fmt);
 void rtp_recv_stop(rtp_recv_ctx* ctx);
 

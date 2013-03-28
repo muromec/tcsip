@@ -39,7 +39,7 @@ void send_stats(int rbytes, int nbytes){
     if((cc%100)==0) fprintf(stderr, "send[%d] by %d/%d bytes %d/%d\n", cc, rbytes, nbytes, rb, nb);
 }
 
-#if DEBUG
+#if RTP_DEBUG
 #define dsend_stats(__r, __n) send_stats(__r, __n)
 #else
 #define dsend_stats(__r, __n) {}
