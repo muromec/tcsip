@@ -6,13 +6,22 @@
 #include "tcsipcall.h"
 #include "tcmedia.h"
 
+#define O_LIM (320*12)
+
 #if __APPLE__
 #include "sound.h"
 #define sound_t apple_sound
+#define snd_open(__x) apple_sound_open(DIR_BI, 8000, O_LIM, __x)
+#define snd_start(__x) apple_sound_start(__x)
+#define snd_close(__x) {apple_sound_stop(__x);\
+	apple_sound_close(__x);}
 #endif
 #if __linux__
 #include "asound.h"
 #define sound_t alsa_sound
+#define snd_open(__x) alsa_sound_open(__x)
+#define snd_start(__x) alsa_sound_start(__x)
+#define snd_close(__x) alsa_sound_close(__x)
 #endif
 
 #define DEBUG_MODULE "tcmedia"
@@ -20,7 +29,6 @@
 #include <re_dbg.h>
 
 
-#define O_LIM (320*12)
 
 struct tcmedia {
     struct uac *uac;
@@ -494,12 +502,7 @@ int tcmedia_start(struct tcmedia*media)
 
     if(!media->sound) {
         // XXX: use audio, video, chat flags
-#if __APPLE__
-        ok = apple_sound_open(DIR_BI, 8000, O_LIM, &media->sound);
-#endif
-#if __linux__
-        ok = media_open(&media->sound);
-#endif
+	ok = snd_open(&media->sound);
         if(ok!=0)
             return -1;
     }
@@ -521,12 +524,8 @@ int tcmedia_start(struct tcmedia*media)
     media->recv_io_arg.ctx = recv_ctx;
     media->recv_io_arg.handler = rtp_recv_func(media->fmt);
 
-#if __APPLE__
-    ok = apple_sound_start(media->sound);
-#endif
-#if __linux__
-    ok = alsa_sound_start(media->sound);
-#endif
+    ok = snd_start(media->sound);
+
     rtp_send_start(media->send_io_ctx);
 
     return 0;
@@ -547,10 +546,7 @@ void tcmedia_stop(struct tcmedia *media)
     }
 
     if(media->sound) {
-#if __APPLE__
-        apple_sound_stop(media->sound);
-	apple_sound_close(media->sound);
-#endif
+        snd_close(media->sound);
 	media->sound = NULL;
     }
 

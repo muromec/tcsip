@@ -41,7 +41,7 @@ int sippuser_by_name_pl(struct sip_addr **addrp, struct pl *user) {
 
     *mem = tmp;
     *addrp = ret;
-    return ret;
+    return err;
 
 err1:
     mem_deref(tmp);

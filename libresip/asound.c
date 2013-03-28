@@ -36,7 +36,7 @@ restart:
 	goto restart;
 }
 
-int media_open(struct alsa_sound**rp)
+int alsa_sound_open(struct alsa_sound**rp)
 {
 	int rate = 8000;
 	int channels = 1;
@@ -95,18 +95,18 @@ int media_open(struct alsa_sound**rp)
 	snd->play_handle = pcm_handle;
 	*rp = snd;
 
-
 	return 0;
 err:
 	if(snd) free(snd);
 	return pcm;
 }
 
-void alsa_sound_start(struct alsa_sound*snd)
+int alsa_sound_start(struct alsa_sound*snd)
 {
+	return 0;
 }
 
-void media_close(struct alsa_sound*snd)
+void alsa_sound_close(struct alsa_sound*snd)
 {
 	snd_pcm_drain(snd->play_handle);
 	snd_pcm_close(snd->play_handle);

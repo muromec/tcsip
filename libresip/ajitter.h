@@ -3,8 +3,10 @@
 
 #define AJD 32
 
+typedef void(aj_h)(void*arg);
+
 typedef struct
-{
+ajitter {
 	int used;
 	char *buffer;
 	double time[AJD];
@@ -12,6 +14,8 @@ typedef struct
 	int csize;
 	char *out_buffer;
 	int out_have;
+	aj_h *handler;
+	void *handler_arg;
 } ajitter;
 
 typedef struct {
@@ -31,5 +35,6 @@ void ajitter_get_done(ajitter *aj, int idx);
 void ajitter_destroy(ajitter *aj);
 char *ajitter_get_chunk(ajitter *aj, int size, int *ts);
 int ajitter_copy_chunk(ajitter *aj, int size, char* ob, int *ts);
+void ajitter_set_handler(ajitter *aj, aj_h handler, void *arg);
 
 #endif

@@ -1,15 +1,17 @@
 
-struct snd_pcm_t;
+struct _snd_pcm;
+typedef struct _snd_pcm snd_pcm_t;
 
-void media_write(struct snd_pcm_t *playback_handle, char*buf, int len);
-
-void media_close(struct snd_pcm_t *playback_handle);
-
-int media_open(struct snd_pcm_t** rp);
+struct ajitter;
 
 struct alsa_sound
 {
-	ajitter *record_jitter;
-	ajitter *play_jitter;
-	struct snd_pcm_t *play_handle;
-}
+	struct ajitter *record_jitter;
+	struct ajitter *play_jitter;
+	snd_pcm_t *play_handle;
+};
+
+int alsa_sound_open(struct alsa_sound**rp);
+int alsa_sound_start(struct alsa_sound*snd);
+void alsa_sound_close(struct alsa_sound*snd);
+
