@@ -38,6 +38,7 @@ struct httpc;
 - (void)post:(NSString*)val;
 - (void)code:(int) code data:(NSData*)data;
 - (void)ifs:(NSDate*)date;
+- (void)ct:(NSString*)content;
 
 - (void)start;
 - (void)fail;

@@ -42,6 +42,7 @@ static void setup_df() {
 - (id) request:(NSString*) url cb:(Callback*)cb {
     id req = [[TXHttp alloc] initWithApp:httpc api:self];
     [req rload: url cb:cb];
+    [req ct:@"application/json"];
     [rq addObject: req];
 
     return req;

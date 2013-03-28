@@ -94,6 +94,11 @@ static void http_err(int err, void *arg) {
     http_header(request, "If-Modified-Since", (char*)_byte(header));
 }
 
+- (void)ct:(NSString*)content
+{
+    http_header(request, "Accept", (char*)_byte(content));
+}
+
 - (void)start
 {
     http_send(request);
