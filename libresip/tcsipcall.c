@@ -302,8 +302,17 @@ void tcsipcall_control(struct tcsipcall*call, int action)
      * */
     switch(action) {
     case CALL_ACCEPT:
-	if(! TEST(call->cstate, CSTATE_IN_RING))
-	    return;
+        if(call->cstate & (CSTATE_ERR|CSTATE_EST))
+            return;
+
+        if(call->cdir != CALL_IN)
+            return;
+
+        if(! (call->cstate & CSTATE_ICE)) {
+            DROP(call->cstate, CSTATE_RING);
+            return;
+        }
+
 	// 200
         err = tcmedia_offer(call->media, call->msg->mb, &mb);
 	if(err) {
@@ -412,8 +421,17 @@ static void media_event(struct tcmedia* media, enum media_e event, int earg, voi
     struct tcsipcall*call = arg;
     switch(event) {
     case MEDIA_ICE_OK:
-        if(call->cdir == CALL_OUT)
+	call->cstate |= CSTATE_ICE;
+	switch(call->cdir) {
+	case CALL_OUT:
             tcsipcall_send(call);
+	    break;
+	case CALL_IN:
+	    if((call->cstate&CSTATE_IN_RING)==0) {
+		tcsipcall_control(call, CALL_ACCEPT);
+	    }
+	    break;
+	}
         break;
     case MEDIA_KA_WARN:
         re_printf("no sound for %d secs\n", earg);

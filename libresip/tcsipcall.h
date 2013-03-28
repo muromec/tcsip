@@ -10,6 +10,7 @@ typedef enum {
     CSTATE_MEDIA=(1<<3),
     CSTATE_EST=(1<<4),
     CSTATE_ERR=(1<<5),
+    CSTATE_ICE=(1<<6),
     CSTATE_ALIVE=(CSTATE_EST|CSTATE_RING),
 } call_state_t;
 
