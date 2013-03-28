@@ -14,6 +14,7 @@ struct uac {
     struct tls *tls;
     struct sa nsv[16];
     uint32_t nsc;
+    struct sip_addr *local;
 };
 
 static void exit_handler(void *arg)
@@ -30,10 +31,6 @@ static void signal_handler(int sig)
     re_cancel();
 }
 
-static void connect_handler(const struct sip_msg *msg, void *arg)
-{
-}
-
 void call_change(struct tcsipcall* call, void *arg)
 {
     int cstate;
@@ -48,6 +45,43 @@ void call_change(struct tcsipcall* call, void *arg)
     }
 }
 
+void reg_change(enum reg_state state, void*arg) {
+    re_printf("reg change %d\n", state);
+}
+
+static void connect_handler(const struct sip_msg *msg, void *arg)
+{
+    int err;
+    struct uac *uac = arg;
+    struct tcsipcall *call;
+
+    err = tcsipcall_alloc(&call, uac);
+    tcop_users((void*)call, uac->local, NULL);
+    tcsipcall_incomfing(call, msg);
+    tcsipcall_accept(call);
+    tcsipcall_handler(call, call_change, NULL);
+    tcsipcall_control(call, CALL_ACCEPT);
+
+    re_printf("incoming call %r\n", &msg->from.auri);
+}
+
+void call(struct uac *uac, char *name)
+{
+    struct tcsipcall *call;
+    struct sip_addr *dest;
+    int err;
+
+    err = sippuser_by_name(&dest, name);
+    err = tcsipcall_alloc(&call, uac); 
+    tcop_users((void*)call, uac->local, dest);
+    tcsipcall_out(call);
+    tcsipcall_handler(call, call_change, NULL);
+
+    current_call = call;
+
+    re_printf("call %r\n", &dest->auri);
+}
+
 int main(int argc, char *argv[]) {
     libre_init();
     srtp_init();
@@ -56,7 +90,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     int err;
-    struct sip_addr *user_c, *dest;
+    struct sip_addr *user_c;
     struct uac uac;
 
     net_default_source_addr_get(AF_INET, &uac.laddr);
@@ -67,7 +101,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if(argc<4) {
+    if(argc<3) {
         printf("also provide usernames\n");
         return 1;
     }
@@ -91,20 +125,25 @@ int main(int argc, char *argv[]) {
     err = sip_transp_add(uac.sip, SIP_TRANSP_TLS, &uac.laddr,
           uac.tls);
 
-    err = sipsess_listen(&uac.sock, uac.sip, 32, connect_handler, NULL);
+    err = sipsess_listen(&uac.sock, uac.sip, 32, connect_handler, &uac);
 
     err = sippuser_by_name(&user_c, argv[2]);
-    err = sippuser_by_name(&dest, argv[3]);
 
-    struct tcsipcall *call;
-    err = tcsipcall_alloc(&call, &uac); 
-    tcop_users((void*)call, user_c, dest);
-    tcsipcall_out(call);
-    tcsipcall_handler(call, call_change, NULL);
+    uac.local = user_c;
 
-    current_call = call;
+    struct tcsipreg *sreg;
+    struct pl instance_id;
+    pl_set_str(&instance_id, "cc823c2297c211e28cd960c547067464");
+    tcsipreg_alloc(&sreg, &uac);
+    tcop_users(sreg, user_c, user_c);
+    tcsreg_set_instance_pl(sreg, &instance_id);
+    tcsreg_handler(sreg, reg_change, NULL);
+    tcsreg_state(sreg, 1);
 
-    re_printf("call %r\n", &dest->auri);
+    if(argc>3) {
+        call(&uac, argv[3]);
+    }
+
     re_main(signal_handler);
 
     mem_deref(uac.sip);
