@@ -73,7 +73,8 @@ int x509_info(char *path, int *rbefore, int *rafter, char **cname)
 	}
 
 	char *cnret;
-	cnret = malloc(end-start);
+	cnret = malloc(end-start+1);
+	memset(cnret, 0, end-start+1);
 	memcpy(cnret, buf+start, end-start);
 
 	if(rafter)

@@ -156,10 +156,11 @@ int main(int argc, char *argv[]) {
 
     int err;
     struct sip_addr *user_c;
-    struct uac uac;
+    struct uac *uac;
+    uac = mem_alloc(sizeof(struct uac), NULL);
 
-    net_default_source_addr_get(AF_INET, &uac.laddr);
-    sa_set_port(&uac.laddr, 0);
+    net_default_source_addr_get(AF_INET, &uac->laddr);
+    sa_set_port(&uac->laddr, 0);
 
     if(argc<2) {
         printf("provide certificate path\n");
@@ -177,51 +178,54 @@ int main(int argc, char *argv[]) {
 
     pl_set_str(&cname_p, cname);
     user_c = mem_zalloc(sizeof(*user_c), NULL);
+
     err = sip_addr_decode(user_c, &cname_p);
-    err = tls_alloc(&uac.tls, TLS_METHOD_SSLV23, argv[1], NULL);
-    tls_add_ca(uac.tls, "CA.cert");
+    if(err) return 1;
 
-    err = dns_srv_get(NULL, 0, uac.nsv, &uac.nsc);
+    err = tls_alloc(&uac->tls, TLS_METHOD_SSLV23, argv[1], NULL);
+    tls_add_ca(uac->tls, "CA.cert");
 
-    if(uac.nsc==0) {
-        uac.nsc = 1;
-        sa_set_str(uac.nsv, "8.8.8.8", 53);
+    err = dns_srv_get(NULL, 0, uac->nsv, &uac->nsc);
+
+    if(uac->nsc==0) {
+        uac->nsc = 1;
+        sa_set_str(uac->nsv, "8.8.8.8", 53);
     }
 
-    err = dnsc_alloc(&uac.dnsc, NULL, uac.nsv, uac.nsc);
+    err = dnsc_alloc(&uac->dnsc, NULL, uac->nsv, uac->nsc);
 
 
-    err = sip_alloc(&uac.sip, uac.dnsc, 32, 32, 32, 
+    err = sip_alloc(&uac->sip, uac->dnsc, 32, 32, 32, 
           USER_AGENT, exit_handler, NULL);
 
-    err = sip_transp_add(uac.sip, SIP_TRANSP_TLS, &uac.laddr,
-          uac.tls);
+    err = sip_transp_add(uac->sip, SIP_TRANSP_TLS, &uac->laddr,
+          uac->tls);
 
-    err = sipsess_listen(&uac.sock, uac.sip, 32, connect_handler, &uac);
+    err = sipsess_listen(&uac->sock, uac->sip, 32, connect_handler, uac);
 
 
-    uac.local = user_c;
+    uac->local = user_c;
 
     struct tcsipreg *sreg;
     struct pl instance_id;
     pl_set_str(&instance_id, "cc823c2297c211e28cd960c547067464");
-    tcsipreg_alloc(&sreg, &uac);
+    tcsipreg_alloc(&sreg, uac);
     tcop_users(sreg, user_c, user_c);
     tcsreg_set_instance_pl(sreg, &instance_id);
-    tcsreg_handler(sreg, reg_change, &uac);
+    tcsreg_handler(sreg, reg_change, uac);
     tcsreg_state(sreg, 1);
 
     if(argc>2) {
         exit_after = 1;
-        call(&uac, argv[2]);
+        call(uac, argv[2]);
     }
 
-    fd_listen(0, FD_READ, cmd_handler, &uac);
+    fd_listen(0, FD_READ, cmd_handler, uac);
 
     re_main(signal_handler);
 
-    mem_deref(uac.sip);
-    mem_deref(uac.dnsc);
+    mem_deref(uac->sip);
+    mem_deref(uac->dnsc);
 
     libre_close();
     return 0;
