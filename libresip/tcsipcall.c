@@ -5,7 +5,7 @@
 #include "tcmedia.h"
 #include <sys/time.h>
 #include <time.h>
-
+#include <string.h>
 
 struct tcsipcall {
     struct uac *uac;
@@ -175,7 +175,8 @@ void tcsipcall_out(struct tcsipcall*call)
 
 void tcsipcall_parse_from(struct tcsipcall*call)
 {
-    call->remote = mem_ref((void*)&call->msg->from);
+    call->remote = mem_alloc(sizeof(struct sip_taddr), NULL);
+    memcpy(call->remote, &call->msg->from, sizeof(struct sip_taddr));
 }
 
 void tcsipcall_parse_date(struct tcsipcall*call)

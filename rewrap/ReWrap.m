@@ -23,6 +23,13 @@ static void pq_cb(int flags, void *arg)
     [mbox kick];
 }
 
+static void app_de(void *arg) {
+    struct reapp *app = arg;
+    if(app->tls) app->tls = mem_deref(app->tls);
+
+    if(app->dnsc) app->dnsc = mem_deref(app->dnsc);
+}
+
 @implementation ReWrap
 @synthesize mbox;
 - (id)init
@@ -39,7 +46,10 @@ static void pq_cb(int flags, void *arg)
 - (void)setup
 {
     int err;
-    app = malloc(sizeof(struct reapp));
+
+    err = libre_init(); /// XXX: do this conditionally!!!
+
+    app = mem_alloc(sizeof(struct reapp), app_de);
     app->nsc = ARRAY_SIZE(app->nsv);
 
     NSBundle *b = [NSBundle mainBundle];
@@ -47,7 +57,6 @@ static void pq_cb(int flags, void *arg)
     if(!ca_cert)
         ca_cert = @"cert/STARTSSL.cert";
 
-    err = libre_init(); /// XXX: do this conditionally!!!
     err = tls_alloc(&app->tls, TLS_METHOD_SSLV23, NULL, NULL);
     tls_add_ca(app->tls, _byte(ca_cert));
 
