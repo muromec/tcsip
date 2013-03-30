@@ -11,6 +11,7 @@ lobj += tcsipcall
 lobj += tcuplinks
 lobj += tcsip
 lobj += tcreport
+lobj += x509util
 
 lobj-$(linux) += asound
 lobj-$(apple) += sound

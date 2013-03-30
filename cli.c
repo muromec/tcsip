@@ -2,6 +2,7 @@
 #include "tcsipuser.h"
 #include "tcsipreg.h"
 #include "tcsipcall.h"
+#include "x509util.h"
 #include <stdio.h>
 
 #define USER_AGENT "Linux re"
@@ -101,10 +102,20 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if(argc<3) {
-        printf("also provide usernames\n");
-        return 1;
+    char *cname;
+    struct pl cname_p;
+    int after, before;
+    err = x509_info(argv[1], &after, &before, &cname);
+    if(err) {
+	fprintf(stderr, "can't load cert at %s\n", argv[1]);
+	return 1;
     }
+
+    pl_set_str(&cname_p, cname);
+    re_printf("cname %r\n", &cname_p);
+    user_c = mem_zalloc(sizeof(*user_c), NULL);
+    err = sip_addr_decode(user_c, &cname_p);
+    re_printf("local user %r\n", &user_c->auri);
 
     err = tls_alloc(&uac.tls, TLS_METHOD_SSLV23, argv[1], NULL);
     tls_add_ca(uac.tls, "CA.cert");
@@ -127,7 +138,6 @@ int main(int argc, char *argv[]) {
 
     err = sipsess_listen(&uac.sock, uac.sip, 32, connect_handler, &uac);
 
-    err = sippuser_by_name(&user_c, argv[2]);
 
     uac.local = user_c;
 
@@ -140,8 +150,8 @@ int main(int argc, char *argv[]) {
     tcsreg_handler(sreg, reg_change, NULL);
     tcsreg_state(sreg, 1);
 
-    if(argc>3) {
-        call(&uac, argv[3]);
+    if(argc>2) {
+        call(&uac, argv[2]);
     }
 
     re_main(signal_handler);
