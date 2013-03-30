@@ -4,6 +4,10 @@
 #include "tcsipcall.h"
 #include "x509util.h"
 #include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
 
 #define USER_AGENT "Linux re"
 
@@ -18,12 +22,53 @@ struct uac {
     struct sip_addr *local;
 };
 
+static void *current_call = NULL;
+static int exit_after = 0, auto_accept = 0;
+void call(struct uac *uac, char *name);
+
+static void eat() {
+    printf("\x1b[1K\n\x1b[1A");
+}
+
+static void prompt(struct uac *uac) {
+    eat();
+    re_printf("texr %r> ", &uac->local->uri.user);
+    fflush(stdout);
+}
+
+static void cmd_handler(int flags, void *arg)
+{
+    struct uac *uac = arg;
+    int len;
+    char buf[100];
+    memset(buf, 0, 100);
+    len = read(0, buf, 100);
+    if(buf[len-1] != '\n') return;
+
+    if(len > 5 && !strncmp(buf, "call ", 5) ) {
+	buf[len-1] = '\0';
+	call(uac, buf+5);
+	goto exit;
+    }
+    if(len > 4 && !strncmp(buf, "hang", 4)) {
+        if(current_call)
+            tcsipcall_control(current_call, CALL_BYE);
+        current_call = NULL;
+	goto exit;
+    }
+    if(len == 2 && !strncmp(buf, "A\n", 2)) {
+	if(current_call)
+            tcsipcall_control(current_call, CALL_ACCEPT);
+	goto exit;
+    }
+exit:
+    prompt(uac);
+}
+
 static void exit_handler(void *arg)
 {
     re_printf("stop sip\n");
 }
-
-static void *current_call = NULL;
 
 static void signal_handler(int sig)
 {
@@ -39,15 +84,30 @@ void call_change(struct tcsipcall* call, void *arg)
     tcsipcall_dirs(call, NULL, &cstate, NULL, NULL);
 
     if((cstate & CSTATE_ALIVE) == 0) {
+	eat();
         re_printf("call ended\n");
         tcsipcall_remove(call); // wrong place for this
 	current_call = NULL;
-	re_cancel();
+	if(exit_after)
+	    re_cancel();
     }
+
+    prompt(arg);
 }
 
 void reg_change(enum reg_state state, void*arg) {
-    re_printf("reg change %d\n", state);
+    eat();
+    switch(state) {
+    case REG_TRY:
+        re_printf("trying to register...\n");
+        break;
+    case REG_ONLINE:
+	re_printf("online\n");
+	break;
+    default:
+        re_printf("reg change %d\n", state);
+    }
+    prompt(arg);
 }
 
 static void connect_handler(const struct sip_msg *msg, void *arg)
@@ -60,10 +120,14 @@ static void connect_handler(const struct sip_msg *msg, void *arg)
     tcop_users((void*)call, uac->local, NULL);
     tcsipcall_incomfing(call, msg);
     tcsipcall_accept(call);
-    tcsipcall_handler(call, call_change, NULL);
-    tcsipcall_control(call, CALL_ACCEPT);
+    tcsipcall_handler(call, call_change, uac);
+    if(auto_accept)
+        tcsipcall_control(call, CALL_ACCEPT);
+    current_call = call;
 
+    eat();
     re_printf("incoming call %r\n", &msg->from.auri);
+    prompt(uac);
 }
 
 void call(struct uac *uac, char *name)
@@ -76,11 +140,11 @@ void call(struct uac *uac, char *name)
     err = tcsipcall_alloc(&call, uac); 
     tcop_users((void*)call, uac->local, dest);
     tcsipcall_out(call);
-    tcsipcall_handler(call, call_change, NULL);
+    tcsipcall_handler(call, call_change, uac);
 
     current_call = call;
 
-    re_printf("call %r\n", &dest->auri);
+    re_printf("dialing %r\n", &dest->auri);
 }
 
 int main(int argc, char *argv[]) {
@@ -112,11 +176,8 @@ int main(int argc, char *argv[]) {
     }
 
     pl_set_str(&cname_p, cname);
-    re_printf("cname %r\n", &cname_p);
     user_c = mem_zalloc(sizeof(*user_c), NULL);
     err = sip_addr_decode(user_c, &cname_p);
-    re_printf("local user %r\n", &user_c->auri);
-
     err = tls_alloc(&uac.tls, TLS_METHOD_SSLV23, argv[1], NULL);
     tls_add_ca(uac.tls, "CA.cert");
 
@@ -147,12 +208,15 @@ int main(int argc, char *argv[]) {
     tcsipreg_alloc(&sreg, &uac);
     tcop_users(sreg, user_c, user_c);
     tcsreg_set_instance_pl(sreg, &instance_id);
-    tcsreg_handler(sreg, reg_change, NULL);
+    tcsreg_handler(sreg, reg_change, &uac);
     tcsreg_state(sreg, 1);
 
     if(argc>2) {
+        exit_after = 1;
         call(&uac, argv[2]);
     }
+
+    fd_listen(0, FD_READ, cmd_handler, &uac);
 
     re_main(signal_handler);
 
