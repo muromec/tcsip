@@ -86,7 +86,7 @@ void sipc_destruct(void *arg)
     mem_deref(sip->calls_c);
     mem_deref(sip->uplinks_c);
 
-    free(uac);
+    mem_deref(uac);
 
     tmr_debug();
     mem_debug();
