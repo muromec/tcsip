@@ -3,11 +3,13 @@
 enum reg_state;
 struct tcsipcall;
 struct uplink;
+struct pl;
 
 void report_reg(enum reg_state state, void*arg);
 void report_call_change(struct tcsipcall* call, void *arg);
 void report_call(struct tcsipcall* call, void *arg);
 void report_up(struct uplink *up, int op, void*arg);
+void report_cert(int err, struct pl*name, void*arg);
 
 #define push_str(__s) {\
     msgpack_pack_raw(pk, [__s length]);\

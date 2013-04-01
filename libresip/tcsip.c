@@ -292,6 +292,7 @@ afail:
     err = x509_info(certpath, &after, &before, &cname);
     if(err) {
         re_printf("cert load failed\n");
+        if(sip->rarg) report_cert(1, NULL, sip->rarg);
         return;
     }
 
@@ -300,6 +301,7 @@ afail:
     err = sip_addr_decode(sip->user_c, &cname_p);
     if(err) {
         re_printf("CN parse failed\n");
+        if(sip->rarg) report_cert(2, NULL, sip->rarg);
         return;
     }
 
@@ -308,19 +310,22 @@ afail:
     if(after < now.tv_sec) {
         re_printf("cert[%d] timed out[%d]. get new\n",
                 after, (int)now.tv_sec);
+        if(sip->rarg) report_cert(3, NULL, sip->rarg);
         return;
     }
-    re_printf("name %r uri %r\n", &sip->user_c->dname,
-            &sip->user_c->auri);
 
     if(uac->tls) uac->tls = mem_deref(uac->tls);
 
     err = tls_alloc(&uac->tls, TLS_METHOD_SSLV23, certpath, NULL);
     if(err) {
-	    re_printf("tls failed\n");
+        re_printf("tls failed\n");
+        if(sip->rarg) report_cert(4, NULL, sip->rarg);
+        return;
     }
     if(capath)
         tls_add_ca(uac->tls, capath);
+
+    if(sip->rarg) report_cert(0, &sip->user_c->dname, sip->rarg);
 }
 
 void tcsip_call_control(struct tcsip*sip, struct pl* ckey, int op)

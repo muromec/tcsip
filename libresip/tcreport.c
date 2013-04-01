@@ -75,3 +75,14 @@ void report_up(struct uplink *up, int op, void*arg) {
     if(op)
 	msgpack_pack_int(pk, up->ok);
 }
+
+void report_cert(int err, struct pl*name, void*arg)
+{
+    msgpack_packer *pk = arg;
+    msgpack_pack_array(pk, err ? 2 : 3);
+    push_cstr("cert.ok");
+    msgpack_pack_int(pk, err);
+    if(err==0)
+        push_pl((*name));
+}
+
