@@ -126,7 +126,11 @@ static void connect_handler(const struct sip_msg *msg, void *arg)
     current_call = call;
 
     eat();
-    re_printf("incoming call %r\n", &msg->from.auri);
+    if(msg->from.dname.l) {
+        re_printf("incoming call %r %r\n", &msg->from.dname, &msg->from.auri);
+    } else {
+        re_printf("incoming call %r\n", &msg->from.auri);
+    }
     prompt(uac);
 }
 
