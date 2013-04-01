@@ -32,8 +32,9 @@ char* byte(NSString * input){
 static void http_ret(struct request *req, int code, void *arg) {
 
     TXHttp *r = (__bridge_transfer TXHttp*)arg;
-    struct pl *data = http_data(req);
-    NSData *nd = [NSData dataWithBytes:data->p length:data->l];
+    struct mbuf *data = http_data(req);
+    NSData *nd = [NSData dataWithBytes:mbuf_buf(data)
+                                length:mbuf_get_left(data)];
     [r code: code data:nd];
 }
 
