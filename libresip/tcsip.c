@@ -273,7 +273,11 @@ afail:
 #endif
 
     if(bundle) {
+#if TARGET_OS_IPHONE
+        re_sdprintf(&capath, "%s/CA.cert", bundle);
+#else
         re_sdprintf(&capath, "%s/Contents/Resources/CA.cert", bundle);
+#endif
     }
 
     if(home) {
