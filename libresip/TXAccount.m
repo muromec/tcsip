@@ -36,19 +36,7 @@
         return self;
 
     user = pUser;
-    [self loadName];
     return self;
-}
-
-- (void)loadName
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *nkey = [[NSString alloc]
-            initWithFormat:@"name/%@", user];
-
-    name = [defaults stringForKey:nkey];
-    if(!name)
-        name = user;
 }
 
 - (NSString*) cert
@@ -105,10 +93,6 @@
 
 - (void) saveUser {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *nkey = [[NSString alloc]
-            initWithFormat:@"name/%@", user];
-    if(name)
-        [defaults setObject:name forKey:nkey];
     [defaults setObject:user forKey:kSipUser];
     [defaults synchronize];
 }
@@ -143,11 +127,6 @@
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *nkey = [[NSString alloc]
-            initWithFormat:@"name/%@", user];
-
-    [defaults removeObjectForKey:nkey];
-
-    nkey = [[NSString alloc]
             initWithFormat:@"changes/%@", user];
     [defaults removeObjectForKey:nkey];
 }
@@ -197,7 +176,6 @@
         [_cb response:nil];
         return;
     }
-    name = [payload objectForKey:@"name"];
     [self saveUser];
 
     NSString *pem_cert = [payload objectForKey:@"pem"];
