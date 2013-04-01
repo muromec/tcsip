@@ -14,6 +14,9 @@
 		850277D01625B59800AB5038 /* sound.c in Sources */ = {isa = PBXBuildFile; fileRef = 850277BB1625B59700AB5038 /* sound.c */; };
 		850277D91625B59800AB5038 /* TXSipUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277CE1625B59800AB5038 /* TXSipUser.m */; };
 		850277E11625B5C300AB5038 /* MailBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 850277DE1625B5C300AB5038 /* MailBox.m */; };
+		85027EF71709826800AE316A /* x509util.h in Headers */ = {isa = PBXBuildFile; fileRef = 85027EF61709826800AE316A /* x509util.h */; };
+		85027EF91709827400AE316A /* x509util.c in Sources */ = {isa = PBXBuildFile; fileRef = 85027EF81709827400AE316A /* x509util.c */; };
+		85027EFA1709827400AE316A /* x509util.c in Sources */ = {isa = PBXBuildFile; fileRef = 85027EF81709827400AE316A /* x509util.c */; };
 		8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8E1628ADF700CE9AE6 /* TXAccount.m */; };
 		8507AA941628AEEF00CE9AE6 /* Callback.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA921628AEEF00CE9AE6 /* Callback.m */; };
 		8507AAA91628B6BC00CE9AE6 /* TXRestApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */; };
@@ -172,6 +175,8 @@
 		850277CE1625B59800AB5038 /* TXSipUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSipUser.m; sourceTree = "<group>"; };
 		850277DD1625B5C300AB5038 /* MailBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MailBox.h; path = utils/MailBox.h; sourceTree = "<group>"; };
 		850277DE1625B5C300AB5038 /* MailBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MailBox.m; path = utils/MailBox.m; sourceTree = "<group>"; };
+		85027EF61709826800AE316A /* x509util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509util.h; sourceTree = "<group>"; };
+		85027EF81709827400AE316A /* x509util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = x509util.c; sourceTree = "<group>"; };
 		8507AA8E1628ADF700CE9AE6 /* TXAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXAccount.m; sourceTree = "<group>"; };
 		8507AA8F1628ADF700CE9AE6 /* TXAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXAccount.h; sourceTree = "<group>"; };
 		8507AA921628AEEF00CE9AE6 /* Callback.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Callback.m; path = utils/Callback.m; sourceTree = "<group>"; };
@@ -480,6 +485,8 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				85027EF81709827400AE316A /* x509util.c */,
+				85027EF61709826800AE316A /* x509util.h */,
 				851E851B170177440054989F /* tcsip.c */,
 				851E851C170177440054989F /* tcsip.h */,
 				851E851617016ED80054989F /* tcreport.c */,
@@ -802,6 +809,7 @@
 				8548DF8516FF041700494FB9 /* tcmedia.h in Headers */,
 				851E85151700F64A0054989F /* tcuplinks.h in Headers */,
 				851E851A17016ED80054989F /* tcreport.h in Headers */,
+				85027EF71709826800AE316A /* x509util.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -914,6 +922,7 @@
 				851E85131700F64A0054989F /* tcuplinks.c in Sources */,
 				851E851817016ED80054989F /* tcreport.c in Sources */,
 				851E851D170177440054989F /* tcsip.c in Sources */,
+				85027EF91709827400AE316A /* x509util.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -948,6 +957,7 @@
 				851E85141700F64A0054989F /* tcuplinks.c in Sources */,
 				851E851917016ED80054989F /* tcreport.c in Sources */,
 				851E851E170177440054989F /* tcsip.c in Sources */,
+				85027EFA1709827400AE316A /* x509util.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
