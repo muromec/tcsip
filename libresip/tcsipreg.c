@@ -2,11 +2,13 @@
 #include "tcsipreg.h"
 #include "tcsipuser.h"
 #include "txsip_private.h"
+#include <string.h>
 
-#ifdef __APPLE__
+#if __APPLE__
 #include "CoreFoundation/CoreFoundation.h"
-const CFStringRef kCFStreamNetworkServiceType;
-CFStringRef const kCFStreamNetworkServiceTypeVoIP;
+#if TARGET_OS_IPHONE
+#include "CFNetwork/CFSocketStream.h"
+#endif
 #endif
 
 static const char *registrar = "sip:sip.texr.net";
@@ -25,7 +27,7 @@ struct tcsipreg {
     void *handler_arg;
     uplink_h* uhandler;
     void *uhandler_arg;
-#ifdef __APPLE__
+#if TARGET_OS_IPHONE
     struct tcp_conn *upstream;
     CFReadStreamRef upstream_ref;
 #endif
@@ -250,7 +252,7 @@ void tcsreg_token(struct tcsipreg *reg, const uint8_t *data, size_t length)
 
 void tcsreg_voip(struct tcsipreg *reg, struct tcp_conn *conn)
 {
-#if __APPLE__
+#if TARGET_OS_IPHONE
     if(conn == reg->upstream)
        return;
 
