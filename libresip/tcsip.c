@@ -1,4 +1,5 @@
 #include <re.h>
+#include <sys/time.h>
 #include <msgpack.h>
 #include "strmacro.h"
 
@@ -17,6 +18,7 @@
 #include "tcsipcall.h"
 #include "tcuplinks.h"
 #include "tcsip.h"
+#include "x509util.h"
 
 #if TARGET_OS_IPHONE
 #define USER_AGENT "TexR/iOS libre"
@@ -45,7 +47,6 @@ void tcsip_call_incoming(struct tcsip* sip, const struct sip_msg *msg);
 static void sip_init(struct tcsip*sip);
 static void create_ua(struct tcsip*sip);
 void listen_laddr(struct tcsip*sip);
-void tcsip_recreate_tls(struct tcsip *sip);
 
 /* called upon incoming calls */
 static void connect_handler(const struct sip_msg *msg, void *arg)
@@ -248,21 +249,9 @@ void tcsip_uuid(struct tcsip *sip, struct pl *uuid)
     pl_dup(&uac->instance_id, uuid);
 }
 
-void tcsip_local(struct tcsip* sip, struct pl* login, struct pl* name)
+void tcsip_local(struct tcsip* sip, struct pl* login)
 {
     int err;
-    if(sip->user_c) sip->user_c = mem_deref(sip->user_c);
-
-    err = sippuser_by_name_pl(&sip->user_c, login);
-    if(name) pl_dup(&sip->user_c->dname, name);
-
-    tcsip_recreate_tls(sip);
-}
-
-void tcsip_recreate_tls(struct tcsip *sip)
-{
-    int err;
-    struct sip_addr *user_c = sip->user_c;
     struct uac *uac = sip->uac;
     char *certpath, *capath=NULL;
     char *home = getenv("HOME"), *bundle = NULL;
@@ -289,18 +278,46 @@ afail:
 
     if(home) {
         re_sdprintf(&certpath, "%s/Library/Texr/%r.cert",
-                home, &user_c->uri.user);
+                home, login);
 
     } else {
-        re_sdprintf(&certpath, "./%r.cert",
-                &user_c->uri.user);
+        re_sdprintf(&certpath, "./%r.cert", login);
     }
+
+    char *cname;
+    struct pl cname_p;
+    int after, before;
+    struct timeval now;
+
+    err = x509_info(certpath, &after, &before, &cname);
+    if(err) {
+        re_printf("cert load failed\n");
+        return;
+    }
+
+    pl_set_str(&cname_p, cname);
+    sip->user_c = mem_zalloc(sizeof(struct sip_addr), NULL);
+    err = sip_addr_decode(sip->user_c, &cname_p);
+    if(err) {
+        re_printf("CN parse failed\n");
+        return;
+    }
+
+    gettimeofday(&now, NULL);
+
+    if(after < now.tv_sec) {
+        re_printf("cert[%d] timed out[%d]. get new\n",
+                after, (int)now.tv_sec);
+        return;
+    }
+    re_printf("name %r uri %r\n", &sip->user_c->dname,
+            &sip->user_c->auri);
 
     if(uac->tls) uac->tls = mem_deref(uac->tls);
 
     err = tls_alloc(&uac->tls, TLS_METHOD_SSLV23, certpath, NULL);
     if(err) {
-	    re_printf("fuck\n");
+	    re_printf("tls failed\n");
     }
     if(capath)
         tls_add_ca(uac->tls, capath);

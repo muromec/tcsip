@@ -69,13 +69,12 @@
     push_str(uuid);
 }
 
-- (void)me:(NSString*)login name:(NSString*)name
+- (void)me:(NSString*)login
 {
     struct msgpack_packer *pk = box.packer;
-    msgpack_pack_array(pk, 3);
+    msgpack_pack_array(pk, 2);
     push_cstr("sip.me");
     push_str(login);
-    push_str(name);
 }
 
 - (void)obCmd:(msgpack_object)ob
@@ -137,13 +136,10 @@
 
     if(!strncmp(cmd.ptr, "sip.me", cmd.size)) {
         arg++;
-        struct pl login, name;
+        struct pl login;
         login.p = arg->via.raw.ptr;
         login.l = arg->via.raw.size;
-        arg ++;
-        name.p = arg->via.raw.ptr;
-        name.l = arg->via.raw.size;
-        tcsip_local(harg, &login, &name);
+        tcsip_local(harg, &login);
     }
 }
 

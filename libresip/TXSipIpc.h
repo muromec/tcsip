@@ -27,6 +27,6 @@ struct pl;
 - (void)call:(NSString*)user name:(NSString*)name;
 - (void)apns:(NSData*)token;
 - (void)uuid:(NSString*)uuid;
-- (void)me:(NSString*)login name:(NSString*)name;
+- (void)me:(NSString*)login;
 
 @end
