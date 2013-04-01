@@ -95,6 +95,7 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:user forKey:kSipUser];
     [defaults synchronize];
+    [self drop_changes];
 }
 
 - (void) saveCert:(NSString*)pem_cert
@@ -125,6 +126,36 @@
         removeItemAtPath: [TXAccount userCert: user]
 		   error: nil];
 
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *nkey = [[NSString alloc]
+            initWithFormat:@"changes/%@", user];
+    [defaults removeObjectForKey:nkey];
+}
+
+- (NSDate*)changes_stamp
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *nkey = [[NSString alloc]
+            initWithFormat:@"changes/%@", user];
+    NSInteger chstamp = [defaults integerForKey:nkey];
+    if(!chstamp) return nil;
+
+    return [NSDate dateWithTimeIntervalSince1970:chstamp];
+}
+
+- (void)setChanges_stamp:(NSDate*)val
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *nkey = [[NSString alloc]
+            initWithFormat:@"changes/%@", user];
+    NSInteger ts = [val timeIntervalSince1970];
+
+    [defaults setInteger:ts forKey:nkey];
+    [defaults synchronize];
+}
+
+- (void)drop_changes
+{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *nkey = [[NSString alloc]
             initWithFormat:@"changes/%@", user];

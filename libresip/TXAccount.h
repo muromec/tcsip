@@ -35,5 +35,6 @@
 @property (readonly) NSString* uuid;
 @property NSString* name;
 @property (readonly) TXRestApi *api;
+@property NSDate* changes_stamp;
 
 @end
