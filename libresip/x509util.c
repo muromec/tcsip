@@ -29,12 +29,11 @@ int cert_time(ASN1_TIME* asntime)
 	return (int)timegm(&tv);
 }
 
-int x509_info(char *path, int *rbefore, int *rafter, char **cname)
+int x509_info(char *path, int *rafter, int *rbefore, char **cname)
 {
 	int err = 0;
 	X509 *x509=NULL;
 	X509_NAME *name=NULL;
-	ASN1_TIME *before, *after;
 
 	BIO *bp = NULL;
 
