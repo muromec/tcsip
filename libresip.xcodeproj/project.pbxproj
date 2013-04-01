@@ -17,6 +17,7 @@
 		85027EF71709826800AE316A /* x509util.h in Headers */ = {isa = PBXBuildFile; fileRef = 85027EF61709826800AE316A /* x509util.h */; };
 		85027EF91709827400AE316A /* x509util.c in Sources */ = {isa = PBXBuildFile; fileRef = 85027EF81709827400AE316A /* x509util.c */; };
 		85027EFA1709827400AE316A /* x509util.c in Sources */ = {isa = PBXBuildFile; fileRef = 85027EF81709827400AE316A /* x509util.c */; };
+		85027EFB17098D3200AE316A /* tcsip.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 851E851C170177440054989F /* tcsip.h */; };
 		8507AA901628ADF700CE9AE6 /* TXAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA8E1628ADF700CE9AE6 /* TXAccount.m */; };
 		8507AA941628AEEF00CE9AE6 /* Callback.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AA921628AEEF00CE9AE6 /* Callback.m */; };
 		8507AAA91628B6BC00CE9AE6 /* TXRestApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 8507AAA81628B6BC00CE9AE6 /* TXRestApi.m */; };
@@ -142,6 +143,7 @@
 			dstPath = "include/${PRODUCT_NAME}";
 			dstSubfolderSpec = 16;
 			files = (
+				85027EFB17098D3200AE316A /* tcsip.h in CopyFiles */,
 				8548DF8D16FF5B9900494FB9 /* TXHttp.h in CopyFiles */,
 				8548DF8C16FF5B5D00494FB9 /* tcsipreg.h in CopyFiles */,
 				8548DF8B16FF5B3200494FB9 /* tcsipuser.c in CopyFiles */,

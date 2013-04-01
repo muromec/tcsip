@@ -389,3 +389,9 @@ void tcsip_xdns(struct tcsip* sip, void *arg)
 {
     if(sip) sip->xdnsc = arg;
 }
+
+void tcsip_close(struct tcsip*sip)
+{
+    mem_deref(sip);
+}
+
