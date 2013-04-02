@@ -269,7 +269,7 @@ void tcsip_uuid(struct tcsip *sip, struct pl *uuid)
     pl_dup(&uac->instance_id, uuid);
 }
 
-void tcsip_local(struct tcsip* sip, struct pl* login)
+int tcsip_local(struct tcsip* sip, struct pl* login)
 {
     int err;
     struct uac *uac = sip->uac;
@@ -320,9 +320,9 @@ afail:
 
     err = x509_info(certpath, &after, &before, &cname);
     if(err) {
-        re_printf("cert load failed\n");
+        re_printf("cert load failed %s\n", certpath);
         cert_h(1, NULL);
-        return;
+        return 1;
     }
 
     pl_set_str(&cname_p, cname);
@@ -331,7 +331,7 @@ afail:
     if(err) {
         re_printf("CN parse failed\n");
         cert_h(2, NULL);
-        return;
+        return 2;
     }
 
     gettimeofday(&now, NULL);
@@ -340,7 +340,7 @@ afail:
         re_printf("cert[%d] timed out[%d]. get new\n",
                 after, (int)now.tv_sec);
         cert_h(3, NULL);
-        return;
+        return 3;
     }
 
     if(uac->tls) uac->tls = mem_deref(uac->tls);
@@ -349,12 +349,19 @@ afail:
     if(err) {
         re_printf("tls failed\n");
         cert_h(4, NULL);
-        return;
+        return 4;
     }
     if(capath)
         tls_add_ca(uac->tls, capath);
 
     cert_h(0, &sip->user_c->dname);
+
+    return 0;
+}
+
+struct sip_addr *tcsip_user(struct tcsip*sip)
+{
+    return sip->user_c;
 }
 
 void tcsip_call_control(struct tcsip*sip, struct pl* ckey, int op)
