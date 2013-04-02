@@ -39,8 +39,16 @@ struct tcsip {
     struct list *calls_c;
 
     int rmode;
-    void* rarg;
+    struct sip_handlers *rarg;
     void *xdnsc; // XXX we have two dns clients
+};
+
+static struct sip_handlers msgpack_handlers = {
+    .reg_h = report_reg,
+    .call_ch = report_call_change,
+    .call_h = report_call,
+    .up_h = report_up,
+    .cert_h = report_cert,
 };
 
 void tcsip_call_incoming(struct tcsip* sip, const struct sip_msg *msg);
@@ -88,6 +96,8 @@ void sipc_destruct(void *arg)
     mem_deref(sip->uplinks_c);
 
     mem_deref(uac);
+    if(sip->rarg)
+        mem_deref(sip->rarg);
 
     tmr_debug();
     mem_debug();
@@ -108,7 +118,17 @@ int tcsip_alloc(struct tcsip**rp, int mode, void *rarg)
     }
 
     sip->uac = mem_zalloc(sizeof(struct uac), NULL);
-    sip->rarg = rarg;
+    if(mode) {
+        sip->rarg = mem_alloc(sizeof(struct sip_handlers), NULL);
+        memcpy(sip->rarg, &msgpack_handlers, sizeof(struct sip_handlers));
+        sip->rarg->arg = rarg;
+    } else {
+        sip->rarg = mem_ref(rarg);
+    }
+
+    if(sip->rarg && !sip->rarg->arg)
+        sip->rarg = mem_deref(sip->rarg);
+
     sip->rmode = mode;
 
     sip_init(sip);
@@ -128,7 +148,7 @@ static void sip_init(struct tcsip*sip)
     list_init(sip->calls_c);
     
     tcuplinks_alloc(&sip->uplinks_c);
-    tcuplinks_handler(sip->uplinks_c, report_up, sip->rarg);
+    tcuplinks_handler(sip->uplinks_c, sip->rarg->up_h, sip->rarg->arg);
 
 }
 
@@ -225,8 +245,8 @@ void tcsip_set_online(struct tcsip *sip, int state)
 
         tcsreg_uhandler(sip->sreg_c, uplink_upd, sip->uplinks_c);
 
-        if(sip->rarg)
-            tcsreg_handler(sip->sreg_c, report_reg, sip->rarg);
+        if(sip->rarg && sip->rarg->reg_h)
+            tcsreg_handler(sip->sreg_c, sip->rarg->reg_h, sip->rarg->arg);
     }
 
     if(sip->sreg_c)
@@ -293,10 +313,15 @@ afail:
     int after, before;
     struct timeval now;
 
+#define cert_h(_code, _name) {\
+    if(sip->rarg && sip->rarg->cert_h){\
+        sip->rarg->cert_h(_code, _name, sip->rarg->arg);\
+    }}
+
     err = x509_info(certpath, &after, &before, &cname);
     if(err) {
         re_printf("cert load failed\n");
-        if(sip->rarg) report_cert(1, NULL, sip->rarg);
+        cert_h(1, NULL);
         return;
     }
 
@@ -305,7 +330,7 @@ afail:
     err = sip_addr_decode(sip->user_c, &cname_p);
     if(err) {
         re_printf("CN parse failed\n");
-        if(sip->rarg) report_cert(2, NULL, sip->rarg);
+        cert_h(2, NULL);
         return;
     }
 
@@ -314,7 +339,7 @@ afail:
     if(after < now.tv_sec) {
         re_printf("cert[%d] timed out[%d]. get new\n",
                 after, (int)now.tv_sec);
-        if(sip->rarg) report_cert(3, NULL, sip->rarg);
+        cert_h(3, NULL);
         return;
     }
 
@@ -323,13 +348,13 @@ afail:
     err = tls_alloc(&uac->tls, TLS_METHOD_SSLV23, certpath, NULL);
     if(err) {
         re_printf("tls failed\n");
-        if(sip->rarg) report_cert(4, NULL, sip->rarg);
+        cert_h(4, NULL);
         return;
     }
     if(capath)
         tls_add_ca(uac->tls, capath);
 
-    if(sip->rarg) report_cert(0, &sip->user_c->dname, sip->rarg);
+    cert_h(0, &sip->user_c->dname);
 }
 
 void tcsip_call_control(struct tcsip*sip, struct pl* ckey, int op)
@@ -359,11 +384,11 @@ void tcsip_start_call(struct tcsip* sip, struct sip_addr*udest)
     tcsipcall_out(call);
 
     tcsipcall_append(call, sip->calls_c);
-    if(!sip->rarg)
+    if(!sip->rarg || !sip->rarg->call_ch)
 	return;
         
-    tcsipcall_handler(call, report_call_change, sip->rarg);
-    report_call(call, sip->rarg);
+    tcsipcall_handler(call, sip->rarg->call_ch, sip->rarg->arg);
+    sip->rarg->call_h(call, sip->rarg->arg);
 }
 
 
@@ -382,11 +407,11 @@ void tcsip_call_incoming(struct tcsip* sip, const struct sip_msg *msg)
     tcsipcall_append(call, sip->calls_c);
     tcsipcall_accept(call);
 
-    if(!sip->rarg)
-        return;
-
-    tcsipcall_handler(call, report_call_change, sip->rarg);
-    report_call(call, sip->rarg);
+    if(!sip->rarg || !sip->rarg->call_ch)
+	return;
+        
+    tcsipcall_handler(call, sip->rarg->call_ch, sip->rarg->arg);
+    sip->rarg->call_h(call, sip->rarg->arg);
 }
 
 void tcsip_xdns(struct tcsip* sip, void *arg)

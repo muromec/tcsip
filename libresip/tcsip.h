@@ -5,6 +5,19 @@ struct tcsip;
 struct pl;
 struct sip_addr;
 
+enum reg_state;
+struct tcsipcall;
+struct uplink;
+
+struct sip_handlers {
+    void *arg;
+    void(*reg_h)(enum reg_state, void*arg);
+    void(*call_ch)(struct tcsipcall* call, void *arg);
+    void(*call_h)(struct tcsipcall* call, void *arg);
+    void(*up_h)(struct uplink *up, int op, void*arg);
+    void(*cert_h)(int err, struct pl*name, void*arg);
+};
+
 void tcsip_set_online(struct tcsip *sip, int state);
 void tcsip_apns(struct tcsip *sip, const char*data, size_t length);
 void tcsip_uuid(struct tcsip *sip, struct pl *uuid);
