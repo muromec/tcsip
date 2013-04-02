@@ -19,6 +19,8 @@ LIBS-$(apple) += -framework CoreAudio
 
 DEP = deps-armlinux
 LIBS-static += $(DEP)/libre.a  $(DEP)/libsrtp.a $(DEP)/libopus.a
+LIBS-static += $(DEP)/libmsgpack.a
+
 LIBS += $(LIBS-static) $(LIBS-static-y)
 
 LIBS += $(LIBS-y)
@@ -31,12 +33,16 @@ all: cli
 objects += $(patsubst %,libresip/%.o,$(lobj))
 
 objects += g711/g711.o
-objects += cli.o
 
 CC := gcc
 
-cli: $(objects) $(LIBS-static)
-	$(CC) $(objects) $(LIBS-static) $(LIBS) -o $@
+all: cli driver
+
+cli: cli.o $(objects) $(LIBS-static)
+	$(CC) $< $(objects) $(LIBS-static) $(LIBS) -o $@
+
+driver: driver.o $(objects) $(LIBS-static)
+	$(CC) $< $(objects) $(LIBS-static) $(LIBS) -o $@
 
 clean:
-	rm -f $(objects)
+	rm -f $(objects) cli.o driver.o
