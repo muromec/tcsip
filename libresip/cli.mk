@@ -10,6 +10,7 @@ lobj += tcsipreg
 lobj += tcsipcall
 lobj += tcuplinks
 lobj += tcsip
+lobj += tcipc
 lobj += tcreport
 lobj += x509util
 

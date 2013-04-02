@@ -1,5 +1,6 @@
 #include "re.h"
 #include "tcsip.h"
+#include "tcipc.h"
 #include "tcsipuser.h"
 #include "tcsipreg.h"
 #include "tcsipcall.h"
@@ -21,11 +22,6 @@ struct cli_app {
     int client_fd;
     struct msgpack_unpacker *up;
 };
-
-static void exit_handler(void *arg)
-{
-    re_printf("stop sip\n");
-}
 
 static void signal_handler(int sig)
 {
@@ -57,8 +53,10 @@ int svc_make(const char *pathname)
 
 int write_fd(void* data, const char* buf, unsigned int len)
 {
-    int fd = *(int*)data;
-    return (int)write(fd, buf, len);
+    struct cli_app *app = data;
+    if(!app->client_fd) return len;
+
+    return (int)write(app->client_fd, buf, len);
 }
 
 static void read_cb(int flags, void *arg)
@@ -70,9 +68,6 @@ static void read_cb(int flags, void *arg)
 
     if(!(flags & FD_READ))
         return;
-
-    if(msgpack_unpacker_execute(up))
-        goto one;
 
     msgpack_unpacker_reserve_buffer(up, 256);
 
@@ -93,15 +88,16 @@ static void read_cb(int flags, void *arg)
     if(rsize > 0)
         msgpack_unpacker_buffer_consumed(up, rsize);
 
+restart:
     if(!msgpack_unpacker_execute(up))
         goto none;
 
-one:
     ob = msgpack_unpacker_data(up);
     msgpack_unpacker_reset(up);
 
-    msgpack_object_print(stderr, ob);
-    printf("\n");
+    tcsip_ob_cmd(app->sip, ob);
+
+    goto restart;
 
 none:
     return;
@@ -117,7 +113,6 @@ static void accept_cb(int flags, void *arg)
     struct cli_app *app = arg;
 
     fd = accept(app->control_fd, &addr, &addrlen);
-    re_printf("accepted %d\n", fd);
     if(app->client_fd) {
         shutdown(fd, 1);
         close(fd);
@@ -127,7 +122,6 @@ static void accept_cb(int flags, void *arg)
     app->client_fd = fd;
 
     fd_listen(fd, FD_READ, read_cb, app);
-    re_printf("listen %d\n", fd);
 }
 
 int main(int argc, char *argv[]) {
@@ -146,11 +140,10 @@ int main(int argc, char *argv[]) {
 
     sock = svc_make("/tmp/texr.sock");
     if(sock < 0) {
-        printf("failed to bind\n");
+        fprintf(stderr, "failed to bind\n");
         return 1;
     }
 
-    packer = msgpack_packer_new(&sock, write_fd);
 
     app = mem_zalloc(sizeof(struct cli_app), NULL);
     if(!app) {
@@ -161,10 +154,12 @@ int main(int argc, char *argv[]) {
     app->client_fd = 0;
     app->up = up;
 
+    packer = msgpack_packer_new(app, write_fd);
+
     tcsip_alloc(&app->sip, 1, packer);
 
     if(!app->sip) {
-        printf("failed to create driver instance\n");
+        fprintf(stderr, "failed to create driver instance\n");
         return 1;
     }
 
