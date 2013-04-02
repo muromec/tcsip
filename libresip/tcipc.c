@@ -10,6 +10,9 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
 {
     msgpack_object *arg;
     msgpack_object_raw cmd;
+    if(ob.via.array.size < 1) {
+        return;
+    }
     arg = ob.via.array.ptr;
 
     if(arg->type != MSGPACK_OBJECT_RAW)
@@ -18,6 +21,10 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
     cmd = arg->via.raw;
 
     if(!strncmp(cmd.ptr, "sip.online", cmd.size)) {
+        if(ob.via.array.size != 2) {
+            return;
+        }
+ 
         arg++;
         tcsip_set_online(sip, (int)arg->via.i64);
     }
@@ -26,6 +33,9 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
 		__x.l = __y->via.raw.size; arg++;})
 
     if(!strncmp(cmd.ptr, "sip.call.place", cmd.size)) {
+        if(ob.via.array.size != 3) {
+            return;
+        }
         arg++;
         struct sip_addr* dest;
 	struct pl tmp;
@@ -40,6 +50,9 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
         mem_deref(dest);
     }
     if(!strncmp(cmd.ptr, "sip.call.control", cmd.size)) {
+        if(ob.via.array.size != 3) {
+            return;
+        }
         arg++;
         struct pl ckey;
         ckey.p = arg->via.raw.ptr;
@@ -51,11 +64,17 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
     }
 
     if(!strncmp(cmd.ptr, "sip.apns", cmd.size)) {
+        if(ob.via.array.size != 2) {
+            return;
+        }
         arg++;
         tcsip_apns(sip, arg->via.raw.ptr, arg->via.raw.size);
     }
 
     if(!strncmp(cmd.ptr, "sip.uuid", cmd.size)) {
+        if(ob.via.array.size != 2) {
+            return;
+        }
         arg++;
         struct pl uuid;
         uuid.p = arg->via.raw.ptr;
@@ -64,6 +83,9 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
     }
 
     if(!strncmp(cmd.ptr, "sip.me", cmd.size)) {
+        if(ob.via.array.size != 2) {
+            return;
+        }
         arg++;
         struct pl login;
         login.p = arg->via.raw.ptr;
