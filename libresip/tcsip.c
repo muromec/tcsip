@@ -292,8 +292,6 @@ afail1:
 afail:
 #endif
 
-    re_printf("bundle %s name %r\n", bundle, login);
-
     if(bundle) {
 #if TARGET_OS_IPHONE
         re_sdprintf(&capath, "%s/CA.cert", bundle);
