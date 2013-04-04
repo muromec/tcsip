@@ -52,9 +52,7 @@ static int offer_handler(struct mbuf **mbp, const struct sip_msg *msg,
 static int answer_handler(const struct sip_msg *msg, void *arg)
 {
     struct tcsipcall *call = arg;
-    tcmedia_answer(call->media, msg->mb);
-
-    return 0;
+    return tcmedia_answer(call->media, msg->mb);
 }
 
 /* called when SIP progress (like 180 Ringing) responses are received */
