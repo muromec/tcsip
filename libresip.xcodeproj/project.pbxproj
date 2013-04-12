@@ -129,6 +129,9 @@
 		85DBA21F16FCC4C500FB7B84 /* TXHttp.h in Headers */ = {isa = PBXBuildFile; fileRef = 85DBA21D16FCC4C500FB7B84 /* TXHttp.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85DBA22016FCC4C500FB7B84 /* TXHttp.m in Sources */ = {isa = PBXBuildFile; fileRef = 85DBA21E16FCC4C500FB7B84 /* TXHttp.m */; };
 		85DBA22116FCC4C500FB7B84 /* TXHttp.m in Sources */ = {isa = PBXBuildFile; fileRef = 85DBA21E16FCC4C500FB7B84 /* TXHttp.m */; };
+		85E5EF5D170EEBDF0083A52B /* tcipc.c in Sources */ = {isa = PBXBuildFile; fileRef = 85E5EF5B170EEBDF0083A52B /* tcipc.c */; };
+		85E5EF5E170EEBDF0083A52B /* tcipc.c in Sources */ = {isa = PBXBuildFile; fileRef = 85E5EF5B170EEBDF0083A52B /* tcipc.c */; };
+		85E5EF5F170EEBDF0083A52B /* tcipc.h in Headers */ = {isa = PBXBuildFile; fileRef = 85E5EF5C170EEBDF0083A52B /* tcipc.h */; };
 		85EF252616F3CDE200068C00 /* cross.h in Headers */ = {isa = PBXBuildFile; fileRef = 85EF252416F3CCEC00068C00 /* cross.h */; };
 		85FF742516290A60005C64D5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742316290A60005C64D5 /* libcrypto.a */; };
 		85FF742616290A60005C64D5 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85FF742416290A60005C64D5 /* libssl.a */; };
@@ -301,6 +304,8 @@
 		85D64144163C62EA008D3974 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
 		85DBA21D16FCC4C500FB7B84 /* TXHttp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXHttp.h; path = utils/TXHttp.h; sourceTree = "<group>"; };
 		85DBA21E16FCC4C500FB7B84 /* TXHttp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TXHttp.m; path = utils/TXHttp.m; sourceTree = "<group>"; };
+		85E5EF5B170EEBDF0083A52B /* tcipc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tcipc.c; sourceTree = "<group>"; };
+		85E5EF5C170EEBDF0083A52B /* tcipc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcipc.h; sourceTree = "<group>"; };
 		85EF252416F3CCEC00068C00 /* cross.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cross.h; sourceTree = "<group>"; };
 		85FF73D8162909F4005C64D5 /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
 		85FF73D9162909F4005C64D5 /* asn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1.h; sourceTree = "<group>"; };
@@ -487,6 +492,8 @@
 		850277A31625B53E00AB5038 /* libresip */ = {
 			isa = PBXGroup;
 			children = (
+				85E5EF5B170EEBDF0083A52B /* tcipc.c */,
+				85E5EF5C170EEBDF0083A52B /* tcipc.h */,
 				85027EF81709827400AE316A /* x509util.c */,
 				85027EF61709826800AE316A /* x509util.h */,
 				851E851B170177440054989F /* tcsip.c */,
@@ -812,6 +819,7 @@
 				851E85151700F64A0054989F /* tcuplinks.h in Headers */,
 				851E851A17016ED80054989F /* tcreport.h in Headers */,
 				85027EF71709826800AE316A /* x509util.h in Headers */,
+				85E5EF5F170EEBDF0083A52B /* tcipc.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -925,6 +933,7 @@
 				851E851817016ED80054989F /* tcreport.c in Sources */,
 				851E851D170177440054989F /* tcsip.c in Sources */,
 				85027EF91709827400AE316A /* x509util.c in Sources */,
+				85E5EF5D170EEBDF0083A52B /* tcipc.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -960,6 +969,7 @@
 				851E851917016ED80054989F /* tcreport.c in Sources */,
 				851E851E170177440054989F /* tcsip.c in Sources */,
 				85027EFA1709827400AE316A /* x509util.c in Sources */,
+				85E5EF5E170EEBDF0083A52B /* tcipc.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
