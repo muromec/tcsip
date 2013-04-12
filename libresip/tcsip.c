@@ -89,6 +89,7 @@ void sipc_destruct(void *arg)
     mem_deref(uac->sip);
     mem_deref(uac->sock);
     mem_deref(uac->tls);
+    mem_deref(uac->dnsc);
     mem_deref(sip->user_c);
     mem_deref(sip->sreg_c);
     list_flush(sip->calls_c);
