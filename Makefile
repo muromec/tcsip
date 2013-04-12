@@ -39,7 +39,7 @@ CC := gcc
 all: cli driver
 
 cli: cli.o $(objects) $(LIBS-static)
-	$(CC) $< $(objects) $(LIBS-static) $(LIBS) -o $@
+	$(CC) -Wl,-undefined,error -Wl,-flat_namespace  $< $(objects) $(LIBS-static) $(LIBS) -o $@
 
 driver: driver.o $(objects) $(LIBS-static)
 	$(CC) $< $(objects) $(LIBS-static) $(LIBS) -o $@
