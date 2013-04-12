@@ -176,7 +176,8 @@ int main(int argc, char *argv[]) {
     }
     glob_app = app;// signal handlers suck
 
-    app->handlers = &cli_handlers;
+    app->handlers = mem_zalloc(sizeof(*app->handlers), NULL);
+    memcpy(app->handlers, &cli_handlers, sizeof(*app->handlers));
     app->handlers->arg = app;
 
     tcsip_alloc(&app->sip, 0, app->handlers);
