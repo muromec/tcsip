@@ -104,6 +104,9 @@ void reg_change(enum reg_state state, void*arg) {
     case REG_ONLINE:
 	re_printf("online\n");
 	break;
+    case REG_NONE:
+        re_printf("offline\n");
+        break;
     default:
         re_printf("reg change %d\n", state);
     }
