@@ -219,6 +219,8 @@ int main(int argc, char *argv[]) {
 
     re_main(signal_handler);
 
+    fd_close(0);
+
     mem_deref(sip);
 
 fail:
