@@ -238,10 +238,10 @@ int tcmedia_setup(struct tcmedia*media, call_dir_t dir)
     sdp_media_set_lattr(media->sdp_media_sf, true, "crypto", crypto_line);
 
 #define FMT_CH(pt, name, srate, ch) {\
-    err |= sdp_format_add(NULL, media->sdp_media, true,\
+    err |= sdp_format_add(NULL, media->sdp_media, false,\
 	pt, name, srate, ch,\
 	 NULL, NULL, NULL, false, NULL);\
-    err |= sdp_format_add(NULL, media->sdp_media_s, true,\
+    err |= sdp_format_add(NULL, media->sdp_media_s, false,\
 	pt, name, srate, ch,\
 	 NULL, NULL, NULL, false, NULL);\
     err |= sdp_format_add(NULL, media->sdp_media_sf, false,\
