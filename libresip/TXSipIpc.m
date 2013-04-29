@@ -8,6 +8,7 @@
 
 #import "TXSipIpc.h"
 #include "tcsip.h"
+#include "tcipc.h"
 #import "MailBox.h"
 #include <msgpack.h>
 #include "strmacro.h"
