@@ -90,6 +90,8 @@ void reg_destruct(void *arg) {
     if(reg->instance_id.p) mem_deref((void*)reg->instance_id.p);
     if(reg->apns_token.p) mem_deref((void*)reg->apns_token.p);
 
+    if(reg->reg) reg->reg = mem_deref(reg->reg);
+
     tmr_cancel(&reg->reg_tmr);
 }
 
