@@ -30,6 +30,7 @@
 - (void) auth:(NSString*)pUser password:(NSString*)pPassw cb:(Callback*)CB;
 - (void)create:(NSString*)email phone:(NSString*)phone cb:(Callback*)cb;
 - (void) drop;
+- (void) saveName:(NSString*)fullname user:(NSString*)pUser password:(NSString*)pPassw cb:(Callback*)CB;
 
 @property (readonly) NSString* user;
 @property (readonly) NSString* uuid;

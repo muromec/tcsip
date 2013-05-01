@@ -198,6 +198,14 @@
     [req start];
 }
 
+- (void) saveName:(NSString*)fullname user:(NSString*)pUser password:(NSString*)pPassw cb:(Callback*)cb
+{
+    id req = [api request: @"fullname" cb:cb];
+    [req setAuth:pUser password:pPassw];
+    [req post:@"name" val:fullname];
+    [req start];
+}
+
 - (void) certLoaded:(NSDictionary*)ret
 {
     NSDictionary *payload = [ret objectForKey:@"data"];
