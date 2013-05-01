@@ -121,6 +121,7 @@ void tcsreg_state(struct tcsipreg *reg, enum reg_cmd state) {
 
     switch(state) {
     case REG_OFF:
+        reg->reg = mem_deref(reg->reg);
         return;
     case REG_FG:
         reg_time = 60;
@@ -172,8 +173,13 @@ void tcsreg_send(struct tcsipreg *reg) {
 }
 
 void tcsreg_resend(struct tcsipreg *reg) {
+    int err;
     reg->reg_time++;
-    sipreg_expires(reg->reg, reg->reg_time);
+    err = sipreg_expires(reg->reg, reg->reg_time);
+    if(err) {
+        reg->reg = mem_deref(reg->reg);
+        report(REG_NONE);
+    }
     // delegate TRY
 }
 
