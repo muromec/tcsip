@@ -20,6 +20,7 @@ struct uac {
     uint32_t nsc;
     struct tls *tls;
     struct pl instance_id;
+    struct mbuf apns;
 };
 
 struct uplink {

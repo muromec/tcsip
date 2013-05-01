@@ -90,6 +90,7 @@ void sipc_destruct(void *arg)
     mem_deref(uac->sock);
     mem_deref(uac->tls);
     mem_deref(uac->dnsc);
+    mbuf_reset(&uac->apns);
     mem_deref(sip->user_c);
     mem_deref(sip->sreg_c);
     list_flush(sip->calls_c);
@@ -131,6 +132,8 @@ int tcsip_alloc(struct tcsip**rp, int mode, void *rarg)
         sip->rarg = mem_deref(sip->rarg);
 
     sip->rmode = mode;
+
+    mbuf_init(&sip->uac->apns);
 
     sip_init(sip);
 
@@ -243,6 +246,8 @@ void tcsip_set_online(struct tcsip *sip, int state)
 
         if(uac->instance_id.l)
             tcsreg_set_instance_pl(sip->sreg_c, &uac->instance_id);
+        if(mbuf_get_left(&uac->apns))
+            tcsreg_token(sip->sreg_c, &uac->apns);
 
         tcsreg_uhandler(sip->sreg_c, uplink_upd, sip->uplinks_c);
 
@@ -256,7 +261,14 @@ void tcsip_set_online(struct tcsip *sip, int state)
 
 void tcsip_apns(struct tcsip *sip, const char*data, size_t length)
 {
-    tcsreg_token(sip->sreg_c, (const uint8_t*)data, length);
+    struct uac *uac = sip->uac;
+    mbuf_reset(&uac->apns);
+    mbuf_write_mem(&uac->apns, data, length);
+    mbuf_set_pos(&uac->apns, 0);
+
+    if(sip->sreg_c)
+        tcsreg_token(sip->sreg_c, &uac->apns);
+
 }
 
 void tcsip_uuid(struct tcsip *sip, struct pl *uuid)

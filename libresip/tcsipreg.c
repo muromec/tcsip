@@ -231,7 +231,7 @@ void tcsreg_set_instance_pl(struct tcsipreg *reg, struct pl* instance_id)
     pl_dup(&reg->instance_id, instance_id);
 }
 
-void tcsreg_token(struct tcsipreg *reg, const uint8_t *data, size_t length)
+void tcsreg_token(struct tcsipreg *reg, struct mbuf *tdata)
 {
     char enc_token[50];
     char *fmt=NULL;
@@ -240,7 +240,7 @@ void tcsreg_token(struct tcsipreg *reg, const uint8_t *data, size_t length)
     tmp.l = sizeof(enc_token);
     memset(enc_token, 0, tmp.l);
 
-    base64_encode(data, length, (char*)tmp.p, &tmp.l);
+    base64_encode(mbuf_buf(tdata), mbuf_get_left(tdata), (char*)tmp.p, &tmp.l);
 
     if(reg->apns_token.p) mem_deref((void*)reg->apns_token.p);
     pl_dup(&reg->apns_token, &tmp);
