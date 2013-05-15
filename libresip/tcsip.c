@@ -263,7 +263,7 @@ void tcsip_apns(struct tcsip *sip, const char*data, size_t length)
 {
     struct uac *uac = sip->uac;
     mbuf_reset(&uac->apns);
-    mbuf_write_mem(&uac->apns, data, length);
+    mbuf_write_mem(&uac->apns, (const uint8_t*)data, length);
     mbuf_set_pos(&uac->apns, 0);
 
     if(sip->sreg_c)
