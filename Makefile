@@ -5,7 +5,7 @@ RE_CFLAGS = -DHAVE_INTTYPES_H -DHAVE_STDBOOL_H \
     -DHAVE_INET6 -DHAVE_GAI_STRERROR -DRELEASE
 
 INCL = -Ideps/include/ -I./libresip -I../srtp/include/ -I../srtp/crypto/include/ \
-   -I../opus-1.0.2/include/  -Ig711
+   -I../opus/include/  -Ig711
 
 
 LIBS = -lm -lpthread -lcrypto -lssl -lz -lresolv
@@ -16,6 +16,7 @@ LIBS-$(apple) += -framework CoreFoundation
 LIBS-$(apple) += -framework SystemConfiguration
 LIBS-$(apple) += -framework AudioUnit
 LIBS-$(apple) += -framework CoreAudio
+LIBS-$(apple) +=  -Wl,-flat_namespace
 
 DEP = deps-armlinux
 LIBS-static += $(DEP)/libre.a  $(DEP)/libsrtp.a $(DEP)/libopus.a
@@ -39,7 +40,7 @@ CC := gcc
 all: cli driver
 
 cli: cli.o $(objects) $(LIBS-static)
-	$(CC) -Wl,-undefined,error -Wl,-flat_namespace  $< $(objects) $(LIBS-static) $(LIBS) -o $@
+	$(CC) -Wl,-undefined,error  $< $(objects) $(LIBS-static) $(LIBS) -o $@
 
 driver: driver.o $(objects) $(LIBS-static)
 	$(CC) $< $(objects) $(LIBS-static) $(LIBS) -o $@
