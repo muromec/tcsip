@@ -314,8 +314,12 @@ afail:
     }
 
     if(home) {
+#if __APPLE__
         re_sdprintf(&certpath, "%s/Library/Texr/%r.cert",
                 home, login);
+#else
+        re_sdprintf(&certpath, "%s/.texr.cert", home);
+#endif
 
     } else {
         re_sdprintf(&certpath, "./%r.cert", login);
