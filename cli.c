@@ -1,3 +1,5 @@
+#include <errno.h>
+
 #include "re.h"
 #include "tcsip.h"
 #include "tcsipuser.h"
@@ -150,6 +152,10 @@ void got_call(struct tcsipcall* call, void *arg) {
 }
 
 void got_cert(int err, struct pl*name, void*arg) {
+    if(err) {
+      re_cancel();
+      return;
+    }
     struct cli_app *app = arg;
     struct sip_addr *local = tcsip_user(app->sip);
     if(local)
