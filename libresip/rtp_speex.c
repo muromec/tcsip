@@ -122,7 +122,7 @@ rtp_send_ctx* rtp_send_speex_init() {
     speex_bits_init(&send_ctx->enc_bits);
     speex_bits_reset(&send_ctx->enc_bits);
     send_ctx->enc_state = speex_encoder_init(&speex_nb_mode);
-    speex_decoder_ctl(send_ctx->enc_state, SPEEX_GET_FRAME_SIZE, &send_ctx->frame_size); 
+    speex_encoder_ctl(send_ctx->enc_state, SPEEX_GET_FRAME_SIZE, &send_ctx->frame_size);
     send_ctx->frame_size *= 2;
     send_ctx->mb = mbuf_alloc(400 + RTP_HEADER_SIZE);
     send_ctx->fmt = FMT_SPEEX;

@@ -6,7 +6,7 @@
 #include <sys/time.h>
 
 #define PCM_DEVICE "default"
-#define REC_CH 64
+#define REC_CH 512
 
 #define ERR(...) if(err) {\
 		fprintf(stderr, "alsa: "__VA_ARGS__);\
@@ -64,7 +64,6 @@ void alsa_rec(void *arg) {
 
         ajitter_put_done(snd->record_jitter, ajp->idx, now.tv_sec);
 
-        printf("alsa record by timer %d\n", ret);
 timer:
         tmr_start(&snd->rec_timer, 10, alsa_rec, snd);
 
