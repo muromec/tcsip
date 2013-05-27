@@ -80,25 +80,13 @@ void rtp_send_io(void *varg)
 
     struct mbuf *mb = arg->mb;
 
-#if __linux__
-static int fake = 0;
-char _obuf[1000];
-#endif
-
     char *obuf;
 restart:
 
-#if __APPLE__
     obuf = ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
     if(!obuf)
         goto timer;
-#endif
 
-#if __linux__
-    obuf = _obuf;
-    fake ++;
-    if(fake > 10) return;
-#endif
     len = speex_encode_int(arg->enc_state, (spx_int16_t*)obuf, &arg->enc_bits);
 
     mb->pos = RTP_HEADER_SIZE;
@@ -120,7 +108,11 @@ restart:
     goto restart;
 
 timer:
+#if __APPLE__
     tmr_start(&arg->tmr, 4, rtp_send_io, varg);
+#else
+    (void*)1;
+#endif
 }
 
 rtp_send_ctx* rtp_send_speex_init() {

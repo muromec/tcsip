@@ -104,7 +104,11 @@ rtp_recv_ctx* rtp_recv_init(fmt_t fmt)
 
 
 void rtp_send_start(rtp_send_ctx* ctx) {
+#if __APPLE__
     tmr_start(&ctx->tmr, 10, rtp_send_func(ctx->fmt), ctx);
+#else
+    ajitter_set_handler(ctx->record_jitter,  rtp_send_func(ctx->fmt), ctx);
+#endif
 }
 
 
