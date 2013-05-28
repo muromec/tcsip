@@ -5,12 +5,11 @@ RE_CFLAGS = -DHAVE_INTTYPES_H -DHAVE_STDBOOL_H \
     -DHAVE_INET6 -DHAVE_GAI_STRERROR -DRELEASE
 
 INCL = -Ideps/include/ -I./libresip -I../srtp/include/ -I../srtp/crypto/include/ \
-   -I../opus/include/  -Ig711
+   -I../opus/include/ -I../speex/include  -Ig711
 
 
 LIBS = -lm -lpthread -lcrypto -lssl -lz -lresolv
-LIBS-$(linux) += $(shell pkg-config speex --libs)
-LIBS-static-$(apple) += $(DEP)/libspeex.a $(DEP)/libspeexdsp.a
+LIBS-static += $(DEP)/libspeex.a $(DEP)/libspeexdsp.a
 LIBS-$(linux) += -lasound
 LIBS-$(apple) += -framework CoreFoundation
 LIBS-$(apple) += -framework SystemConfiguration
