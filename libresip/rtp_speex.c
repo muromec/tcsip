@@ -108,11 +108,7 @@ restart:
     goto restart;
 
 timer:
-#if __APPLE__
-    tmr_start(&arg->tmr, 4, rtp_send_io, varg);
-#else
-    (void*)1;
-#endif
+    send_tmr(rtp_send_io);
 }
 
 rtp_send_ctx* rtp_send_speex_init() {

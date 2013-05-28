@@ -63,21 +63,9 @@ void rtp_send_opus(void *varg)
 
     struct mbuf *mb = arg->mb;
     unsigned char *obuf;
-#if __linux__
-    short __buf[1000];
-    static int fake = 0;
-#endif
     short *ibuf;
 restart:
-#if __APPLE__
     ibuf = (short*)ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
-#endif
-
-#if __linux__
-    ibuf = &__buf[0];
-    fake ++;
-    if(fake > 10) return;
-#endif
 
     if(!ibuf)
         goto timer;
@@ -101,7 +89,7 @@ restart:
     goto restart;
 
 timer:
-    tmr_start(&arg->tmr, 4, rtp_send_opus, varg);
+    send_tmr(rtp_send_opus);
 }
 
 rtp_send_ctx* rtp_send_opus_init() {

@@ -82,7 +82,7 @@ restart:
     goto restart;
 
 timer:
-    tmr_start(&arg->tmr, 4, rtp_send_pcmu, varg);
+    send_tmr(rtp_send_pcmu);
 }
 
 void rtp_recv_pcmu(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg)
