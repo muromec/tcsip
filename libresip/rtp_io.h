@@ -7,7 +7,7 @@
 #if __APPLE__
 #define send_tmr(_f) tmr_start(&arg->tmr, 4, _f, varg);
 #else
-1;
+#define send_tmr(_f) (void*)1;
 #endif
 
 typedef enum {
