@@ -54,7 +54,7 @@ void alsa_rec(void *arg) {
           goto timer;
         }
         if(ret <= 0) {
-          printf("oops %d %d\n", ret, sz);
+	  fprintf(stderr, "alsa write fail: %d\n", ret);
           goto timer;
         }
         ajp->left = ret * 2;
@@ -76,13 +76,14 @@ int alsa_setup(snd_pcm_t *pcm_handle) {
 	unsigned int pcm, tmp, dir;
 	snd_pcm_hw_params_t *hw_params;
 	snd_pcm_uframes_t frames;
+	snd_pcm_uframes_t periodsize = REC_CH * 2;
 
         snd_pcm_hw_params_malloc(&hw_params);
 
 	snd_pcm_hw_params_any(pcm_handle, hw_params);
 
 	/* Set hw_paramseters */
-	snd_pcm_hw_params_set_access(pcm_handle, hw_params,
+	err = snd_pcm_hw_params_set_access(pcm_handle, hw_params,
 			SND_PCM_ACCESS_RW_INTERLEAVED);
 	ERR("ERROR: Can't set interleaved mode. %s\n", snd_strerror(pcm));
 
@@ -92,19 +93,18 @@ int alsa_setup(snd_pcm_t *pcm_handle) {
 
 	err = snd_pcm_hw_params_set_channels(pcm_handle, hw_params, channels);
 	ERR("ERROR: Can't set channels number. %s\n", snd_strerror(pcm));
-
+	
 	err = snd_pcm_hw_params_set_rate_near(pcm_handle, hw_params, &rate, 0);
 	ERR("ERROR: Can't set rate. %s\n", snd_strerror(pcm));
 
+	err = snd_pcm_hw_params_set_buffer_size_near(pcm_handle, hw_params, &periodsize);
 	/* Write hw_paramseters */
 	err = snd_pcm_hw_params(pcm_handle, hw_params);
 	ERR("ERROR: Can't set harware hw_paramseters. %s\n", snd_strerror(pcm));
 
 	snd_pcm_hw_params_get_channels(hw_params, &tmp);
-	printf("channels %d\n", tmp);
 	snd_pcm_hw_params_get_rate(hw_params, &tmp, 0);
-	printf("rate %d\n", tmp);
--       snd_pcm_hw_params_get_period_size(hw_params, &frames, 0);
+        snd_pcm_hw_params_get_period_size(hw_params, &frames, 0);
 
 	snd_pcm_hw_params_free(hw_params);
 
