@@ -85,6 +85,19 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     tcsipcall_hangup(call);
 }
 
+#if ANDROID
+#define CHAR_BIT 8
+#include <time64.h>
+time_t timegm(struct tm * const t) {
+    static const time_t kTimeMax = ~(1 << (sizeof (time_t) * CHAR_BIT - 1));
+    static const time_t kTimeMin = (1 << (sizeof (time_t) * CHAR_BIT - 1));
+    time64_t result = timegm64(t);
+    if (result < kTimeMin || result > kTimeMax)
+        return -1;
+    return result;
+}
+#endif
+
 static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
 			  void *arg)
 {
