@@ -17,12 +17,20 @@
 #define snd_close(__x) {apple_sound_stop(__x);\
 	apple_sound_close(__x);}
 #endif
-#if __linux__
+#if __linux__ && !defined(ANDROID)
 #include "asound.h"
 #define sound_t alsa_sound
 #define snd_open(__x) alsa_sound_open(__x)
 #define snd_start(__x) alsa_sound_start(__x)
 #define snd_close(__x) alsa_sound_close(__x)
+#endif
+
+#if ANDROID
+#include "opensl_io.h"
+#define sound_t opensl_sound
+#define snd_open(__x) opensl_sound_open(__x)
+#define snd_start(__x) opensl_sound_start(__x)
+#define snd_close(__x) opensl_sound_close(__x)
 #endif
 
 #define DEBUG_MODULE "tcmedia"

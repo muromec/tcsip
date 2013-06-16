@@ -17,6 +17,7 @@ lobj += x509util
 lobj-$(linux) += asound
 lobj-$(apple) += sound
 lobj-$(apple) += sound_utils
+lobj-$(android) += opensl_io
 
 lobj += ajitter
 
