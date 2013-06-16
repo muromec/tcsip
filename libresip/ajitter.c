@@ -6,7 +6,7 @@
 //#define DBG(x) (printf x);
 #define DBG(x) {}
 
-#if __linux__
+#if __linux__ && !defined(ANDROID)
 #include <sys/param.h>
 #define min(a,b) MIN(a,b)
 #else
