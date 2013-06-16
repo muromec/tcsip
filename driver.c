@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include <msgpack.h>
+#include "driver.h"
 
 struct cli_app {
     struct tcsip *sip;
@@ -124,7 +125,7 @@ static void accept_cb(int flags, void *arg)
     fd_listen(fd, FD_READ, read_cb, app);
 }
 
-int main(int argc, char *argv[]) {
+int libresip_driver(char *sock_path) {
     libre_init();
 
     int err, sock;
@@ -138,12 +139,11 @@ int main(int argc, char *argv[]) {
     mempool = msgpack_zone_new(2048);
     up = msgpack_unpacker_new(128);
 
-    sock = svc_make("/tmp/texr.sock");
+    sock = svc_make(sock_path);
     if(sock < 0) {
         fprintf(stderr, "failed to bind\n");
-        return 1;
+        return sock;
     }
-
 
     app = mem_zalloc(sizeof(struct cli_app), NULL);
     if(!app) {
