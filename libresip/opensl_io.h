@@ -65,31 +65,12 @@ typedef struct opensl_stream {
   SLRecordItf recorderRecord;
   SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 
-  // buffer indexes
-  int currentInputIndex;
-  int currentOutputIndex;
-
-  // current buffer half (0, 1)
-  int currentOutputBuffer;
-  int currentInputBuffer;
-  
-  // buffers
-  short *outputBuffer[2];
-  short *inputBuffer[2];
-
-  // size of buffers
-  int outBufSamples;
-  int inBufSamples;
-
-  // locks
-  void*  inlock;
-
-  double time;
   int inchannels;
   int outchannels;
   int   sr;
 
   void *ctx;
+  void *half_read;
 
 } OPENSL_STREAM;
 
@@ -105,7 +86,7 @@ typedef struct opensl_stream {
   /* 
   Read a buffer from the OpenSL stream *p, of size samples. Returns the number of samples read.
   */
-  int android_AudioIn(OPENSL_STREAM *p, float *buffer,int size);
+  int android_AudioIn(OPENSL_STREAM *p);
   /*
   Write a buffer to the OpenSL stream *p, of size samples. Returns the number of samples written.
   */

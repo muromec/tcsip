@@ -48,6 +48,12 @@ static void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context);
 
 void sles_write(void *arg);
 
+#define BUFFERFRAMES 512
+#define REC_CH BUFFERFRAMES
+#define VECSAMPS_MONO 64
+#define VECSAMPS_STEREO 128
+#define SR 8000
+
 // creates the OpenSL ES audio engine
 static SLresult openSLCreateEngine(OPENSL_STREAM *p)
 {
@@ -323,20 +329,6 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
   p->inchannels = inchannels;
   p->outchannels = outchannels;
   p->sr = sr;
-  p->inlock = createThreadLock();
-
-  if((p->inBufSamples  =  bufferframes*inchannels) != 0){
-    if((p->inputBuffer[0] = (short *) calloc(p->inBufSamples, sizeof(short))) == NULL ||
-       (p->inputBuffer[1] = (short *) calloc(p->inBufSamples, sizeof(short))) == NULL){
-      android_CloseAudioDevice(p);
-      return NULL; 
-    }
-  }
-
-  p->currentInputIndex = 0;
-  p->currentOutputBuffer  = 0;
-  p->currentInputIndex = p->inBufSamples;
-  p->currentInputBuffer = 0; 
 
   if(openSLCreateEngine(p) != SL_RESULT_SUCCESS) {
     android_CloseAudioDevice(p);
@@ -353,9 +345,6 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
     return NULL;
   }  
 
-  notifyThreadLock(p->inlock);
-
-  p->time = 0.;
   return p;
 }
 
@@ -367,59 +356,43 @@ void android_CloseAudioDevice(OPENSL_STREAM *p){
 
   openSLDestroyEngine(p);
 
-  if (p->inlock != NULL) {
-    notifyThreadLock(p->inlock);
-    destroyThreadLock(p->inlock);
-    p->inlock = NULL;
-  }
-    
-  if (p->inputBuffer[0] != NULL) {
-    free(p->inputBuffer[0]);
-    p->inputBuffer[0] = NULL;
-  }
-
-  if (p->inputBuffer[1] != NULL) {
-    free(p->inputBuffer[1]);
-    p->inputBuffer[1] = NULL;
-  }
-
   free(p);
 }
-
-// returns timestamp of the processed stream
-double android_GetTimestamp(OPENSL_STREAM *p){
-  return p->time;
-}
-
 
 // this callback handler is called every time a buffer finishes recording
 void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
+  struct timeval now;
   OPENSL_STREAM *p = (OPENSL_STREAM *) context;
-  notifyThreadLock(p->inlock);
+  struct opensl_sound *snd = p->ctx;
+  ajitter_packet *ajp = p->half_read;
+
+  if(!snd)
+    return;
+
+  ajp->left = REC_CH;
+  ajp->off = 0;
+
+  gettimeofday(&now, NULL);
+
+  ajitter_put_done(snd->record_jitter, ajp->idx, now.tv_sec);
+
+  android_AudioIn(p);
+
 }
  
 // gets a buffer of size samples from the device
-int android_AudioIn(OPENSL_STREAM *p,float *buffer,int size){
-  short *inBuffer;
-  int i, bufsamps = p->inBufSamples, index = p->currentInputIndex;
-  if(p == NULL || bufsamps ==  0) return 0;
+int android_AudioIn(OPENSL_STREAM *p) {
 
-  inBuffer = p->inputBuffer[p->currentInputBuffer];
-  for(i=0; i < size; i++){
-    if (index >= bufsamps) {
-      waitThreadLock(p->inlock);
-      (*p->recorderBufferQueue)->Enqueue(p->recorderBufferQueue, 
-					 inBuffer,bufsamps*sizeof(short));
-      p->currentInputBuffer = (p->currentInputBuffer ? 0 : 1);
-      index = 0;
-      inBuffer = p->inputBuffer[p->currentInputBuffer];
-    }
-    buffer[i] = (float) inBuffer[index++]*CONVMYFLT;
-  }
-  p->currentInputIndex = index;
-  if(p->outchannels == 0) p->time += (double) size/(p->sr*p->inchannels);
-  return i;
+    struct opensl_sound *snd = p->ctx;
+
+    ajitter_packet *ajp = ajitter_put_ptr(snd->record_jitter);
+    p->half_read = ajp;
+
+    (*p->recorderBufferQueue)->Enqueue(p->recorderBufferQueue,
+            ajp->data, REC_CH);
+  
+    return 0;
 }
 
 // this callback handler is called every time a buffer finishes playing
@@ -504,11 +477,6 @@ void destroyThreadLock(void *lock)
   free(p);
 }
 
-#define BUFFERFRAMES 512
-#define VECSAMPS_MONO 64
-#define VECSAMPS_STEREO 128
-#define SR 8000
-
 static char silence[320];
 
 void sles_write(void *arg)
@@ -529,32 +497,6 @@ void sles_write(void *arg)
     } else {
         android_AudioOut(stream, silence, sizeof(silence));
     }
-}
-
-void sles_rec(void *arg) {
-    struct opensl_sound *snd = arg;
-    OPENSL_STREAM *stream = snd->stream;
-    struct ajitter *aj = snd->record_jitter;
-    int samps;
-    struct timeval now;
-
-    ajitter_packet *ajp = ajitter_put_ptr(snd->record_jitter);
-
-    samps = android_AudioIn(stream,ajp->data,VECSAMPS_MONO);
-    if(samps <= 0)
-        goto timer;
-
-    ajp->left = samps * 2;
-    ajp->off = 0;
-
-    gettimeofday(&now, NULL);
-
-    ajitter_put_done(snd->record_jitter, ajp->idx, now.tv_sec);
-
-timer:
-
-    tmr_start(&snd->rec_timer, 10, sles_rec, snd);
-
 }
 
 int opensl_sound_open(struct opensl_sound**rp)
@@ -579,7 +521,6 @@ int opensl_sound_open(struct opensl_sound**rp)
     stream->ctx = snd;
     snd->stream = stream;
 
-    sles_write(snd);
 
     *rp = snd;
     return 0;
@@ -592,7 +533,9 @@ err:
 int opensl_sound_start(struct opensl_sound*snd){
 
     LOGI("opensl timer start %p", snd);
-    tmr_start(&snd->rec_timer, 10, sles_rec, snd);
+
+    sles_write(snd);
+    android_AudioIn(snd->stream);
 
     return 0;
 }
