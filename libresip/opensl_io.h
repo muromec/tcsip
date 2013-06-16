@@ -83,12 +83,13 @@ typedef struct opensl_stream {
 
   // locks
   void*  inlock;
-  void*  outlock;
 
   double time;
   int inchannels;
   int outchannels;
   int   sr;
+
+  void *ctx;
 
 } OPENSL_STREAM;
 
@@ -108,7 +109,7 @@ typedef struct opensl_stream {
   /*
   Write a buffer to the OpenSL stream *p, of size samples. Returns the number of samples written.
   */
-  int android_AudioOut(OPENSL_STREAM *p, float *buffer,int size);
+  int android_AudioOut(OPENSL_STREAM *p, char *buffer,int size);
   /*
   Get the current IO block time in seconds
   */
@@ -125,6 +126,7 @@ struct opensl_sound
     struct ajitter *record_jitter;
     struct ajitter *play_jitter;
     OPENSL_STREAM *stream;
+    struct tmr rec_timer;
 };
 
 int opensl_sound_open(struct opensl_sound**rp);

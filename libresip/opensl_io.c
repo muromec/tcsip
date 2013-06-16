@@ -34,12 +34,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CONV16BIT 32768
 #define CONVMYFLT (1./32768.)
 
+#include <android/log.h>
+
+#define LOG_TAG "audio"
+#define LOGI(x...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG,x)
+
 static void* createThreadLock(void);
 static int waitThreadLock(void *lock);
 static void notifyThreadLock(void *lock);
 static void destroyThreadLock(void *lock);
 static void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context);
 static void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context);
+
+void sles_write(void *arg);
 
 // creates the OpenSL ES audio engine
 static SLresult openSLCreateEngine(OPENSL_STREAM *p)
@@ -317,15 +324,6 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
   p->outchannels = outchannels;
   p->sr = sr;
   p->inlock = createThreadLock();
-  p->outlock = createThreadLock();
- 
-  if((p->outBufSamples  =  bufferframes*outchannels) != 0) {
-    if((p->outputBuffer[0] = (short *) calloc(p->outBufSamples, sizeof(short))) == NULL ||
-       (p->outputBuffer[1] = (short *) calloc(p->outBufSamples, sizeof(short))) == NULL) {
-      android_CloseAudioDevice(p);
-      return NULL;
-    }
-  }
 
   if((p->inBufSamples  =  bufferframes*inchannels) != 0){
     if((p->inputBuffer[0] = (short *) calloc(p->inBufSamples, sizeof(short))) == NULL ||
@@ -355,7 +353,6 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
     return NULL;
   }  
 
-  notifyThreadLock(p->outlock);
   notifyThreadLock(p->inlock);
 
   p->time = 0.;
@@ -376,22 +373,6 @@ void android_CloseAudioDevice(OPENSL_STREAM *p){
     p->inlock = NULL;
   }
     
-  if (p->outlock != NULL) {
-    notifyThreadLock(p->outlock);
-    destroyThreadLock(p->outlock);
-    p->inlock = NULL;
-  }
-    
-  if (p->outputBuffer[0] != NULL) {
-    free(p->outputBuffer[0]);
-    p->outputBuffer[0] = NULL;
-  }
-
-  if (p->outputBuffer[1] != NULL) {
-    free(p->outputBuffer[1]);
-    p->outputBuffer[1] = NULL;
-  }
-
   if (p->inputBuffer[0] != NULL) {
     free(p->inputBuffer[0]);
     p->inputBuffer[0] = NULL;
@@ -445,31 +426,23 @@ int android_AudioIn(OPENSL_STREAM *p,float *buffer,int size){
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
   OPENSL_STREAM *p = (OPENSL_STREAM *) context;
-  notifyThreadLock(p->outlock);
+  if(!p->ctx) {
+      goto stop;
+  }
+
+  sles_write(p->ctx);
+  return;
+
+stop:
+  android_CloseAudioDevice(p);
 }
 
 // puts a buffer of size samples to the device
-int android_AudioOut(OPENSL_STREAM *p, float *buffer,int size){
+int android_AudioOut(OPENSL_STREAM *p, char *buffer,int size){
 
-  short *outBuffer;
-  int i, bufsamps = p->outBufSamples, index = p->currentOutputIndex;
-  if(p == NULL  || bufsamps ==  0)  return 0;
-  outBuffer = p->outputBuffer[p->currentOutputBuffer];
+  (*p->bqPlayerBufferQueue)->Enqueue(p->bqPlayerBufferQueue, buffer, size);
 
-  for(i=0; i < size; i++){
-    outBuffer[index++] = (short) (buffer[i]*CONV16BIT);
-    if (index >= p->outBufSamples) {
-      waitThreadLock(p->outlock);
-      (*p->bqPlayerBufferQueue)->Enqueue(p->bqPlayerBufferQueue, 
-					 outBuffer,bufsamps*sizeof(short));
-      p->currentOutputBuffer = (p->currentOutputBuffer ?  0 : 1);
-      index = 0;
-      outBuffer = p->outputBuffer[p->currentOutputBuffer];
-    }
-  }
-  p->currentOutputIndex = index;
-  p->time += (double) size/(p->sr*p->outchannels);
-  return i;
+  return size;
 }
 
 //----------------------------------------------------------------------
@@ -531,10 +504,12 @@ void destroyThreadLock(void *lock)
   free(p);
 }
 
-#define BUFFERFRAMES 1024
+#define BUFFERFRAMES 512
 #define VECSAMPS_MONO 64
 #define VECSAMPS_STEREO 128
 #define SR 8000
+
+static char silence[320];
 
 void sles_write(void *arg)
 {
@@ -547,11 +522,39 @@ void sles_write(void *arg)
 
     avail = 160;
 
-    obuf = ajitter_get_chunk(aj, avail * 2, &ts);
+    obuf = ajitter_get_chunk(aj, avail, &ts);
 
-    if(!obuf) return;
+    if(obuf) {
+        android_AudioOut(stream,obuf, avail);
+    } else {
+        android_AudioOut(stream, silence, sizeof(silence));
+    }
+}
 
-    android_AudioOut(stream,obuf, avail*2);
+void sles_rec(void *arg) {
+    struct opensl_sound *snd = arg;
+    OPENSL_STREAM *stream = snd->stream;
+    struct ajitter *aj = snd->record_jitter;
+    int samps;
+    struct timeval now;
+
+    ajitter_packet *ajp = ajitter_put_ptr(snd->record_jitter);
+
+    samps = android_AudioIn(stream,ajp->data,VECSAMPS_MONO);
+    if(samps <= 0)
+        goto timer;
+
+    ajp->left = samps * 2;
+    ajp->off = 0;
+
+    gettimeofday(&now, NULL);
+
+    ajitter_put_done(snd->record_jitter, ajp->idx, now.tv_sec);
+
+timer:
+
+    tmr_start(&snd->rec_timer, 10, sles_rec, snd);
+
 }
 
 int opensl_sound_open(struct opensl_sound**rp)
@@ -560,18 +563,23 @@ int opensl_sound_open(struct opensl_sound**rp)
     OPENSL_STREAM *stream;
    
     snd = mem_zalloc(sizeof(struct opensl_sound), NULL);
-    stream = android_OpenAudioDevice(SR,1,2,BUFFERFRAMES);
+    stream = android_OpenAudioDevice(SR,1,1,BUFFERFRAMES);
+    LOGI("stream open %p snd %p", stream, snd);
     if(!stream) {
         fprintf(stderr, "opensl failed to open\n");
         goto err;
     }
 
     snd->play_jitter = ajitter_init(320); // speex frame
-//    snd->record_jitter = ajitter_init(REC_CH*2);
+    snd->record_jitter = ajitter_init(BUFFERFRAMES*2);
 
-    ajitter_set_handler(snd->play_jitter, sles_write, snd);
+    memset(silence, 0, sizeof(silence));
 
+
+    stream->ctx = snd;
     snd->stream = stream;
+
+    sles_write(snd);
 
     *rp = snd;
     return 0;
@@ -581,9 +589,21 @@ err:
     return -1;
 }
 
-int opensl_sound_start(struct opensl_sound*rp){
+int opensl_sound_start(struct opensl_sound*snd){
+
+    LOGI("opensl timer start %p", snd);
+    tmr_start(&snd->rec_timer, 10, sles_rec, snd);
+
     return 0;
 }
 
-void opensl_sound_close(struct opensl_sound*rp){
+void opensl_sound_close(struct opensl_sound*snd){
+
+    tmr_cancel(&snd->rec_timer);
+
+    OPENSL_STREAM *stream = snd->stream;
+    stream->ctx = NULL;
+
+    mem_deref(snd->play_jitter);
+    mem_deref(snd->record_jitter);
 }
