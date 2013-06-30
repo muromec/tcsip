@@ -34,15 +34,27 @@ objects += $(patsubst %,libresip/%.o,$(lobj))
 
 objects += g711/g711.o
 
+objects_driver = $(objects)
+objects_driver += driver.o
+
+objects_driver_cli = $(objects)
+objects_driver_cli += driver.o driver_cli.o
+
+
 CC := gcc
 
-all: cli driver
+all: cli driver libredriver.so
 
 cli: cli.o $(objects) $(LIBS-static)
 	$(CC) -Wl,-undefined,error  $< $(objects) $(LIBS-static) $(LIBS) -o $@
 
-driver: driver.o $(objects) $(LIBS-static)
-	$(CC) $< $(objects) $(LIBS-static) $(LIBS) -o $@
+driver: $(objects_driver_cli) $(LIBS-static)
+	$(CC) $(objects_driver_cli) $(LIBS-static) $(LIBS) -o $@
+
+libredriver.so: driver.o $(objects) $(LIBS-static)
+	$(CC) -shared -Wl,-soname,libredriver.so -o libredriver.so $< $(objects)  $(LIBS-static) $(LIBS) 
+
+
 
 clean:
 	rm -f $(objects) cli.o driver.o
