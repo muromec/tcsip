@@ -169,6 +169,8 @@ int libresip_driver(char *sock_path) {
 
     re_main(signal_handler);
 
+    fd_close(sock);
+
     mem_deref(sip);
 
 fail:
