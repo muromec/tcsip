@@ -20,10 +20,20 @@
 #include "tcsip.h"
 #include "x509util.h"
 
+#if __APPLE__
 #if TARGET_OS_IPHONE
 #define USER_AGENT "TexR/iOS libre"
 #else
 #define USER_AGENT "TexR/OSX libre"
+#endif
+#endif
+
+#if __linux__
+#if ANDROID
+#define USER_AGENT "TexR/android libre"
+#else
+#define USER_AGENT "TexR/linux libre"
+#endif
 #endif
 
 int ui_idiom;
@@ -306,19 +316,27 @@ afail:
 #endif
 
     if(bundle) {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE || ANDROID
         re_sdprintf(&capath, "%s/CA.cert", bundle);
 #else
         re_sdprintf(&capath, "%s/Contents/Resources/CA.cert", bundle);
 #endif
     }
 
+#if ANDROID
+    re_sdprintf(&capath, "%s/CA.cert", home);
+#endif
+
     if(home) {
 #if __APPLE__
         re_sdprintf(&certpath, "%s/Library/Texr/%r.cert",
                 home, login);
 #else
+#if ANDROID
+        re_sdprintf(&certpath, "%s/%r.cert", home, login);
+#else
         re_sdprintf(&certpath, "%s/.texr.cert", home);
+#endif
 #endif
 
     } else {
