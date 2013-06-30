@@ -542,11 +542,10 @@ int opensl_sound_start(struct opensl_sound*snd){
 
 void opensl_sound_close(struct opensl_sound*snd){
 
-    tmr_cancel(&snd->rec_timer);
-
     OPENSL_STREAM *stream = snd->stream;
     stream->ctx = NULL;
 
     mem_deref(snd->play_jitter);
     mem_deref(snd->record_jitter);
+    mem_detef(snd);
 }

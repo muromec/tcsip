@@ -8,7 +8,9 @@ INCL = -Ideps/include/ -I./libresip -I../srtp/include/ -I../srtp/crypto/include/
    -I../opus/include/ -I../speex/include  -Ig711
 
 
-LIBS = -lm -lpthread -lcrypto -lssl -lz -lresolv
+LIBS = -lm -lz 
+LIBS-$(linux) += -lpthread -lcrypto -lssl  -lresolv
+LIBS-$(apple) += -lpthread -lcrypto -lssl  -lresolv 
 LIBS-static += $(DEP)/libspeex.a $(DEP)/libspeexdsp.a
 LIBS-$(linux) += -lasound
 LIBS-$(apple) += -framework CoreFoundation
@@ -16,10 +18,12 @@ LIBS-$(apple) += -framework SystemConfiguration
 LIBS-$(apple) += -framework AudioUnit
 LIBS-$(apple) += -framework CoreAudio
 LIBS-$(apple) +=  -Wl,-flat_namespace
+LIBS-$(android) += -llog -lOpenSLES
 
 DEP = deps-armlinux
 LIBS-static += $(DEP)/libre.a  $(DEP)/libsrtp.a $(DEP)/libopus.a
 LIBS-static += $(DEP)/libmsgpack.a
+LIBS-static-$(android) += $(DEP)/libssl.a $(DEP)/libcrypto.a
 
 LIBS += $(LIBS-static) $(LIBS-static-y)
 

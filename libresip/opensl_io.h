@@ -107,7 +107,6 @@ struct opensl_sound
     struct ajitter *record_jitter;
     struct ajitter *play_jitter;
     OPENSL_STREAM *stream;
-    struct tmr rec_timer;
 };
 
 int opensl_sound_open(struct opensl_sound**rp);
