@@ -150,6 +150,7 @@ static void http_err(int err, void *arg) {
     if(!err) {
         request = mem_deref(request);
 	request = mem_ref(new_req);
+        http_send(new_req);
 	return YES;
     }
     return NO;
