@@ -160,6 +160,7 @@ int tcsip_alloc(struct tcsip**rp, int mode, void *rarg)
         sip->rarg = mem_deref(sip->rarg);
 
     sip->rmode = mode;
+    sip->http = NULL;
 
     mbuf_init(&sip->uac->apns);
 
@@ -384,11 +385,14 @@ static struct tchttp * get_http(char *login) {
     int err;
     struct tchttp *http;
     int nsv;
-    http = mem_alloc(sizeof(struct tchttp), NULL);
+    http = mem_zalloc(sizeof(struct tchttp), NULL);
     if(!http)
         return NULL;
 
-    char *ca_cert = "Contents/Resources/STARTSSL.cert"; // XXX: platform-specific
+    char *home, *ca_cert;
+    home = getenv("HOME");
+
+    re_sdprintf(&ca_cert, "%s/STARTSSL.cert", home);
 
     http->nsc = ARRAY_SIZE(http->nsv);
 
@@ -396,8 +400,16 @@ static struct tchttp * get_http(char *login) {
     tls_add_ca(http->tls, ca_cert);
 
     err = dns_srv_get(NULL, 0, http->nsv, &http->nsc);
-
+    if(err) {
+        http->nsc = 0;
+    }
     err = dnsc_alloc(&http->dnsc, NULL, http->nsv, http->nsc);
+
+    if(http->dnsc && !http->nsc) {
+        sa_set_str(http->nsv, "8.8.8.8", 53);
+        http->nsc = 1;
+    }
+    dnsc_srv_set(http->dnsc, http->nsv, http->nsc);
 
     return http;
 }
@@ -413,7 +425,9 @@ static void http_cert_done(struct request *req, int code, void *arg) {
     switch(code) {
     case 401:
         err = http_auth(req, &new_req, http->login, http->password);
-        if(!err) {
+        if(err) {
+            h_cert(sip, 403, NULL);
+        } else {
             http_header(new_req, "Accept", "application/x-x509-user-cert");
             http_send(new_req);
         }
@@ -428,7 +442,8 @@ static void http_cert_done(struct request *req, int code, void *arg) {
 }
 
 static void http_cert_err(int err, void *arg) {
-    re_printf("http fail %d\n", err);
+    struct tcsip *sip = arg;
+    h_cert(sip, err, NULL);
 }
 
 int tcsip_get_cert(struct tcsip* sip, struct pl* login, struct pl*password) {
