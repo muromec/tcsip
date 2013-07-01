@@ -22,6 +22,7 @@ void tcsip_set_online(struct tcsip *sip, int state);
 void tcsip_apns(struct tcsip *sip, const char*data, size_t length);
 void tcsip_uuid(struct tcsip *sip, struct pl *uuid);
 int tcsip_local(struct tcsip* sip, struct pl* login);
+int tcsip_get_cert(struct tcsip* sip, struct pl* login, struct pl*password);
 
 int tcsip_alloc(struct tcsip**rp, int mode, void *rarg);
 void tcsip_start_call(struct tcsip* sip, struct sip_addr*udest);

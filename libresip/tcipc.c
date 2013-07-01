@@ -92,5 +92,19 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
         login.l = arg->via.raw.size;
         tcsip_local(sip, &login);
     }
+
+    if(!strncmp(cmd.ptr, "cert.get", cmd.size)) {
+        if(ob.via.array.size != 3) {
+            return;
+        }
+        arg++;
+        struct pl login, password;
+        login.p = arg->via.raw.ptr;
+        login.l = arg->via.raw.size;
+        arg++;
+        password.p = arg->via.raw.ptr;
+        password.l = arg->via.raw.size;
+        tcsip_get_cert(sip, &login, &password);
+    }
 }
 

@@ -5,7 +5,7 @@ RE_CFLAGS = -DHAVE_INTTYPES_H -DHAVE_STDBOOL_H \
     -DHAVE_INET6 -DHAVE_GAI_STRERROR -DRELEASE
 
 INCL = -Ideps/include/ -I./libresip -I../srtp/include/ -I../srtp/crypto/include/ \
-   -I../opus/include/ -I../speex/include  -Ig711
+   -I../opus/include/ -I../speex/include  -Ig711 -I./rehttp/
 
 
 LIBS = -lm -lz 
@@ -37,6 +37,7 @@ all: cli
 objects += $(patsubst %,libresip/%.o,$(lobj))
 
 objects += g711/g711.o
+objects += rehttp/http.o rehttp/auth.o
 
 objects_driver = $(objects)
 objects_driver += driver.o

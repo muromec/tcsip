@@ -13,6 +13,8 @@ lobj += tcsip
 lobj += tcipc
 lobj += tcreport
 lobj += x509util
+lobj += x509gen
+lobj += platpath
 
 lobj-$(linux) += asound
 lobj-$(apple) += sound
