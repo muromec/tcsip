@@ -547,5 +547,5 @@ void opensl_sound_close(struct opensl_sound*snd){
 
     mem_deref(snd->play_jitter);
     mem_deref(snd->record_jitter);
-    mem_detef(snd);
+    mem_deref(snd);
 }
