@@ -23,6 +23,7 @@
 #include "x509util.h"
 #include "platpath.h"
 #include "http.h"
+#include "store/history.h"
 
 #if __APPLE__
 #include "sound/apple/sound.h"
@@ -61,6 +62,8 @@ struct tcsip {
     struct sip_addr *user_c;
 
     struct list *calls_c;
+
+    struct history *hist;
 
     int rmode;
     struct sip_handlers *rarg;
@@ -377,6 +380,9 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
         tls_add_ca(uac->tls, capath);
 
     cert_h(0, &sip->user_c->dname);
+
+    history_alloc(&sip->hist, login);
+    history_fetch(sip->hist);
 
     return 0;
 }

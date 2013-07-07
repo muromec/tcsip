@@ -21,6 +21,9 @@ lobj-$(apple) += sound/apple/sound
 lobj-$(apple) += sound/apple/sound_utils
 lobj-$(android) += sound/android/opensl_io
 
+lobj += store/sqlite3
+lobj += store/history
+
 lobj += ajitter
 
 lobj += $(lobj-y)
