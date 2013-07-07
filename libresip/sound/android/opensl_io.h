@@ -67,7 +67,8 @@ typedef struct opensl_stream {
 
   int inchannels;
   int outchannels;
-  int   sr;
+  int sr;
+  int wait;
 
   void *ctx;
   void *half_read;

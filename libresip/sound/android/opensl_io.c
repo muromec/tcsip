@@ -34,17 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CONV16BIT 32768
 #define CONVMYFLT (1./32768.)
 
-#include <android/log.h>
-
-#define LOG_TAG "audio"
-#define LOGI(x...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG,x)
-
-static void* createThreadLock(void);
-static int waitThreadLock(void *lock);
-static void notifyThreadLock(void *lock);
-static void destroyThreadLock(void *lock);
 static void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context);
 static void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context);
+static void opensl_sound_destroy(struct opensl_sound*snd);
 
 void sles_write(void *arg);
 
@@ -329,6 +321,7 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
   p->inchannels = inchannels;
   p->outchannels = outchannels;
   p->sr = sr;
+  p->wait = 0;
 
   if(openSLCreateEngine(p) != SL_RESULT_SUCCESS) {
     android_CloseAudioDevice(p);
@@ -357,6 +350,7 @@ void android_CloseAudioDevice(OPENSL_STREAM *p){
   openSLDestroyEngine(p);
 
   free(p);
+
 }
 
 // this callback handler is called every time a buffer finishes recording
@@ -367,8 +361,14 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
   struct opensl_sound *snd = p->ctx;
   ajitter_packet *ajp = p->half_read;
 
-  if(!snd)
+  int wait;
+  wait = __sync_val_compare_and_swap(&p->wait, 2, 1);
+  switch(wait) {
+  case 2:
     return;
+  case 1:
+    goto stop;
+  }
 
   ajp->left = REC_CH;
   ajp->off = 0;
@@ -378,7 +378,10 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
   ajitter_put_done(snd->record_jitter, ajp->idx, now.tv_sec);
 
   android_AudioIn(p);
+  return;
 
+stop:
+  opensl_sound_destroy(snd);
 }
  
 // gets a buffer of size samples from the device
@@ -399,15 +402,21 @@ int android_AudioIn(OPENSL_STREAM *p) {
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
   OPENSL_STREAM *p = (OPENSL_STREAM *) context;
-  if(!p->ctx) {
-      goto stop;
+  
+  int wait;
+  wait = __sync_val_compare_and_swap(&p->wait, 2, 1);
+  switch(wait) {
+  case 2:
+    return;
+  case 1:
+    goto stop;
   }
 
   sles_write(p->ctx);
   return;
 
 stop:
-  android_CloseAudioDevice(p);
+  opensl_sound_destroy(p->ctx);
 }
 
 // puts a buffer of size samples to the device
@@ -416,65 +425,6 @@ int android_AudioOut(OPENSL_STREAM *p, char *buffer,int size){
   (*p->bqPlayerBufferQueue)->Enqueue(p->bqPlayerBufferQueue, buffer, size);
 
   return size;
-}
-
-//----------------------------------------------------------------------
-// thread Locks
-// to ensure synchronisation between callbacks and processing code
-void* createThreadLock(void)
-{
-  threadLock  *p;
-  p = (threadLock*) malloc(sizeof(threadLock));
-  if (p == NULL)
-    return NULL;
-  memset(p, 0, sizeof(threadLock));
-  if (pthread_mutex_init(&(p->m), (pthread_mutexattr_t*) NULL) != 0) {
-    free((void*) p);
-    return NULL;
-  }
-  if (pthread_cond_init(&(p->c), (pthread_condattr_t*) NULL) != 0) {
-    pthread_mutex_destroy(&(p->m));
-    free((void*) p);
-    return NULL;
-  }
-  p->s = (unsigned char) 1;
-
-  return p;
-}
-
-int waitThreadLock(void *lock)
-{
-  threadLock  *p;
-  int   retval = 0;
-  p = (threadLock*) lock;
-  pthread_mutex_lock(&(p->m));
-  while (!p->s) {
-    pthread_cond_wait(&(p->c), &(p->m));
-  }
-  p->s = (unsigned char) 0;
-  pthread_mutex_unlock(&(p->m));
-}
-
-void notifyThreadLock(void *lock)
-{
-  threadLock *p;
-  p = (threadLock*) lock;
-  pthread_mutex_lock(&(p->m));
-  p->s = (unsigned char) 1;
-  pthread_cond_signal(&(p->c));
-  pthread_mutex_unlock(&(p->m));
-}
-
-void destroyThreadLock(void *lock)
-{
-  threadLock  *p;
-  p = (threadLock*) lock;
-  if (p == NULL)
-    return;
-  notifyThreadLock(p);
-  pthread_cond_destroy(&(p->c));
-  pthread_mutex_destroy(&(p->m));
-  free(p);
 }
 
 static char silence[320];
@@ -506,7 +456,6 @@ int opensl_sound_open(struct opensl_sound**rp)
    
     snd = mem_zalloc(sizeof(struct opensl_sound), NULL);
     stream = android_OpenAudioDevice(SR,1,1,BUFFERFRAMES);
-    LOGI("stream open %p snd %p", stream, snd);
     if(!stream) {
         fprintf(stderr, "opensl failed to open\n");
         goto err;
@@ -517,10 +466,8 @@ int opensl_sound_open(struct opensl_sound**rp)
 
     memset(silence, 0, sizeof(silence));
 
-
     stream->ctx = snd;
     snd->stream = stream;
-
 
     *rp = snd;
     return 0;
@@ -532,20 +479,29 @@ err:
 
 int opensl_sound_start(struct opensl_sound*snd){
 
-    LOGI("opensl timer start %p", snd);
-
     sles_write(snd);
     android_AudioIn(snd->stream);
 
     return 0;
 }
 
-void opensl_sound_close(struct opensl_sound*snd){
+void opensl_sound_close(struct opensl_sound*snd)
+{
 
     OPENSL_STREAM *stream = snd->stream;
+    stream->wait = 2;
+
+}
+
+static void opensl_sound_destroy(struct opensl_sound*snd) {
+
+    OPENSL_STREAM *stream = snd->stream;
+
     stream->ctx = NULL;
 
-    mem_deref(snd->play_jitter);
-    mem_deref(snd->record_jitter);
+    snd->play_jitter = mem_deref(snd->play_jitter);
+    snd->record_jitter = mem_deref(snd->record_jitter);
     mem_deref(snd);
+
+    android_CloseAudioDevice(stream);
 }

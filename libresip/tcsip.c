@@ -12,7 +12,6 @@
 #include <re_dbg.h>
 
 #include "txsip_private.h"
-#include "sound.h"
 #include <srtp.h>
 
 #include "tcreport.h"
@@ -26,6 +25,7 @@
 #include "http.h"
 
 #if __APPLE__
+#include "sound.h"
 #if TARGET_OS_IPHONE
 #define USER_AGENT "TexR/iOS libre"
 #else
@@ -233,7 +233,7 @@ void listen_laddr(struct tcsip*sip)
 	
     /* add supported SIP transports */
     err |= sip_transp_add(uac->sip, SIP_TRANSP_TLS, &uac->laddr, uac->tls);
-	
+
     /* create SIP session socket */
     err = sipsess_listen(&uac->sock, uac->sip, 32, connect_handler, sip);
     DEBUG_INFO("got laddr %J, listen %d\n", &uac->laddr, err);

@@ -10,7 +10,7 @@
 #define O_LIM (320*12)
 
 #if __APPLE__
-#include "sound.h"
+#include "sound/apple/sound.h"
 #define sound_t apple_sound
 #define snd_open(__x) apple_sound_open(DIR_BI, 8000, O_LIM, __x)
 #define snd_start(__x) apple_sound_start(__x)
@@ -18,7 +18,7 @@
 	apple_sound_close(__x);}
 #endif
 #if __linux__ && !defined(ANDROID)
-#include "asound.h"
+#include "sound/linux/asound.h"
 #define sound_t alsa_sound
 #define snd_open(__x) alsa_sound_open(__x)
 #define snd_start(__x) alsa_sound_start(__x)
@@ -26,7 +26,7 @@
 #endif
 
 #if ANDROID
-#include "opensl_io.h"
+#include "sound/android/opensl_io.h"
 #define sound_t opensl_sound
 #define snd_open(__x) opensl_sound_open(__x)
 #define snd_start(__x) opensl_sound_start(__x)
@@ -574,7 +574,6 @@ void tcmedia_stop(struct tcmedia *media)
         snd_close(media->sound);
 	media->sound = NULL;
     }
-
 
     if(media->recv_io_arg.ctx) {
 	rtp_recv_stop(media->recv_io_arg.ctx);
