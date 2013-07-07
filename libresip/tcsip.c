@@ -25,7 +25,7 @@
 #include "http.h"
 
 #if __APPLE__
-#include "sound.h"
+#include "sound/apple/sound.h"
 #if TARGET_OS_IPHONE
 #define USER_AGENT "TexR/iOS libre"
 #else
