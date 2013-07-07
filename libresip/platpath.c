@@ -38,6 +38,20 @@ afail1:
 afail:
     return -1;
 }
+
+int platpath_db(struct pl *login, char **dbpath) {
+    int err;
+    char *home = getenv("HOME");
+
+    if(home) {
+        re_sdprintf(dbpath, "%s/Library/Texr/%r.db", home, login);
+    } else {
+        re_sdprintf(dbpath, "./%r.db", login);
+    }
+
+    return 0;
+}
+
 #endif
 
 #if ANDROID
