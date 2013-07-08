@@ -382,7 +382,8 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 
     cert_h(0, &sip->user_c->dname);
 
-    history_alloc(&sip->hist, login);
+    if(!sip->hist)
+        history_alloc(&sip->hist, login);
 
     return 0;
 }
@@ -408,7 +409,10 @@ void tcsip_hist_ipc(struct tcsip* sip, int flag)
         goto out;
 
     if(sip->rarg && sip->rarg->hist_h){
-        sip->rarg->hist_h(0, &idx, hlist, sip->rarg->arg);
+        if(hlist)
+            sip->rarg->hist_h(0, &idx, hlist, sip->rarg->arg);
+        else
+            sip->rarg->hist_h(1, NULL, NULL, sip->rarg->arg);
     }
 
     list_flush(hlist);

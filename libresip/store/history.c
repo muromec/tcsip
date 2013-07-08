@@ -9,6 +9,8 @@ struct history {
     sqlite3 *db;
     struct pl login;
     struct pl iter;
+    struct json_object* top;
+    struct pl top_idx;
 };
 
 static char *FETCH_SQL = "SELECT blob, idx, blob_key from blob \
@@ -27,6 +29,9 @@ static char *FETCH_SQL_N = "SELECT blob, idx, blob_key from blob \
 static char *STORE_SQL = "INSERT into blob \
             (blob_key, idx, blob, curnt) \
             values (?, ?, ?, 1)";
+
+static char *OBSOLETE_SQL = "UPDATE blob set curnt=0 \
+            where idx=? and blob_key GLOB ? and blob_key<?";
 
 void hist_dealloc(void *arg)
 {
@@ -87,15 +92,22 @@ static bool sort_handler(struct le *le1, struct le *le2, void *arg)
 	return hel1->time > hel2->time;
 }
 
-static struct list* blob_parse(const char *blob) {
+static struct list* blob_parse(const char *blob, struct json_object**rp) {
     int len;
     struct json_object* token, *ob;
     struct pl tmp;
     char *ob_str;
-    struct list *hlist = mem_alloc(sizeof(struct list), NULL);
-    list_init(hlist);
+    struct list *hlist;
     struct hist_el *hel;
+
+    *rp = NULL;
     
+    hlist = mem_alloc(sizeof(struct list), NULL);
+    if(!hlist)
+        return NULL;
+
+    list_init(hlist);
+
     token = json_tokener_parse(blob);
 
     len = json_object_object_length(token);
@@ -130,11 +142,27 @@ static struct list* blob_parse(const char *blob) {
         hel++;
     }
 
-    json_object_put(token);
-
     list_sort(hlist, sort_handler, NULL);
 
+    *rp = token;
+
     return hlist;
+}
+
+int get_idx(struct list *hlist, struct pl *rp)
+{
+    struct le *idx_el;
+    struct hist_el *hel;
+
+    idx_el = list_tail(hlist);
+
+    if(!idx_el)
+        return -EINVAL;
+
+    hel = (struct hist_el *)idx_el->data;
+    pl_dup(rp, &hel->key);
+
+    return 0;
 }
 
 int history_fetch(struct history *hist, const char *start_idx, struct pl*idx, struct list **bulk)
@@ -144,6 +172,10 @@ int history_fetch(struct history *hist, const char *start_idx, struct pl*idx, st
     const char *tail, *ret_idx;
     struct pl tmp;
     char *key_glob;
+    struct json_object* block;
+
+    *bulk = NULL;
+
     err = re_sdprintf(&key_glob, "%r/h/*", &hist->login);
 
     err = sqlite3_prepare_v2(hist->db,
@@ -171,7 +203,16 @@ int history_fetch(struct history *hist, const char *start_idx, struct pl*idx, st
         pl_dup(idx, &tmp);
         pl_dup(&hist->iter, idx);
         ret_idx = (const char*)sqlite3_column_text(stmt, 0);
-        *bulk = blob_parse(ret_idx);
+        *bulk = blob_parse(ret_idx, &block);
+
+        if(block && (hist->top==NULL)) {
+            hist->top =  json_object_get(block);
+            get_idx(*bulk, &hist->top_idx);
+        }
+
+        if(block)
+           json_object_put(block);
+
     }
 
 out:
@@ -181,24 +222,58 @@ fail:
     return err;
 }
 
+int history_obsolete(struct history *hist, char *key, char *idx)
+{
+
+    int err;
+    char *key_glob;
+
+    sqlite3_stmt *stmt;
+
+    err = sqlite3_prepare_v2(hist->db, OBSOLETE_SQL, -1, &stmt, 0);
+    if(err)
+        goto done;
+
+    err = re_sdprintf(&key_glob, "%r/h/*", &hist->login);
+
+    sqlite3_bind_text(stmt, 1, idx, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, key_glob, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, key, -1, SQLITE_STATIC);
+
+
+    err = sqlite3_step(stmt);
+
+    sqlite3_finalize(stmt);
+
+    if(err = SQLITE_DONE) {
+        return 0;
+    }
+done:
+    return err;
+}
+
 int history_store(struct history *hist, char *key, char *idx, char* data)
 {
     int err;
     sqlite3_stmt *stmt;
 
     err = sqlite3_prepare_v2(hist->db, STORE_SQL, -1, &stmt, 0);
+    if(err)
+        goto done;
 
     sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, idx, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, data, -1, SQLITE_STATIC);
 
     err = sqlite3_step(stmt);
-    re_printf("step %d\n", err);
     
     sqlite3_finalize(stmt);
 
-    if(err = SQLITE_DONE)
+    if(err = SQLITE_DONE) {
+        history_obsolete(hist, key, idx);
         return 0;
+    }
+done:
 
     return err;
 }
@@ -206,7 +281,7 @@ int history_store(struct history *hist, char *key, char *idx, char* data)
 int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct pl *login, struct pl *name)
 {
     int err;
-    char *key, *key_c;
+    char *key, *key_c, *idx;
     struct timeval now;
     struct json_object *ob, *entry, *jkey, *jlogin, *jname;
     struct json_object *jevent, *jts;
@@ -216,7 +291,14 @@ int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct 
     err = re_sdprintf(&key, "%r/h/%d.%d", &hist->login, now.tv_sec, now.tv_usec);
     err = re_sdprintf(&key_c, "%r", ckey);
 
-    ob = json_object_new_object();
+    if(hist->top) {
+        ob = json_object_get(hist->top);
+        re_sdprintf(&idx,"%r", &hist->top_idx);
+    } else {
+        ob = json_object_new_object();
+        idx = key_c;
+    }
+
     entry = json_object_new_object();
 
 #define push_str(__frm, __key, __tmp) {\
@@ -236,18 +318,9 @@ int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct 
 
     json_object_object_add(ob, key_c, entry);
 
-    history_store(hist, key, key_c, json_object_to_json_string(ob));
-
-    sqlite3_close_v2(hist->db);
+    history_store(hist, key, idx, json_object_to_json_string(ob));
 
     json_object_put(ob);
-    json_object_put(entry);
-
-    json_object_put(jkey);
-    json_object_put(jlogin);
-    json_object_put(jname);
-    json_object_put(jts);
-    json_object_put(jevent);
 
     return 0;
 }
