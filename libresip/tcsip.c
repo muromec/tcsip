@@ -568,6 +568,36 @@ void tcsip_call_control(struct tcsip*sip, struct pl* ckey, int op)
 
 }
 
+void tcsip_call_history(struct tcsip* sip, struct tcsipcall *call)
+{
+    int dir, state, reason, ts, event;
+    struct pl *ckey;
+    struct sip_addr *remote;
+
+    tcsipcall_dirs(call, &dir, &state, &reason, &ts);
+    if(state & CSTATE_ALIVE)
+        return;
+
+    // FIXME: wtf? ios version doesn't log incoming calls
+    if(dir == CALL_IN)
+        return;
+
+    event = 1;
+
+    ckey = tcsipcall_ckey(call);
+    tcop_lr((void*)call, NULL, &remote);
+
+    history_add(sip->hist, event, ts, ckey, &remote->uri.user, &remote->dname);
+}
+
+void tcsip_call_changed(struct tcsipcall *call, void *arg)
+{
+    struct tcsip* sip = arg;
+
+    sip->rarg->call_h(call, sip->rarg->arg);
+    tcsip_call_history(sip, call);
+}
+
 void tcsip_start_call(struct tcsip* sip, struct sip_addr*udest)
 {
     struct uac *uac = sip->uac;
@@ -585,7 +615,7 @@ void tcsip_start_call(struct tcsip* sip, struct sip_addr*udest)
     if(!sip->rarg || !sip->rarg->call_ch)
 	return;
         
-    tcsipcall_handler(call, sip->rarg->call_ch, sip->rarg->arg);
+    tcsipcall_handler(call, tcsip_call_changed, sip);
     sip->rarg->call_h(call, sip->rarg->arg);
 }
 
@@ -608,7 +638,7 @@ void tcsip_call_incoming(struct tcsip* sip, const struct sip_msg *msg)
     if(!sip->rarg || !sip->rarg->call_ch)
 	return;
         
-    tcsipcall_handler(call, sip->rarg->call_ch, sip->rarg->arg);
+    tcsipcall_handler(call, tcsip_call_changed, sip);
     sip->rarg->call_h(call, sip->rarg->arg);
 }
 

@@ -1,4 +1,5 @@
 #include "re.h"
+#include <sys/time.h>
 #include "platpath.h"
 #include "history.h"
 #include "json.h"
@@ -22,6 +23,10 @@ static char *FETCH_SQL_N = "SELECT blob, idx, blob_key from blob \
             and curnt=1 \
             ORDER BY idx DESC \
             LIMIT 1";
+
+static char *STORE_SQL = "INSERT into blob \
+            (blob_key, idx, blob, curnt) \
+            values (?, ?, ?, 1)";
 
 void hist_dealloc(void *arg)
 {
@@ -175,3 +180,75 @@ out:
 fail:
     return err;
 }
+
+int history_store(struct history *hist, char *key, char *idx, char* data)
+{
+    int err;
+    sqlite3_stmt *stmt;
+
+    err = sqlite3_prepare_v2(hist->db, STORE_SQL, -1, &stmt, 0);
+
+    sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, idx, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, data, -1, SQLITE_STATIC);
+
+    err = sqlite3_step(stmt);
+    re_printf("step %d\n", err);
+    
+    sqlite3_finalize(stmt);
+
+    if(err = SQLITE_DONE)
+        return 0;
+
+    return err;
+}
+
+int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct pl *login, struct pl *name)
+{
+    int err;
+    char *key, *key_c;
+    struct timeval now;
+    struct json_object *ob, *entry, *jkey, *jlogin, *jname;
+    struct json_object *jevent, *jts;
+
+    gettimeofday(&now, NULL);
+
+    err = re_sdprintf(&key, "%r/h/%d.%d", &hist->login, now.tv_sec, now.tv_usec);
+    err = re_sdprintf(&key_c, "%r", ckey);
+
+    ob = json_object_new_object();
+    entry = json_object_new_object();
+
+#define push_str(__frm, __key, __tmp) {\
+    __tmp = json_object_new_string_len(__frm->p, __frm->l);\
+    json_object_object_add(entry, __key, __tmp);}
+
+#define push_int(__val, __key, __tmp){\
+    __tmp = json_object_new_int(__val);\
+    json_object_object_add(entry, __key, __tmp);} 
+
+    push_str(ckey, "key", jkey);
+    push_str(login, "login", jlogin);
+    push_str(name, "name", jname);
+
+    push_int(event, "event", jevent);
+    push_int(ts, "date", jts); 
+
+    json_object_object_add(ob, key_c, entry);
+
+    history_store(hist, key, key_c, json_object_to_json_string(ob));
+
+    sqlite3_close_v2(hist->db);
+
+    json_object_put(ob);
+    json_object_put(entry);
+
+    json_object_put(jkey);
+    json_object_put(jlogin);
+    json_object_put(jname);
+    json_object_put(jts);
+    json_object_put(jevent);
+
+    return 0;
+}
+
