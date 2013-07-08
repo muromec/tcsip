@@ -5,7 +5,8 @@ RE_CFLAGS = -DHAVE_INTTYPES_H -DHAVE_STDBOOL_H \
     -DHAVE_INET6 -DHAVE_GAI_STRERROR -DRELEASE
 
 INCL = -Ideps/include/ -I./libresip -I../srtp/include/ -I../srtp/crypto/include/ \
-   -I../opus/include/ -I../speex/include  -Ig711 -I./rehttp/
+   -I../opus/include/ -I../speex/include  -Ig711 -I./rehttp/ \
+   -I../json-c/
 
 
 LIBS = -lm -lz 
@@ -19,6 +20,8 @@ LIBS-$(apple) += -framework AudioUnit
 LIBS-$(apple) += -framework CoreAudio
 LIBS-$(apple) +=  -Wl,-flat_namespace
 LIBS-$(android) += -llog -lOpenSLES
+LIBS-static += $(DEP)/libjson.a $(DEP)/libjson-c.a
+
 
 DEP = deps-armlinux
 LIBS-static += $(DEP)/libre.a  $(DEP)/libsrtp.a $(DEP)/libopus.a
