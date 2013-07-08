@@ -404,6 +404,9 @@ void tcsip_hist_ipc(struct tcsip* sip, int flag)
     if(!sip || !sip->hist)
         return;
 
+    if(flag)
+        history_reset(sip->hist);
+
     err = history_next(sip->hist, &idx, &hlist); 
     if(err)
         goto out;

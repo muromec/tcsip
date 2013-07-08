@@ -73,6 +73,20 @@ fail:
     return err;
 }
 
+int history_reset(struct history *hist)
+{
+    if(hist->top) {
+        json_object_put(hist->top);
+        hist->top = NULL;
+        mem_deref((void*)hist->top_idx.p);
+    }
+
+    if(hist->iter.l) {
+        mem_deref((void*)hist->iter.p);
+        hist->iter.l = 0;
+    }
+}
+
 int history_next(struct history *hist, struct pl*idx, struct list **bulk)
 {
     char *iter = NULL;

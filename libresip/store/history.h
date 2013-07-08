@@ -19,5 +19,6 @@ int history_alloc(struct history **rp, struct pl *login);
 int history_fetch(struct history *hist, const char *start_idx, struct pl *idx, struct list**);
 int history_next(struct history *hist, struct pl*idx, struct list **bulk);
 int history_add(struct history *hist, int event, int ts, struct pl*key, struct pl *login, struct pl *name);
+int history_reset(struct history *hist);
 
 #endif
