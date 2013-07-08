@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
+#include <store/history.h>
 
 #define USER_AGENT "Linux re"
 
@@ -33,6 +34,17 @@ static void prompt(struct cli_app *app) {
     eat();
     re_printf("texr %r> ", &app->local->uri.user);
     fflush(stdout);
+}
+
+static bool history_handler(struct le *le, void *arg)
+{
+    struct hist_el *hel = le->data;
+
+    re_printf("hist %d event %d %r <%r>\n",
+            hel->time,
+            hel->event, &hel->name, &hel->login);
+
+    return false;
 }
 
 static void cmd_handler(int flags, void *arg)
@@ -59,6 +71,19 @@ static void cmd_handler(int flags, void *arg)
 	if(app->current_call)
             tcsipcall_control(app->current_call, CALL_ACCEPT);
 	goto exit;
+    }
+    if(len > 4 && !strncmp(buf, "hist", 4)) {
+        re_printf("fetch idx\n");
+        struct pl idx;
+        struct list *hlist = NULL;
+        tcsip_hist_fetch(app->sip, &idx, &hlist);
+        if(hlist) {
+            list_apply(hlist, true, history_handler, NULL);
+            list_flush(hlist);
+            mem_deref(hlist);
+        }
+
+        re_printf("got idx %r\n", &idx);
     }
 exit:
     prompt(app);
