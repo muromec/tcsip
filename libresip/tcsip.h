@@ -4,6 +4,7 @@
 struct tcsip;
 struct pl;
 struct sip_addr;
+struct list;
 
 enum reg_state;
 struct tcsipcall;
@@ -16,6 +17,7 @@ struct sip_handlers {
     void(*call_h)(struct tcsipcall* call, void *arg);
     void(*up_h)(struct uplink *up, int op, void*arg);
     void(*cert_h)(int err, struct pl*name, void*arg);
+    void(*hist_h)(int err, struct pl*idx, struct list*hlist, void*arg);
 };
 
 void tcsip_set_online(struct tcsip *sip, int state);
@@ -30,5 +32,7 @@ void tcsip_call_control(struct tcsip*sip, struct pl* ckey, int op);
 void tcsip_xdns(struct tcsip* sip, void *arg);
 void tcsip_close(struct tcsip*sip);
 struct sip_addr *tcsip_user(struct tcsip*sip);
+int tcsip_hist_fetch(struct tcsip* sip, struct pl *pidx, struct list **);
+void tcsip_hist_ipc(struct tcsip* sip, int flag);
 
 #endif

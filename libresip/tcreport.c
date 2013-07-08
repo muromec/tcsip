@@ -5,6 +5,7 @@
 #include "tcsipreg.h"
 #include "tcsipcall.h"
 #include "txsip_private.h"
+#include "store/history.h"
 #include <msgpack.h>
 
 void report_call_change(struct tcsipcall* call, void *arg) {
@@ -86,3 +87,34 @@ void report_cert(int err, struct pl*name, void*arg)
         push_pl((*name));
 }
 
+static bool history_el(struct le *le, void *arg)
+{
+    msgpack_packer *pk = arg;
+    struct hist_el *hel = le->data;
+
+    msgpack_pack_array(pk, 5);
+    msgpack_pack_int(pk, hel->event);
+    msgpack_pack_int(pk, hel->time);
+    push_pl(hel->key);
+    push_pl(hel->login);
+    push_pl(hel->name);
+
+    return false;
+}
+
+
+void report_hist(int err, struct pl *idx, struct list*hlist, void*arg)
+{
+    int cnt;
+    msgpack_packer *pk = arg;
+    msgpack_pack_array(pk, err ? 2 : 4);
+    push_cstr("hist.res");
+    msgpack_pack_int(pk, err);
+    if(err) return;
+
+    push_pl((*idx));
+    cnt = list_count(hlist);
+    msgpack_pack_array(pk, cnt);
+
+    list_apply(hlist, true, history_el, arg);
+}

@@ -78,6 +78,7 @@ static struct sip_handlers msgpack_handlers = {
     .call_h = report_call,
     .up_h = report_up,
     .cert_h = report_cert,
+    .hist_h = report_hist,
 };
 
 static void tcsip_savecert(struct tcsip*sip, char *login, struct mbuf*data);
@@ -382,9 +383,38 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
     cert_h(0, &sip->user_c->dname);
 
     history_alloc(&sip->hist, login);
-    history_fetch(sip->hist);
 
     return 0;
+}
+
+int tcsip_hist_fetch(struct tcsip* sip, struct pl *pidx, struct list **hlist) {
+    if(!sip || !sip->hist)
+        return -EINVAL;
+
+    return history_next(sip->hist, pidx, hlist);
+}
+
+void tcsip_hist_ipc(struct tcsip* sip, int flag)
+{
+    int err;
+    struct pl idx;
+    struct list *hlist;
+
+    if(!sip || !sip->hist)
+        return;
+
+    err = history_next(sip->hist, &idx, &hlist); 
+    if(err)
+        goto out;
+
+    if(sip->rarg && sip->rarg->hist_h){
+        sip->rarg->hist_h(0, &idx, hlist, sip->rarg->arg);
+    }
+
+    list_flush(hlist);
+    mem_deref(hlist);
+out:
+    return;
 }
 
 static struct tchttp * get_http(char *login) {
