@@ -332,10 +332,10 @@ int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct 
 
     json_object_object_add(ob, key_c, entry);
 
-    history_store(hist, key, idx, json_object_to_json_string(ob));
+    err = history_store(hist, key, idx, json_object_to_json_string(ob));
 
     json_object_put(ob);
 
-    return 0;
+    return err;
 }
 

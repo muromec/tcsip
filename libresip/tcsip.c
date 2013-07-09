@@ -578,6 +578,7 @@ void tcsip_call_control(struct tcsip*sip, struct pl* ckey, int op)
 void tcsip_call_history(struct tcsip* sip, struct tcsipcall *call)
 {
     int dir, state, reason, ts, event;
+    int err;
     struct pl *ckey;
     struct sip_addr *remote;
 
@@ -594,7 +595,8 @@ void tcsip_call_history(struct tcsip* sip, struct tcsipcall *call)
     ckey = tcsipcall_ckey(call);
     tcop_lr((void*)call, NULL, &remote);
 
-    history_add(sip->hist, event, ts, ckey, &remote->uri.user, &remote->dname);
+    err = history_add(sip->hist, event, ts, ckey, &remote->uri.user, &remote->dname);
+
 }
 
 void tcsip_call_changed(struct tcsipcall *call, void *arg)
