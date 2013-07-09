@@ -603,7 +603,7 @@ void tcsip_call_changed(struct tcsipcall *call, void *arg)
 {
     struct tcsip* sip = arg;
 
-    sip->rarg->call_h(call, sip->rarg->arg);
+    sip->rarg->call_ch(call, sip->rarg->arg);
     tcsip_call_history(sip, call);
 }
 
