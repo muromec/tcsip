@@ -586,11 +586,16 @@ void tcsip_call_history(struct tcsip* sip, struct tcsipcall *call)
     if(state & CSTATE_ALIVE)
         return;
 
-    // FIXME: wtf? ios version doesn't log incoming calls
-    if(dir == CALL_IN)
-        return;
+    event = 0;
+    if(reason == CEND_OK)
+        event |= HIST_OK;
+    else
+        event |= HIST_HANG;
 
-    event = 1;
+    if(dir==CALL_IN)
+        event |= HIST_IN;
+    else
+        event |= HIST_OUT;
 
     ckey = tcsipcall_ckey(call);
     tcop_lr((void*)call, NULL, &remote);

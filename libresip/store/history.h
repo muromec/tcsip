@@ -6,12 +6,22 @@ struct pl;
 struct list;
 struct le;
 
+enum hist_event {
+    HIST_OUT=(1<<1),
+    HIST_IN=(1<<2),
+    HIST_OK=(1<<3),
+    HIST_HANG=(1<<4),
+    HIST_CONTACT=(1<<5),
+    HIST_CONTACT_RM=(1<<7),
+    HIST_CONTACT_ADD=(1<<8),
+};
+
 struct hist_el {
     struct le le;
     struct pl key;
     struct pl login;
     struct pl name;
-    int event;
+    enum hist_event event;
     int time;
 };
 
