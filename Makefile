@@ -14,6 +14,7 @@ LIBS-$(linux) += -lpthread -lcrypto -lssl  -lresolv
 LIBS-$(apple) += -lpthread -lcrypto -lssl  -lresolv 
 LIBS-static += $(DEP)/libspeex.a $(DEP)/libspeexdsp.a
 LIBS-$(linux) += -lasound
+LIBS-$(linux) += -ldl
 LIBS-$(apple) += -framework CoreFoundation
 LIBS-$(apple) += -framework SystemConfiguration
 LIBS-$(apple) += -framework AudioUnit
