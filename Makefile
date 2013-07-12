@@ -34,8 +34,10 @@ LIBS += $(LIBS-y)
 
 all: cli
 
+OPT_FLAGS := -fPIC -O2
+
 %.o: %.c
-	$(CC) -std=gnu99  $< -o $@ -c $(INCL) $(ADD_INCL) $(RE_CFLAGS) -O0
+	$(CC) -std=gnu99  $< -o $@ -c $(INCL) $(ADD_INCL) $(RE_CFLAGS) $(OPT_FLAGS)
 
 objects += $(patsubst %,libresip/%.o,$(lobj))
 
