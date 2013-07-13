@@ -13,6 +13,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include <srtp.h>
 #include <msgpack.h>
 #include "driver.h"
 
@@ -126,7 +127,6 @@ static void accept_cb(int flags, void *arg)
 }
 
 int libresip_driver(char *sock_path) {
-    libre_init();
 
     int err, sock;
     struct tcsip *sip;
@@ -135,6 +135,13 @@ int libresip_driver(char *sock_path) {
     struct msgpack_zone *mempool;
     struct msgpack_unpacker *up;
     struct msgpack_packer *packer;
+
+    libre_init();
+
+#if __APPLE__
+    err = apple_sound_init();
+#endif
+    err = srtp_init();
 
     mempool = msgpack_zone_new(2048);
     up = msgpack_unpacker_new(128);
@@ -172,6 +179,18 @@ int libresip_driver(char *sock_path) {
     fd_close(sock);
 
     mem_deref(sip);
+    mem_deref(app);
+
+    msgpack_packer_free(packer);
+    msgpack_unpacker_free(up);
+    msgpack_zone_free(mempool);
+
+#if __APPLE__
+    apple_sound_deinit();
+#endif
+
+    tmr_debug();
+    mem_debug();
 
 fail:
     libre_close();

@@ -1,3 +1,4 @@
+#include "re.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -72,8 +73,7 @@ int x509_info(char *path, int *rafter, int *rbefore, char **cname)
 	}
 
 	char *cnret;
-	cnret = malloc(end-start+1);
-	memset(cnret, 0, end-start+1);
+	cnret = mem_zalloc(end-start+1, NULL);
 	memcpy(cnret, buf+start, end-start);
 
 	if(rafter)

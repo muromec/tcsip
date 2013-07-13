@@ -10,7 +10,7 @@
 
 void report_call_change(struct tcsipcall* call, void *arg) {
     int cstate, reason;
-    struct pl *ckey = tcsipcall_ckey(call);
+    char *ckey = tcsipcall_ckey(call);
 
     msgpack_packer *pk = arg;
 
@@ -21,7 +21,7 @@ void report_call_change(struct tcsipcall* call, void *arg) {
 
         msgpack_pack_array(pk, 3);
         push_cstr("sip.call.del");
-        push_pl((*ckey));
+        push_cstr_len(ckey);
         msgpack_pack_int(pk, reason);
 
 	return;
@@ -30,7 +30,7 @@ void report_call_change(struct tcsipcall* call, void *arg) {
     if(cstate & CSTATE_EST) {
         msgpack_pack_array(pk, 2);
         push_cstr("sip.call.est");
-        push_pl((*ckey));
+        push_cstr_len(ckey);
  
 	return;
     }
@@ -40,13 +40,13 @@ void report_call_change(struct tcsipcall* call, void *arg) {
 void report_call(struct tcsipcall* call, void *arg) {
     int cdir, cstate, ts;
     struct sip_addr *remote;
-    struct pl *ckey = tcsipcall_ckey(call);
+    char *ckey = tcsipcall_ckey(call);
 
     msgpack_packer *pk = arg;
     msgpack_pack_array(pk, 7);
     push_cstr("sip.call.add");
 
-    push_pl((*ckey));
+    push_cstr_len(ckey);
 
     tcsipcall_dirs(call, &cdir, &cstate, NULL, &ts);
 
@@ -95,15 +95,15 @@ static bool history_el(struct le *le, void *arg)
     msgpack_pack_array(pk, 5);
     msgpack_pack_int(pk, hel->event);
     msgpack_pack_int(pk, hel->time);
-    push_pl(hel->key);
-    push_pl(hel->login);
-    push_pl(hel->name);
+    push_cstr_len(hel->key);
+    push_cstr_len(hel->login);
+    push_cstr_len(hel->name);
 
     return false;
 }
 
 
-void report_hist(int err, struct pl *idx, struct list*hlist, void*arg)
+void report_hist(int err, char *idx, struct list*hlist, void*arg)
 {
     int cnt;
     msgpack_packer *pk = arg;
@@ -112,7 +112,7 @@ void report_hist(int err, struct pl *idx, struct list*hlist, void*arg)
     msgpack_pack_int(pk, err);
     if(err) return;
 
-    push_pl((*idx));
+    push_cstr_len(idx);
     cnt = list_count(hlist);
     msgpack_pack_array(pk, cnt);
 

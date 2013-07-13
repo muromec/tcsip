@@ -56,7 +56,7 @@ void tcsipcall_accept(struct tcsipcall*call);
 void tcsipcall_handler(struct tcsipcall*call, tcsipcall_h ch, void*arg);
 
 void tcsipcall_dirs(struct tcsipcall*call, int *dir, int *state, int *reason, int *ts);
-struct pl* tcsipcall_ckey(struct tcsipcall*call);
+char* tcsipcall_ckey(struct tcsipcall*call);
 void tcsipcall_control(struct tcsipcall*call, int action);
 
 #endif

@@ -17,7 +17,7 @@ struct tcsipcall {
     struct sip_msg *msg;
     tcsipcall_h *handler;
     void *handler_arg;
-    struct pl ckey;
+    char *ckey;
     int cdir;
     int cstate;
     int reason;
@@ -36,9 +36,11 @@ void call_destruct(void *arg)
 {
     struct tcsipcall *call = arg;
 
-    if(call->local) call->local = mem_deref(call->local);
-    if(call->remote) call->remote = mem_deref(call->remote);
+    call->local = mem_deref(call->local);
+    call->remote = mem_deref(call->remote);
     call->uac = mem_deref(call->uac);
+    call->msg = mem_deref(call->msg);
+    call->ckey = mem_deref(call->ckey);
 
 }
 
@@ -150,18 +152,10 @@ void tcsipcall_remove(struct tcsipcall*call)
 
 void tcsipcall_key(struct tcsipcall*call)
 {
-    char *tmp;
-    struct pl ptmp;
-
-    re_sdprintf(&tmp, "%d@%r->%r", call->ts,
+    re_sdprintf(&call->ckey, "%d@%r->%r", call->ts,
        call->cdir ? &call->local->auri: &call->remote->auri,
        call->cdir ? &call->remote->auri : &call->local->auri
     );
-
-    pl_set_str(&ptmp, tmp);
-    pl_dup(&call->ckey, &ptmp);
-
-    mem_deref(tmp);
 
 }
 
@@ -283,6 +277,7 @@ void tcsipcall_hangup(struct tcsipcall*call) {
     }
 
     call->handler(call, call->handler_arg);
+    tcsipcall_remove(call);
 }
 void tcsipcall_accept(struct tcsipcall*call)
 {
@@ -377,6 +372,7 @@ void tcsipcall_control(struct tcsipcall*call, int action)
 	}
 
 	tcsipcall_hangup(call);
+        mem_deref(call);
         break;
 
    }
@@ -462,8 +458,8 @@ void tcsipcall_dirs(struct tcsipcall*call, int *dir, int *state, int *reason, in
     if(ts) *ts = (int)call->ts;
 }
 
-struct pl* tcsipcall_ckey(struct tcsipcall*call)
+char* tcsipcall_ckey(struct tcsipcall*call)
 {
-    return &call->ckey;
+    return call->ckey;
 }
 

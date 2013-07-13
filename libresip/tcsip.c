@@ -12,7 +12,6 @@
 #include <re_dbg.h>
 
 #include "txsip_private.h"
-#include <srtp.h>
 
 #include "tcreport.h"
 #include "tcsipuser.h"
@@ -60,6 +59,7 @@ struct tcsip {
     struct tcsipreg *sreg_c;
     struct tcuplinks *uplinks_c;
     struct sip_addr *user_c;
+    char *cname;
 
     struct list *calls_c;
 
@@ -103,11 +103,12 @@ static void exit_handler(void *arg)
 bool find_ckey(struct le *le, void *arg)
 {
     struct tcsipcall *call = le->data;
-    struct pl *ckey = arg, *thiskey;
+    struct pl *ckey = arg;
+    char *thiskey;
 
     thiskey = tcsipcall_ckey(call);
 
-    return !pl_cmp(ckey, thiskey);
+    return !pl_strcmp(ckey, thiskey);
 }
 
 void sipc_destruct(void *arg)
@@ -127,18 +128,15 @@ void sipc_destruct(void *arg)
     mem_deref(sip->sreg_c);
     list_flush(sip->calls_c);
     mem_deref(sip->calls_c);
+    sip->hist = mem_deref(sip->hist);
     mem_deref(sip->uplinks_c);
+    mem_deref(sip->cname);
 
     mem_deref(uac);
     if(sip->rarg)
         mem_deref(sip->rarg);
 
-    tmr_debug();
-    mem_debug();
 
-#if __APPLE__
-    apple_sound_deinit();
-#endif
 }
 int tcsip_alloc(struct tcsip**rp, int mode, void *rarg)
 {
@@ -194,10 +192,6 @@ static void create_ua(struct tcsip*sip)
 
     int err; /* errno return values */
     struct uac *uac = sip->uac;
-#if __APPLE__
-    err = apple_sound_init();
-#endif
-    err = srtp_init();
 
     uac->nsc = sizeof(uac->nsv) / sizeof(uac->nsv[0]);
     err = dns_srv_get(NULL, 0, uac->nsv, &uac->nsc);
@@ -330,7 +324,7 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 {
     int err;
     struct uac *uac = sip->uac;
-    char *certpath, *capath=NULL;
+    char *certpath=NULL, *capath=NULL;
     char path[2048];
     char *cname;
     struct pl cname_p;
@@ -353,6 +347,7 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 
     pl_set_str(&cname_p, cname);
     sip->user_c = mem_zalloc(sizeof(struct sip_addr), NULL);
+    sip->cname = cname;
     err = sip_addr_decode(sip->user_c, &cname_p);
     if(err) {
         re_printf("CN parse failed\n");
@@ -385,10 +380,13 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
     if(!sip->hist)
         history_alloc(&sip->hist, login);
 
+    mem_deref(capath);
+    mem_deref(certpath);
+
     return 0;
 }
 
-int tcsip_hist_fetch(struct tcsip* sip, struct pl *pidx, struct list **hlist) {
+int tcsip_hist_fetch(struct tcsip* sip, char **pidx, struct list **hlist) {
     if(!sip || !sip->hist)
         return -EINVAL;
 
@@ -398,7 +396,7 @@ int tcsip_hist_fetch(struct tcsip* sip, struct pl *pidx, struct list **hlist) {
 void tcsip_hist_ipc(struct tcsip* sip, int flag)
 {
     int err;
-    struct pl idx;
+    char *idx = NULL;
     struct list *hlist;
 
     if(!sip || !sip->hist)
@@ -413,13 +411,14 @@ void tcsip_hist_ipc(struct tcsip* sip, int flag)
 
     if(sip->rarg && sip->rarg->hist_h){
         if(hlist)
-            sip->rarg->hist_h(0, &idx, hlist, sip->rarg->arg);
+            sip->rarg->hist_h(0, idx, hlist, sip->rarg->arg);
         else
             sip->rarg->hist_h(1, NULL, NULL, sip->rarg->arg);
     }
 
     list_flush(hlist);
     mem_deref(hlist);
+    mem_deref(idx);
 out:
     return;
 }
@@ -579,7 +578,8 @@ void tcsip_call_history(struct tcsip* sip, struct tcsipcall *call)
 {
     int dir, state, reason, ts, event;
     int err;
-    struct pl *ckey;
+    char *tmp;
+    struct pl ckey;
     struct sip_addr *remote;
 
     tcsipcall_dirs(call, &dir, &state, &reason, &ts);
@@ -597,10 +597,11 @@ void tcsip_call_history(struct tcsip* sip, struct tcsipcall *call)
     else
         event |= HIST_OUT;
 
-    ckey = tcsipcall_ckey(call);
+    tmp = tcsipcall_ckey(call);
+    pl_set_str(&ckey, tmp);
     tcop_lr((void*)call, NULL, &remote);
 
-    err = history_add(sip->hist, event, ts, ckey, &remote->uri.user, &remote->dname);
+    err = history_add(sip->hist, event, ts, &ckey, &remote->uri.user, &remote->dname);
 
 }
 

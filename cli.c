@@ -74,7 +74,7 @@ static void cmd_handler(int flags, void *arg)
     }
     if(len > 4 && !strncmp(buf, "hist", 4)) {
         re_printf("fetch idx\n");
-        struct pl idx;
+        char *idx;
         struct list *hlist = NULL;
         tcsip_hist_fetch(app->sip, &idx, &hlist);
         if(hlist) {
@@ -82,6 +82,8 @@ static void cmd_handler(int flags, void *arg)
             list_flush(hlist);
             mem_deref(hlist);
         }
+        if(idx)
+          mem_deref(idx);
 
         re_printf("got idx %r\n", &idx);
     }

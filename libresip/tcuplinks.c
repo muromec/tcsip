@@ -128,6 +128,7 @@ static void report(struct tcuplinks *ups, struct list* upl)
     }
 
     ups->data_c = ups->uris_c;
+    ups->uris_c = NULL;
 }
 
 void one_rm(struct tcuplinks *ups, struct uplink*up)
