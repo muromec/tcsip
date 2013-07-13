@@ -97,4 +97,19 @@ int platpath(struct pl *login, char **certpath, char**capath) {
 
     re_sdprintf(capath, "./CA.cert", home);
 }
+
+int platpath_db(struct pl *login, char **dbpath) {
+    int err;
+    char *home = getenv("HOME");
+
+    if(home) {
+        re_sdprintf(dbpath, "%s/.texr.db", home);
+    } else {
+        re_sdprintf(dbpath, "./%r.db", login);
+    }
+
+    return 0;
+}
+
+
 #endif
