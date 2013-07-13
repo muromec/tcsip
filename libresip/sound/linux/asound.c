@@ -167,8 +167,12 @@ int alsa_sound_start(struct alsa_sound*snd)
 
 void alsa_sound_close(struct alsa_sound*snd)
 {
-	snd_pcm_drain(snd->play_handle);
+	snd_pcm_drop(snd->play_handle);
 	snd_pcm_close(snd->play_handle);
+        snd_pcm_drop(snd->rec_handle);
+        snd_pcm_close(snd->rec_handle);
+        ajitter_destroy(snd->play_jitter);
+        ajitter_destroy(snd->record_jitter);
         tmr_cancel(&snd->rec_timer);
 	mem_deref(snd);
 }

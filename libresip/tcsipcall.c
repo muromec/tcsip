@@ -278,6 +278,7 @@ void tcsipcall_hangup(struct tcsipcall*call) {
 
     call->handler(call, call->handler_arg);
     tcsipcall_remove(call);
+    mem_deref(call);
 }
 void tcsipcall_accept(struct tcsipcall*call)
 {
@@ -346,6 +347,8 @@ void tcsipcall_control(struct tcsipcall*call, int action)
 
         sipsess_answer(call->sess, 200, "OK", mb, NULL);
 
+        mem_deref(mb);
+
         DROP(call->cstate, CSTATE_RING);
 	call->cstate |= CSTATE_EST;
 
@@ -372,7 +375,6 @@ void tcsipcall_control(struct tcsipcall*call, int action)
 	}
 
 	tcsipcall_hangup(call);
-        mem_deref(call);
         break;
 
    }
