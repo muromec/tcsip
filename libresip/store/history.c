@@ -140,7 +140,6 @@ static struct list* blob_parse(const char *blob, struct json_object**rp) {
     token = json_tokener_parse(blob);
 
     len = json_object_object_length(token);
-    hel = mem_zalloc(sizeof(struct hist_el)*len, histel_distruct);
 
 #define get_str(__key, __dest) {\
         int tlen;\
@@ -148,10 +147,13 @@ static struct list* blob_parse(const char *blob, struct json_object**rp) {
         ob = json_object_object_get(val0, __key); \
         tlen = json_object_get_string_len(ob);\
         tmp = (char*)json_object_get_string(ob);\
-        __dest = mem_alloc(tlen+1, NULL);\
-        __dest[tlen] = '\0';\
-        memcpy(__dest, tmp, tlen);\
-        }
+        if(tlen > 0) {\
+            __dest = mem_alloc(tlen+1, NULL);\
+            __dest[tlen] = '\0';\
+            memcpy(__dest, tmp, tlen);\
+        } else {\
+            __dest = NULL;\
+        }}
 
 #define get_int(__key, __dest) {\
         ob = json_object_object_get(val0, __key); \
@@ -160,6 +162,8 @@ static struct list* blob_parse(const char *blob, struct json_object**rp) {
 
     json_object_object_foreach(token, key0, val0)
     {
+
+        hel = mem_zalloc(sizeof(struct hist_el), histel_distruct);
         get_str("key", hel->key);
         get_str("name", hel->name);
         get_str("user", hel->login);
@@ -170,7 +174,6 @@ static struct list* blob_parse(const char *blob, struct json_object**rp) {
 
         list_append(hlist, &hel->le, hel);
 
-        hel++;
     }
 
     list_sort(hlist, sort_handler, NULL);
