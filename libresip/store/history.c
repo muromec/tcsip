@@ -95,6 +95,8 @@ int history_reset(struct history *hist)
     }
 
     hist->iter = mem_deref(hist->iter);
+
+    return 0;
 }
 
 int history_next(struct history *hist, char**idx, struct list **bulk)
@@ -278,7 +280,7 @@ int history_obsolete(struct history *hist, char *key, char *idx)
 
     sqlite3_finalize(stmt);
 
-    if(err = SQLITE_DONE) {
+    if(err == SQLITE_DONE) {
         err = 0;
     }
 done:
@@ -303,7 +305,7 @@ int history_store(struct history *hist, char *key, char *idx, const char* data)
     
     sqlite3_finalize(stmt);
 
-    if(err = SQLITE_DONE) {
+    if(err == SQLITE_DONE) {
         history_obsolete(hist, key, idx);
         err = 0;
     }
