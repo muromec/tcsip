@@ -537,7 +537,7 @@ static void tcsip_savecert(struct tcsip*sip, char *clogin, struct mbuf*data) {
     platpath(&login, &certpath, &capath);
 
     unlink(certpath);
-    wfd = open(certpath, O_WRONLY | O_CREAT | O_TRUNC);
+    wfd = open(certpath, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
     if(wfd < 0) {
         printf("failed to open %s\n", certpath);
         h_cert(sip, 10, NULL);
