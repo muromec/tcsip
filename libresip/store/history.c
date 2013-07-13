@@ -269,7 +269,7 @@ int history_obsolete(struct history *hist, char *key, char *idx)
     if(err)
         goto done;
 
-    err = re_sdprintf(&key_glob, "%r/h/*", &hist->login);
+    err = re_sdprintf(&key_glob, "%s/h/*", &hist->login);
 
     sqlite3_bind_text(stmt, 1, idx, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, key_glob, -1, SQLITE_STATIC);
@@ -324,7 +324,7 @@ int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct 
 
     gettimeofday(&now, NULL);
 
-    err = re_sdprintf(&key, "%r/h/%d.%d", &hist->login, now.tv_sec, now.tv_usec);
+    err = re_sdprintf(&key, "%s/h/%d.%d", &hist->login, now.tv_sec, now.tv_usec);
     err = re_sdprintf(&key_c, "%r", ckey);
 
     if(hist->top) {
