@@ -1,3 +1,6 @@
+linux=n
+apple=n
+android=n
 ifeq ($(shell uname -s),Darwin)
 apple=y
 endif
