@@ -3,14 +3,15 @@
 #include <sys/time.h>
 #include "platpath.h"
 #include "history.h"
-#include "json.h"
 #include "sqlite3.h"
+#include <msgpack.h>
+#include "tcreport.h"
 
 struct history {
     sqlite3 *db;
     char *login;
     char *iter;
-    struct json_object* top;
+    struct list *top;
     char *top_idx;
 };
 
@@ -42,10 +43,7 @@ void hist_dealloc(void *arg)
     mem_deref(hist->login);
     mem_deref(hist->top_idx);
     mem_deref(hist->iter);
-    if(hist->top) {
-      json_object_put(hist->top);
-      hist->top = NULL;
-    }
+    mem_deref(hist->top);
 }
 
 int history_alloc(struct history **rp, struct pl *plogin)
@@ -88,11 +86,9 @@ fail:
 
 int history_reset(struct history *hist)
 {
-    if(hist->top) {
-        json_object_put(hist->top);
-        hist->top = NULL;
-        hist->top_idx = mem_deref(hist->top_idx);
-    }
+
+    hist->top = mem_deref(hist->top);
+    hist->top_idx = mem_deref(hist->top_idx);
 
     hist->iter = mem_deref(hist->iter);
 
@@ -122,64 +118,63 @@ void histel_distruct(void *arg) {
   hel->login = mem_deref(hel->login);
 }
 
-static struct list* blob_parse(const char *blob, struct json_object**rp) {
-    int len;
-    struct json_object* token, *ob;
+static struct list* blob_parse(struct mbuf *buf) {
+    int len, err;
     char *ob_str;
     struct list *hlist;
     struct hist_el *hel;
 
-    *rp = NULL;
-    
-    hlist = mem_alloc(sizeof(struct list), NULL);
+    hlist = mem_alloc(sizeof(struct list), (mem_destroy_h*)list_flush);
     if(!hlist)
         return NULL;
 
     list_init(hlist);
 
-    token = json_tokener_parse(blob);
+    msgpack_unpacked msg;
 
-    len = json_object_object_length(token);
+    msgpack_unpacked_init(&msg);
 
-#define get_str(__key, __dest) {\
-        int tlen;\
-        char *tmp;\
-        ob = json_object_object_get(val0, __key); \
-        tlen = json_object_get_string_len(ob);\
-        tmp = (char*)json_object_get_string(ob);\
-        if(tlen > 0) {\
-            __dest = mem_alloc(tlen+1, NULL);\
-            __dest[tlen] = '\0';\
-            memcpy(__dest, tmp, tlen);\
+    err = msgpack_unpack_next(&msg, (char*)mbuf_buf(buf), mbuf_get_left(buf), NULL);
+
+    msgpack_object obj = msg.data;
+    msgpack_object *ob_ct, *arg;
+    msgpack_object_array ob_list;
+
+    ob_list = obj.via.array;
+    ob_ct = ob_list.ptr;
+
+#define get_str(__dest) {\
+        msgpack_object_raw bstr;\
+        bstr = arg->via.raw;\
+        if(bstr.size > 0) {\
+            __dest = mem_alloc(bstr.size+1, NULL);\
+            __dest[bstr.size] = '\0';\
+            memcpy(__dest, bstr.ptr, bstr.size);\
         } else {\
             __dest = NULL;\
         }}
 
-#define get_int(__key, __dest) {\
-        ob = json_object_object_get(val0, __key); \
-        __dest = json_object_get_int(ob); \
-}
+    for(int i=0; i<ob_list.size;i++) {
 
-    json_object_object_foreach(token, key0, val0)
-    {
+        arg = ob_ct->via.array.ptr;
 
         hel = mem_zalloc(sizeof(struct hist_el), histel_distruct);
-        get_str("key", hel->key);
-        get_str("name", hel->name);
-        get_str("user", hel->login);
-        if(!hel->login)
-            get_str("login", hel->login);
-        get_int("date", hel->time);
-        get_int("event", hel->event);
+        hel->event = (int)arg->via.i64; arg++;
+        hel->time = (int)arg->via.i64; arg++;
+
+        get_str(hel->key); arg++;
+        get_str(hel->login); arg++;
+        get_str(hel->name); 
 
         list_append(hlist, &hel->le, hel);
+
+        ob_ct ++;
 
     }
 
     list_sort(hlist, sort_handler, NULL);
 
-    *rp = token;
-
+out:
     return hlist;
 }
 
@@ -205,7 +200,6 @@ int history_fetch(struct history *hist, const char *start_idx, char**idx, struct
     sqlite3_stmt *stmt;
     const char *tail, *ret_idx;
     char *key_glob = NULL;
-    struct json_object* block;
 
     *bulk = NULL;
 
@@ -230,25 +224,28 @@ int history_fetch(struct history *hist, const char *start_idx, char**idx, struct
 
     err = sqlite3_step(stmt);
 
-    if(err == SQLITE_DONE)
+    if(err == SQLITE_DONE) {
         goto out;
+    }
 
     if(err == SQLITE_ROW) {
         ret_idx = (const char*)sqlite3_column_text(stmt, 1);
         re_sdprintf(idx, "%s", ret_idx);
         hist->iter = mem_deref(hist->iter);
-        re_sdprintf(&hist->iter, "%s", idx);
+        re_sdprintf(&hist->iter, "%s", ret_idx);
 
-        ret_idx = (const char*)sqlite3_column_text(stmt, 0);
-        *bulk = blob_parse(ret_idx, &block);
+        struct mbuf buf;
+        mbuf_init(&buf);
+        buf.buf = (unsigned char *)sqlite3_column_blob(stmt, 0);
+        buf.size = sqlite3_column_bytes(stmt, 0);
+        buf.end = buf.size;
 
-        if(block && (hist->top==NULL)) {
-            hist->top =  json_object_get(block);
+        *bulk = blob_parse(&buf);
+
+        if(*bulk && (hist->top==NULL)) {
+            hist->top = mem_ref(*bulk);
             get_idx(*bulk, &hist->top_idx);
         }
-
-        if(block)
-           json_object_put(block);
 
     }
 
@@ -272,12 +269,11 @@ int history_obsolete(struct history *hist, char *key, char *idx)
     if(err)
         goto done;
 
-    err = re_sdprintf(&key_glob, "%s/h/*", &hist->login);
+    err = re_sdprintf(&key_glob, "%s/h/*", hist->login);
 
     sqlite3_bind_text(stmt, 1, idx, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, key_glob, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, key, -1, SQLITE_STATIC);
-
 
     err = sqlite3_step(stmt);
 
@@ -291,7 +287,7 @@ done:
     return err;
 }
 
-int history_store(struct history *hist, char *key, char *idx, const char* data)
+int history_store(struct history *hist, char *key, char *idx, msgpack_sbuffer* buffer)
 {
     int err;
     sqlite3_stmt *stmt;
@@ -302,7 +298,8 @@ int history_store(struct history *hist, char *key, char *idx, const char* data)
 
     sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, idx, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, data, -1, SQLITE_STATIC);
+    sqlite3_bind_blob(stmt, 3, 
+            buffer->data, buffer->size, SQLITE_STATIC);
 
     err = sqlite3_step(stmt);
     
@@ -322,48 +319,62 @@ int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct 
     int err;
     char *key=NULL, *key_c=NULL, *idx=NULL;
     struct timeval now;
-    struct json_object *ob, *entry, *jkey, *jlogin, *jname;
-    struct json_object *jevent, *jts;
+    struct hist_el *hel;
+    struct list *hlist;
+
+    msgpack_sbuffer* buffer = msgpack_sbuffer_new();
+    msgpack_packer* pk = msgpack_packer_new(buffer, msgpack_sbuffer_write);
 
     gettimeofday(&now, NULL);
 
-    err = re_sdprintf(&key, "%s/h/%d.%d", &hist->login, now.tv_sec, now.tv_usec);
+    err = re_sdprintf(&key, "%s/h/%d.%d", hist->login, now.tv_sec, now.tv_usec);
     err = re_sdprintf(&key_c, "%r", ckey);
 
     if(hist->top) {
-        ob = json_object_get(hist->top);
+        hlist = mem_ref(hist->top);
         idx = mem_ref(hist->top_idx);
     } else {
-        ob = json_object_new_object();
+        hlist = mem_alloc(sizeof(struct list), (mem_destroy_h*)list_flush);
+        list_init(hlist);
         idx = mem_ref(key_c);
     }
 
-    entry = json_object_new_object();
+    if(!hlist)
+        goto out;
 
-#define push_str(__frm, __key, __tmp) {\
-    __tmp = json_object_new_string_len(__frm->p, __frm->l);\
-    json_object_object_add(entry, __key, __tmp);}
 
-#define push_int(__val, __key, __tmp){\
-    __tmp = json_object_new_int(__val);\
-    json_object_object_add(entry, __key, __tmp);} 
+    hel = mem_zalloc(sizeof(struct hist_el), histel_distruct);
+    if(!hel)
+        goto out;
 
-    push_str(ckey, "key", jkey);
-    push_str(login, "login", jlogin);
-    push_str(name, "name", jname);
+    hel->time = ts;
+    hel->event = event;
 
-    push_int(event, "event", jevent);
-    push_int(ts, "date", jts); 
+    re_sdprintf(&hel->login, "%r", login);
+    re_sdprintf(&hel->name, "%r", name);
+    re_sdprintf(&hel->key, "%r", ckey);
 
-    json_object_object_add(ob, key_c, entry);
+    list_append(hlist, &hel->le, hel);
 
-    err = history_store(hist, key, idx, json_object_to_json_string(ob));
+    msgpack_pack_array(pk, list_count(hlist));
+    list_apply(hlist, true, write_history_el, pk);
 
-    json_object_put(ob);
+    err = history_store(hist, key, idx, buffer);
+
+    if(!hist->top) {
+        hist->top = mem_ref(hlist);
+        hist->top_idx = mem_ref(idx);
+    }
+
+out:
 
     mem_deref(key);
     mem_deref(key_c);
     mem_deref(idx);
+    mem_deref(hlist);
+
+    msgpack_sbuffer_free(buffer);
+    msgpack_packer_free(pk);
 
     return err;
 }

@@ -434,7 +434,6 @@ void tcsip_hist_ipc(struct tcsip* sip, int flag)
             sip->rarg->hist_h(1, NULL, NULL, sip->rarg->arg);
     }
 
-    list_flush(hlist);
     mem_deref(hlist);
     mem_deref(idx);
 out:

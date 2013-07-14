@@ -1,7 +1,8 @@
-#include "tcreport.h"
+
+#include "re.h"
 
 #include "strmacro.h"
-#include "re.h"
+#include "tcreport.h"
 #include "tcsipreg.h"
 #include "tcsipcall.h"
 #include "txsip_private.h"
@@ -88,7 +89,7 @@ void report_cert(int err, struct pl*name, void*arg)
         push_pl((*name));
 }
 
-static bool history_el(struct le *le, void *arg)
+bool write_history_el(struct le *le, void *arg)
 {
     msgpack_packer *pk = arg;
     struct hist_el *hel = le->data;
@@ -117,7 +118,7 @@ void report_hist(int err, char *idx, struct list*hlist, void*arg)
     cnt = list_count(hlist);
     msgpack_pack_array(pk, cnt);
 
-    list_apply(hlist, true, history_el, arg);
+    list_apply(hlist, true, write_history_el, arg);
 }
 
 static bool ct_el(struct le *le, void *arg)
