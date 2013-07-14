@@ -23,6 +23,7 @@
 #include "platpath.h"
 #include "http.h"
 #include "store/history.h"
+#include "store/contacts.h"
 
 #if __APPLE__
 #include "sound/apple/sound.h"
@@ -64,6 +65,7 @@ struct tcsip {
     struct list *calls_c;
 
     struct history *hist;
+    struct contacts *contacts;
 
     int rmode;
     struct sip_handlers *rarg;
@@ -87,6 +89,7 @@ void tcsip_call_incoming(struct tcsip* sip, const struct sip_msg *msg);
 static void sip_init(struct tcsip*sip);
 static void create_ua(struct tcsip*sip);
 void listen_laddr(struct tcsip*sip);
+static struct tchttp * get_http(char *login);
 
 /* called upon incoming calls */
 static void connect_handler(const struct sip_msg *msg, void *arg)
@@ -377,8 +380,18 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 
     cert_h(0, &sip->user_c->dname);
 
+    if(sip->http) {
+        sip->http = mem_deref(sip->http);
+    }
+        
+    sip->http = get_http(certpath);
+
     if(!sip->hist)
         history_alloc(&sip->hist, login);
+
+    if(!sip->contacts && sip->http) {
+        contacts_alloc(&sip->contacts, (struct httpc *) sip->http);
+    }
 
     mem_deref(capath);
     mem_deref(certpath);
@@ -423,7 +436,21 @@ out:
     return;
 }
 
-static struct tchttp * get_http(char *login) {
+void tcsip_contacts_ipc(struct tcsip* sip)
+{
+    int err;
+    if(!sip->contacts) {
+        err = -EINVAL;
+        goto fail;
+    }
+
+    contacts_fetch(sip->contacts);
+
+fail:
+    return;
+}
+
+static struct tchttp * get_http(char *cert) {
     int err;
     struct tchttp *http;
     int nsv;
@@ -438,7 +465,7 @@ static struct tchttp * get_http(char *login) {
 
     http->nsc = ARRAY_SIZE(http->nsv);
 
-    err = tls_alloc(&http->tls, TLS_METHOD_SSLV23, NULL, NULL);
+    err = tls_alloc(&http->tls, TLS_METHOD_SSLV23, cert, NULL);
     tls_add_ca(http->tls, ca_cert);
 
     err = dns_srv_get(NULL, 0, http->nsv, &http->nsc);
@@ -477,6 +504,7 @@ static void http_cert_done(struct request *req, int code, void *arg) {
     case 200:
         data = http_data(req);
         tcsip_savecert(sip, http->login, data);
+        mem_deref(data); // FIXME: really?
         return;
     default:
         h_cert(sip, code, NULL);

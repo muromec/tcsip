@@ -14,7 +14,9 @@ enum ipc_command {
     SIP_CALL_CONTROL = 0x0006,
     SIP_ME = 0x0be5,
     CERT_GET = 0x01df,
-    HIST_FETCH = 0x0193
+    HIST_FETCH = 0x0193,
+    CONTACTS_FETCH = 0x045a,
+    NONE_COMMAND = 0
 };
 
 void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob) 
@@ -145,6 +147,9 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
 
         tcsip_hist_ipc(sip, flag);
     }
+    break;
+    case CONTACTS_FETCH:
+        tcsip_contacts_ipc(sip);
     break;
     default:
         re_printf("hash %04x, cmd %b\n", cmdid, cmd.ptr, cmd.size);

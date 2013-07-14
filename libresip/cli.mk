@@ -23,6 +23,7 @@ lobj-$(android) += sound/android/opensl_io
 
 lobj += store/sqlite3
 lobj += store/history
+lobj += store/contacts
 
 lobj += ajitter
 
