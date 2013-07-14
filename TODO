@@ -1,1 +1,2 @@
 - send callback on "bad username or password"
+- use ECDHE-RSA-AES128-GCM-SHA256 or ECDHE-RSA-RC4128-SHA
