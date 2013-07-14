@@ -12,6 +12,7 @@ void report_call(struct tcsipcall* call, void *arg);
 void report_up(struct uplink *up, int op, void*arg);
 void report_cert(int err, struct pl*name, void*arg);
 void report_hist(int err, char *idx, struct list*hlist, void*arg);
+void report_ctlist(int err, struct list*ctlist, void*arg);
 
 #define push_str(__s) {\
     msgpack_pack_raw(pk, [__s length]);\

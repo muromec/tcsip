@@ -3,19 +3,15 @@
 #include <sys/time.h>
 #include "platpath.h"
 #include "contacts.h"
-#include "json.h"
+#include <msgpack.h>
+
 #include "sqlite3.h"
 #include "http.h"
 
 struct contacts {
     struct httpc* http;
-};
-
-struct contact_el {
-    struct le le;
-    char *name;
-    char *login;
-    char *phone;
+    contact_h *ch;
+    void *ch_arg;
 };
 
 static void ctel_distruct(void *arg) {
@@ -47,78 +43,100 @@ fail:
     return err;
 }
 
-static struct list* blob_parse(const char *blob)
+static struct list* blob_parse(struct mbuf *buf)
 {
 
-    int tlen, dlen, i;
-    struct json_object* token, *ob, *val, *tmp_ob;
+    int tlen, dlen, i, err;
     struct contact_el *ctel;
     struct list *ctlist;
     char *tmp;
-    
-    token = json_tokener_parse(blob);
 
     ctlist = mem_alloc(sizeof(struct list), NULL);
-
     list_init(ctlist);
 
+    msgpack_unpacked msg;
 
-    ob = json_object_object_get(token, "status");
-    tlen = json_object_get_string_len(ob);
-    if(tlen > 0) {
-        re_printf("got status %s\n", json_object_get_string(ob));
+    msgpack_unpacked_init(&msg);
+
+    err = msgpack_unpack_next(&msg, (char*)mbuf_buf(buf), mbuf_get_left(buf), NULL);
+    if(err != 1) {
+        goto out;
     }
 
-    ob = json_object_object_get(token, "data");
-    dlen = json_object_array_length(ob);
+    msgpack_object obj = msg.data;
+    msgpack_object *arg, *status, *ob_ct;
+    msgpack_object_array *ob_list;
 
-#define get_str(__key, __dest) {\
-        int tlen;\
-        char *tmp;\
-        tmp_ob = json_object_object_get(val, __key); \
-        tlen = json_object_get_string_len(tmp_ob);\
-        tmp = (char*)json_object_get_string(tmp_ob);\
-        if(tlen > 0) {\
-            __dest = mem_alloc(tlen+1, NULL);\
-            __dest[tlen] = '\0';\
-            memcpy(__dest, tmp, tlen);\
+    if(obj.type != MSGPACK_OBJECT_ARRAY) {
+        goto out;
+    }
+
+    arg = obj.via.array.ptr;
+
+    if(arg->type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
+        re_printf("arg type failed\n");
+        goto out;
+    }
+
+    arg ++;
+
+    ob_list = &arg->via.array;
+    ob_ct = ob_list->ptr;
+
+#define get_str(__dest) {\
+        msgpack_object_raw bstr;\
+        bstr = arg->via.raw;\
+        if(bstr.size > 0) {\
+            __dest = mem_alloc(bstr.size+1, NULL);\
+            __dest[bstr.size] = '\0';\
+            memcpy(__dest, bstr.ptr, bstr.size);\
         } else {\
             __dest = NULL;\
         }}
 
-
-    for(i=0; i<dlen;i++) {
-        val = json_object_array_get_idx(ob, i);
+    for(i=0; i<ob_list->size;i++) {
 
         ctel = mem_zalloc(sizeof(struct contact_el), ctel_distruct);
-        get_str("name", ctel->name);
-        get_str("login", ctel->login);
-        get_str("phone", ctel->phone);
+
+        arg = ob_ct->via.array.ptr;
+
+        get_str(ctel->login); arg++;
+        get_str(ctel->name); arg++;
+        get_str(ctel->phone); 
 
         list_append(ctlist, &ctel->le, ctel);
+
+        ob_ct ++;
     }
 
-    json_object_put(token);
-
+out:
     return ctlist;
 };
 
 static void http_ct_done(struct request *req, int code, void *arg) {
+    int err = -1;
     struct contacts *ct = arg; 
-    struct mbuf *data;
-    struct list *ctlist;
+    struct mbuf *data = NULL;
+    struct list *ctlist = NULL;
 
     re_printf("http done with code %d\n", code);
 
     switch(code) {
     case 200:
         data = http_data(req);
-        ctlist = blob_parse((char*)mbuf_buf(data));
+        ctlist = blob_parse(data);
         mem_deref(data);
+        err = 0;
     break;
 
     }
 
+    if(ct->ch) {
+        ct->ch(err, ctlist, ct->ch_arg);
+    }
+
+    mem_deref(data);
+    mem_deref(ctlist);
 }
 
 static void http_ct_err(int err, void *arg) {
@@ -134,8 +152,16 @@ int contacts_fetch(struct contacts *ct) {
 
     http_init(ct->http, &req, "https://www.texr.net/api/contacts");
     http_cb(req, ct, http_ct_done, http_ct_err);
-    http_header(req, "Accept", "application/msgbuf");
+    http_header(req, "Accept", "application/msgpack");
     http_send(req);
 
     return 0;
 }
+
+int contacts_handler(struct contacts *ct, contact_h ch, void *arg)
+{
+    ct->ch = ch;
+    ct->ch_arg = arg;
+    return 0;
+}
+

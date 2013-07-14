@@ -6,6 +6,7 @@
 #include "tcsipcall.h"
 #include "txsip_private.h"
 #include "store/history.h"
+#include "store/contacts.h"
 #include <msgpack.h>
 
 void report_call_change(struct tcsipcall* call, void *arg) {
@@ -117,4 +118,33 @@ void report_hist(int err, char *idx, struct list*hlist, void*arg)
     msgpack_pack_array(pk, cnt);
 
     list_apply(hlist, true, history_el, arg);
+}
+
+static bool ct_el(struct le *le, void *arg)
+{
+    msgpack_packer *pk = arg;
+    struct contact_el *ctel = le->data;
+
+    msgpack_pack_array(pk, 3);
+    push_cstr_len(ctel->login);
+    push_cstr_len(ctel->name);
+    push_cstr_len(ctel->phone);
+
+    return false;
+}
+
+void report_ctlist(int err, struct list*ctlist, void*arg)
+{
+    int cnt;
+    msgpack_packer *pk = arg;
+    msgpack_pack_array(pk, err ? 2 : 3);
+    push_cstr("contacts.res");
+    msgpack_pack_int(pk, err);
+    if(err) return;
+
+    cnt = list_count(ctlist);
+    msgpack_pack_array(pk, cnt);
+
+    list_apply(ctlist, true, ct_el, arg);
+
 }

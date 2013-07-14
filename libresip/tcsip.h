@@ -18,6 +18,7 @@ struct sip_handlers {
     void(*up_h)(struct uplink *up, int op, void*arg);
     void(*cert_h)(int err, struct pl*name, void*arg);
     void(*hist_h)(int err, char*idx, struct list*hlist, void*arg);
+    void(*ctlist_h)(int err, struct list*ctlist, void *arg);
 };
 
 void tcsip_set_online(struct tcsip *sip, int state);

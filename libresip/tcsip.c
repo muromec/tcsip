@@ -81,6 +81,7 @@ static struct sip_handlers msgpack_handlers = {
     .up_h = report_up,
     .cert_h = report_cert,
     .hist_h = report_hist,
+    .ctlist_h = report_ctlist,
 };
 
 static void tcsip_savecert(struct tcsip*sip, char *login, struct mbuf*data);
@@ -391,6 +392,10 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 
     if(!sip->contacts && sip->http) {
         contacts_alloc(&sip->contacts, (struct httpc *) sip->http);
+    }
+
+    if(sip->rarg) {
+        contacts_handler(sip->contacts, sip->rarg->ctlist_h, sip->rarg->arg);
     }
 
     mem_deref(capath);
