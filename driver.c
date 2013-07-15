@@ -13,6 +13,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include <openssl/engine.h>
 #include <srtp.h>
 #include <msgpack.h>
 #include "driver.h"
@@ -191,6 +192,8 @@ int libresip_driver(char *sock_path) {
 
     tmr_debug();
     mem_debug();
+
+    ENGINE_cleanup();
 
 fail:
     libre_close();

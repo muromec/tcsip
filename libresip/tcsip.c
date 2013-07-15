@@ -133,8 +133,10 @@ void sipc_destruct(void *arg)
     list_flush(sip->calls_c);
     mem_deref(sip->calls_c);
     sip->hist = mem_deref(sip->hist);
+    sip->contacts = mem_deref(sip->contacts);
     mem_deref(sip->uplinks_c);
     mem_deref(sip->cname);
+    mem_deref(sip->http);
 
     mem_deref(uac);
     if(sip->rarg)
@@ -142,6 +144,15 @@ void sipc_destruct(void *arg)
 
 
 }
+
+static void tchttp_destruct(void *arg) {
+  struct tchttp *http = arg;
+
+  mem_deref(http->tls);
+  mem_deref(http->dnsc);
+
+}
+
 int tcsip_alloc(struct tcsip**rp, int mode, void *rarg)
 {
     int err = 0;
@@ -166,7 +177,6 @@ int tcsip_alloc(struct tcsip**rp, int mode, void *rarg)
         sip->rarg = mem_deref(sip->rarg);
 
     sip->rmode = mode;
-    sip->http = NULL;
 
     mbuf_init(&sip->uac->apns);
 
@@ -458,7 +468,7 @@ static struct tchttp * get_http(char *cert) {
     int err;
     struct tchttp *http;
     int nsv;
-    http = mem_zalloc(sizeof(struct tchttp), NULL);
+    http = mem_zalloc(sizeof(struct tchttp), tchttp_destruct);
     if(!http)
         return NULL;
 
@@ -471,6 +481,8 @@ static struct tchttp * get_http(char *cert) {
 
     err = tls_alloc(&http->tls, TLS_METHOD_SSLV23, cert, NULL);
     tls_add_ca(http->tls, ca_cert);
+
+    mem_deref(ca_cert);
 
     err = dns_srv_get(NULL, 0, http->nsv, &http->nsc);
     if(err) {
@@ -508,7 +520,6 @@ static void http_cert_done(struct request *req, int code, void *arg) {
     case 200:
         data = http_data(req);
         tcsip_savecert(sip, http->login, data);
-        mem_deref(data); // FIXME: really?
         return;
     default:
         h_cert(sip, code, NULL);

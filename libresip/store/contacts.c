@@ -74,7 +74,6 @@ static struct list* blob_parse(struct mbuf *buf)
     arg = obj.via.array.ptr;
 
     if(arg->type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
-        re_printf("arg type failed\n");
         goto out;
     }
 
@@ -97,6 +96,8 @@ static struct list* blob_parse(struct mbuf *buf)
     for(i=0; i<ob_list->size;i++) {
 
         ctel = mem_zalloc(sizeof(struct contact_el), ctel_distruct);
+        if(!ctel)
+          goto skip;
 
         arg = ob_ct->via.array.ptr;
 
@@ -106,10 +107,12 @@ static struct list* blob_parse(struct mbuf *buf)
 
         list_append(ctlist, &ctel->le, ctel);
 
+skip:
         ob_ct ++;
     }
 
 out:
+    msgpack_unpacked_destroy(&msg);
     return ctlist;
 };
 
@@ -119,13 +122,10 @@ static void http_ct_done(struct request *req, int code, void *arg) {
     struct mbuf *data = NULL;
     struct list *ctlist = NULL;
 
-    re_printf("http done with code %d\n", code);
-
     switch(code) {
     case 200:
         data = http_data(req);
         ctlist = blob_parse(data);
-        mem_deref(data);
         err = 0;
     break;
 
@@ -135,7 +135,7 @@ static void http_ct_done(struct request *req, int code, void *arg) {
         ct->ch(err, ctlist, ct->ch_arg);
     }
 
-    mem_deref(data);
+    list_flush(ctlist);
     mem_deref(ctlist);
 }
 
@@ -146,8 +146,6 @@ static void http_ct_err(int err, void *arg) {
 
 
 int contacts_fetch(struct contacts *ct) {
-    re_printf("fetch contacts\n");
-
     struct request *req;
 
     http_init(ct->http, &req, "https://www.texr.net/api/contacts");
