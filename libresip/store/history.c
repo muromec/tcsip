@@ -135,6 +135,9 @@ static struct list* blob_parse(struct mbuf *buf) {
     msgpack_unpacked_init(&msg);
 
     err = msgpack_unpack_next(&msg, (char*)mbuf_buf(buf), mbuf_get_left(buf), NULL);
+    if(err != 1) {
+        goto out2;
+    }
 
     msgpack_object obj = msg.data;
     msgpack_object *ob_ct, *arg;
@@ -159,6 +162,9 @@ static struct list* blob_parse(struct mbuf *buf) {
         arg = ob_ct->via.array.ptr;
 
         hel = mem_zalloc(sizeof(struct hist_el), histel_distruct);
+        if(!hel)
+          goto skip;
+
         hel->event = (int)arg->via.i64; arg++;
         hel->time = (int)arg->via.i64; arg++;
 
@@ -168,6 +174,7 @@ static struct list* blob_parse(struct mbuf *buf) {
 
         list_append(hlist, &hel->le, hel);
 
+skip:
         ob_ct ++;
 
     }
@@ -175,6 +182,8 @@ static struct list* blob_parse(struct mbuf *buf) {
     list_sort(hlist, sort_handler, NULL);
 
 out:
+    msgpack_unpacked_destroy(&msg);
+out2:
     return hlist;
 }
 

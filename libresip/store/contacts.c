@@ -60,7 +60,7 @@ static struct list* blob_parse(struct mbuf *buf)
 
     err = msgpack_unpack_next(&msg, (char*)mbuf_buf(buf), mbuf_get_left(buf), NULL);
     if(err != 1) {
-        goto out;
+        goto out2;
     }
 
     msgpack_object obj = msg.data;
@@ -113,6 +113,7 @@ skip:
 
 out:
     msgpack_unpacked_destroy(&msg);
+out2:
     return ctlist;
 };
 
