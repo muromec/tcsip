@@ -22,6 +22,8 @@
 #include "x509util.h"
 #include "platpath.h"
 #include "http.h"
+
+#include "store/store.h"
 #include "store/history.h"
 #include "store/contacts.h"
 
@@ -391,18 +393,19 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 
     cert_h(0, &sip->user_c->dname);
 
-    if(sip->http) {
-        sip->http = mem_deref(sip->http);
-    }
         
+    sip->http = mem_deref(sip->http);
+    sip->hist = mem_deref(sip->hist);
+    sip->contacts = mem_deref(sip->contacts);
+
     sip->http = get_http(certpath);
 
-    if(!sip->hist)
-        history_alloc(&sip->hist, login);
+    struct store *st;
+    store_alloc(&st, login);
 
-    if(!sip->contacts && sip->http) {
-        contacts_alloc(&sip->contacts, (struct httpc *) sip->http);
-    }
+    history_alloc(&sip->hist, store_open(st, 'h'));
+
+    contacts_alloc(&sip->contacts, store_open(st, 'c'), (struct httpc *) sip->http);
 
     if(sip->rarg) {
         contacts_handler(sip->contacts, sip->rarg->ctlist_h, sip->rarg->arg);
@@ -410,6 +413,7 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 
     mem_deref(capath);
     mem_deref(certpath);
+    mem_deref(st);
 
     return 0;
 }

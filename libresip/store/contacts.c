@@ -1,15 +1,16 @@
 #include "re.h"
 #include <string.h>
 #include <sys/time.h>
-#include "platpath.h"
 #include "contacts.h"
+#include "store.h"
+
 #include <msgpack.h>
 
-#include "sqlite3.h"
 #include "http.h"
 
 struct contacts {
     struct httpc* http;
+    struct store_client *store;
     contact_h *ch;
     void *ch_arg;
 };
@@ -24,10 +25,15 @@ static void ctel_distruct(void *arg) {
 static void destruct(void *arg) {
     struct contacts *ct = arg;
     mem_deref(ct->http);
+    mem_deref(ct->store);
 }
 
-int contacts_alloc(struct contacts **rp, struct httpc*http) {
+int contacts_alloc(struct contacts **rp, struct store_client *stc, struct httpc*http) {
     int err;
+
+    if(!stc || !http)
+        return -EINVAL;
+
     struct contacts *ct = mem_zalloc(sizeof(struct contacts), destruct);
     if(!ct) {
         err = -ENOMEM;
@@ -35,6 +41,7 @@ int contacts_alloc(struct contacts **rp, struct httpc*http) {
     }
 
     ct->http = mem_ref(http);
+    ct->store = stc;
 
     *rp = ct;
 

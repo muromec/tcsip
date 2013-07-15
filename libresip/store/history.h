@@ -5,6 +5,7 @@ struct history;
 struct pl;
 struct list;
 struct le;
+struct store_client;
 
 enum hist_event {
     HIST_OUT=(1<<1),
@@ -25,7 +26,7 @@ struct hist_el {
     int time;
 };
 
-int history_alloc(struct history **rp, struct pl *login);
+int history_alloc(struct history **rp, struct store_client*s);
 int history_fetch(struct history *hist, const char *start_idx, char* *idx, struct list**);
 int history_next(struct history *hist, char**idx, struct list **bulk);
 int history_add(struct history *hist, int event, int ts, struct pl*key, struct pl *login, struct pl *name);
