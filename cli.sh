@@ -2,7 +2,7 @@
 
 set -e 
 
-CLI=./cli
+CLI=./texr-cli
 
 if [ ! -e ~/.texr.cert ]; then
     TD=$(mktemp -d)
