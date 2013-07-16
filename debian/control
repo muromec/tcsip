@@ -1,0 +1,9 @@
+Source: libresip
+Maintainer: Vadym Abramchuk <abramm@gmail.com>
+Section: net
+Priority: extra
+Build-Depends: libopus-dev, libspeex-dev, libsrtp0-dev
+
+Package: libresip-bin
+Architecture: all
+Description: libresip is a library used inside texr products
