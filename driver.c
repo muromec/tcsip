@@ -14,7 +14,7 @@
 #include <unistd.h>
 
 #include <openssl/engine.h>
-#include <srtp.h>
+#include <srtp/srtp.h>
 #include <msgpack.h>
 #include "driver.h"
 
