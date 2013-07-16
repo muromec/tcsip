@@ -1,2 +1,4 @@
 texr-cli usr/bin/texr-cli
 texr-daemon usr/bin/texr-daemon
+certs/CA.cert usr/share/texr/
+certs/STARTSSL.cert usr/share/texr/
