@@ -21,7 +21,6 @@ LIBS-$(apple) += -framework AudioUnit
 LIBS-$(apple) += -framework CoreAudio
 LIBS-$(apple) +=  -Wl,-flat_namespace
 LIBS-$(android) += -llog -lOpenSLES
-LIBS-static += $(DEP)/libjson.a $(DEP)/libjson-c.a
 
 
 DEP = deps-armlinux
