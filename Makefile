@@ -32,7 +32,7 @@ LIBS += $(LIBS-static) $(LIBS-static-y)
 
 LIBS += $(LIBS-y)
 
-all: cli
+all: texr-cli
 
 OPT_FLAGS := -fPIC -O2
 
@@ -53,14 +53,14 @@ objects_driver_cli += driver.o driver_cli.o
 
 CC := gcc
 
-all: cli driver 
+all: texr-cli texr-daemon
 	
 shared: libredriver.so
 
-cli: cli.o $(objects) $(LIBS-static)
+texr-cli: cli.o $(objects) $(LIBS-static)
 	$(CC) -Wl,-undefined,error  $< $(objects) $(LIBS-static) $(LIBS) -o $@
 
-driver: $(objects_driver_cli) $(LIBS-static)
+texr-daemon: $(objects_driver_cli) $(LIBS-static)
 	$(CC) $(objects_driver_cli) $(LIBS-static) $(LIBS) -o $@
 
 libredriver.so: driver.o $(objects) $(LIBS-static)
@@ -69,4 +69,4 @@ libredriver.so: driver.o $(objects) $(LIBS-static)
 
 
 clean:
-	rm -f $(objects) cli.o driver.o
+	rm -f $(objects) cli.o driver.o texr-cli texr-daemon
