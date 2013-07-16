@@ -1,5 +1,5 @@
 #include "rtp_io.h"
-#include "opus.h"
+#include <opus/opus.h>
 #include <sys/time.h>
 
 typedef struct {

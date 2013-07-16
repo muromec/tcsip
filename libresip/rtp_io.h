@@ -1,4 +1,4 @@
-#include <srtp.h>
+#include <srtp/srtp.h>
 #include <speex/speex.h>
 
 #include "re.h"

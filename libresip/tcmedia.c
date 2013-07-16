@@ -2,7 +2,7 @@
 #include "ajitter.h"
 #include "txsip_private.h"
 #include "rtp_io.h"
-#include <srtp.h>
+#include <srtp/srtp.h>
 #include "tcsipcall.h"
 #include "tcmedia.h"
 #include <sys/time.h>
