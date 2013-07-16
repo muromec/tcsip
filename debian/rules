@@ -2,6 +2,6 @@
 
 %:
 	dh $@
-#override_dh_auto_build:
-
+override_dh_auto_build:
+	make DEP=deps-x86_64linux
 override_dh_auto_install:
