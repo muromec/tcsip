@@ -53,7 +53,9 @@ objects_driver_cli += driver.o driver_cli.o
 
 CC := gcc
 
-all: cli driver libredriver.so
+all: cli driver 
+	
+shared: libredriver.so
 
 cli: cli.o $(objects) $(LIBS-static)
 	$(CC) -Wl,-undefined,error  $< $(objects) $(LIBS-static) $(LIBS) -o $@
