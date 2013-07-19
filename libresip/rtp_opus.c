@@ -2,6 +2,9 @@
 #include <opus/opus.h>
 #include <sys/time.h>
 
+#define OPUS_SRATE 48000
+#define OPUS_MS (OPUS_SRATE/50)
+
 typedef struct {
     int magic;
     srtp_t srtp_out;
@@ -65,7 +68,7 @@ void rtp_send_opus(void *varg)
     unsigned char *obuf;
     short *ibuf;
 restart:
-    ibuf = (short*)ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
+    ibuf = (short*)ajitter_get_chunk(arg->record_jitter, arg->frame_size, &len);
 
     if(!ibuf)
         goto timer;
@@ -86,6 +89,8 @@ restart:
 
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 
+    arg->ts += OPUS_MS;
+
     goto restart;
 
 timer:
@@ -95,6 +100,8 @@ timer:
 rtp_send_ctx* rtp_send_opus_init() {
 
     int err;
+    struct timeval now;
+
     rtp_send_opus_ctx *send_ctx = malloc(sizeof(rtp_send_opus_ctx));
     tmr_init(&send_ctx->tmr);
     send_ctx->mb = mbuf_alloc(400 + RTP_HEADER_SIZE);
@@ -103,6 +110,11 @@ rtp_send_ctx* rtp_send_opus_init() {
     send_ctx->enc = opus_encoder_create(8000, 1, OPUS_APPLICATION_VOIP, &err);
 
     send_ctx->magic = 0x1ee1F00D;
+
+    gettimeofday(&now, NULL);
+
+    send_ctx->ts = now.tv_sec >> 4;
+
     return (rtp_send_ctx*)send_ctx;
 }
 
