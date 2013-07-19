@@ -245,25 +245,27 @@ int tcmedia_setup(struct tcmedia*media, call_dir_t dir)
     sdp_media_set_lattr(media->sdp_media_s, true, "crypto", crypto_line);
     sdp_media_set_lattr(media->sdp_media_sf, true, "crypto", crypto_line);
 
-#define FMT_CH(pt, name, srate, ch) {\
+#define FMT_X(pt, name, srate, ch, p) {\
     err |= sdp_format_add(NULL, media->sdp_media, false,\
 	pt, name, srate, ch,\
-	 NULL, NULL, NULL, false, NULL);\
+	 NULL, NULL, NULL, false, p);\
     err |= sdp_format_add(NULL, media->sdp_media_s, false,\
 	pt, name, srate, ch,\
-	 NULL, NULL, NULL, false, NULL);\
+	 NULL, NULL, NULL, false, p);\
     err |= sdp_format_add(NULL, media->sdp_media_sf, false,\
 	pt, name, srate, ch,\
-	 NULL, NULL, NULL, false, NULL);}
+	 NULL, NULL, NULL, false, p);}
 
-#define FMT(pt, name) FMT_CH(pt, name, 8000, 1)
+#define FMT(pt, name) FMT_X(pt, name, 8000, 1, NULL)
+#define FMT_CH(pt, name, srate, ch) FMT_X(pt, name, srate, ch, NULL)
+
     sdp_media_set_laddr_rtcp(media->sdp_media, rtcp_sock(media->rtp));
     sdp_media_set_laddr_rtcp(media->sdp_media_s, rtcp_sock(media->rtp));
     sdp_media_set_laddr_rtcp(media->sdp_media_sf, rtcp_sock(media->rtp));
 
+    FMT_X("101", "opus", 48000, 2, "minptime=10");
     FMT("97", "speex");
     FMT("0", "PCMU");
-    FMT_CH("101", "opus", 4800, 2);
 
     stun_server_discover(&media->stun_dns, media->uac->dnsc,
 	stun_usage_binding,  stun_proto_udp,
