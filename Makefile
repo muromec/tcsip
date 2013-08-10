@@ -23,7 +23,6 @@ LIBS-$(apple) +=  -Wl,-flat_namespace
 LIBS-$(android) += -llog -lOpenSLES
 
 
-DEP = deps-armlinux
 LIBS-static += $(DEP)/libre.a  $(DEP)/libsrtp.a $(DEP)/libopus.a
 LIBS-static += $(DEP)/libmsgpack.a
 LIBS-static-$(android) += $(DEP)/libssl.a $(DEP)/libcrypto.a
@@ -35,21 +34,17 @@ LIBS += $(LIBS-y)
 all: texr-cli
 
 OPT_FLAGS := -fPIC -O2
+sources = $(patsubst %,libresip/%.c,$(lobj))
+sources += g711/g711.c
+sources += rehttp/http.c rehttp/auth.c
 
-%.o: %.c
-	$(CC) -std=gnu99  $< -o $@ -c $(INCL) $(ADD_INCL) $(RE_CFLAGS) $(OPT_FLAGS)
+sources_cli = $(sources) cli.c
+sources_libdriver = $(sources) driver.c
+sources_daemon = $(sources) driver.c driver_cli.c
 
-objects += $(patsubst %,libresip/%.o,$(lobj))
-
-objects += g711/g711.o
-objects += rehttp/http.o rehttp/auth.o
-
-objects_driver = $(objects)
-objects_driver += driver.o
-
-objects_driver_cli = $(objects)
-objects_driver_cli += driver.o driver_cli.o
-
+objects_cli = $(patsubst %.c,$B/%.o,$(sources_cli))
+objects_libdriver = $(patsubst %.c,$B/%.o,$(sources_libdriver))
+objects_daemon = $(patsubst %.c,$B/%.o,$(sources_daemon))
 
 CC := gcc
 
@@ -57,16 +52,20 @@ all: texr-cli texr-daemon
 	
 shared: libredriver.so
 
-texr-cli: cli.o $(objects) $(LIBS-static)
-	$(CC) -Wl,-undefined,error  $< $(objects) $(LIBS-static) $(LIBS) -o $@
+$(B)/%.o: %.c
+	[ -d $(shell dirname $@) ] || mkdir -p $(shell dirname $@)
+	$(CC) -std=gnu99  $< -o $@ -c $(INCL) $(ADD_INCL) $(RE_CFLAGS) $(OPT_FLAGS)
 
-texr-daemon: $(objects_driver_cli) $(LIBS-static)
-	$(CC) $(objects_driver_cli) $(LIBS-static) $(LIBS) -o $@
 
-libredriver.so: driver.o $(objects) $(LIBS-static)
-	$(CC) -shared -Wl,-soname,libredriver.so -o libredriver.so $< $(objects)  $(LIBS-static) $(LIBS) 
+texr-cli: $(objects_cli) $(LIBS-static)
+	$(CC) -Wl,-undefined,error $(objects_cli) $(LIBS-static) $(LIBS) -o $@
 
+texr-daemon: $(objects_daemon) $(LIBS-static)
+	$(CC) $(objects_daemon) $(LIBS-static) $(LIBS) -o $@
+
+libredriver.so: $(objects_libdriver) $(LIBS-static)
+	$(CC) -shared -Wl,-soname,libredriver.so -o libredriver.so $< $(objects_libddriver)  $(LIBS-static) $(LIBS) 
 
 
 clean:
-	rm -f $(objects) cli.o driver.o texr-cli texr-daemon
+	rm -f $(objects) texr-cli texr-daemon libredriver.so

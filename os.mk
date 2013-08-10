@@ -1,10 +1,19 @@
 linux=n
 apple=n
 android=n
-ifeq ($(shell uname -s),Darwin)
+
+DEP = deps-armlinux
+
+OS=$(shell uname -s)
+ARCH=$(shell uname -m)
+ifeq ($(OS),Darwin)
 apple=y
+DEP := deps
 endif
 
-ifeq ($(shell uname -s),Linux)
+ifeq ($(OS),Linux)
 linux=y
 endif
+
+
+B = build-$(OS)-$(ARCH)
