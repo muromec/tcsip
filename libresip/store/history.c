@@ -27,7 +27,7 @@ void hist_dealloc(void *arg)
 
 int history_alloc(struct history **rp, struct store_client *stc)
 {
-    int err;
+    int err = 0;
     struct history *hist;
 
     *rp = NULL;
@@ -144,7 +144,10 @@ int history_fetch(struct history *hist, const char *start_idx, char**idx, struct
     if(!bulk)
       return -EINVAL;
 
+    list_sort(*bulk, sort_handler, NULL);
+
     get_idx(*bulk, idx);
+
     hist->iter = mem_deref(hist->iter);
     hist->iter = mem_ref(*idx);
 

@@ -403,7 +403,7 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
     struct store *st;
     store_alloc(&st, login);
 
-    history_alloc(&sip->hist, store_open(st, 'h'));
+    err = history_alloc(&sip->hist, store_open(st, 'h'));
 
     contacts_alloc(&sip->contacts, store_open(st, 'c'), (struct httpc *) sip->http);
 
