@@ -140,9 +140,15 @@ int get_idx(struct list *hlist, char **rp)
 int history_fetch(struct history *hist, const char *start_idx, char**idx, struct list **bulk)
 {
     int err;
-    err = store_fetch(hist->store, start_idx, hel_parse, bulk);
     if(!bulk)
       return -EINVAL;
+
+    err = store_fetch(hist->store, start_idx, hel_parse, bulk);
+    if(err)
+      return err;
+
+    if(!*bulk)
+      return 0;
 
     list_sort(*bulk, sort_handler, NULL);
 
