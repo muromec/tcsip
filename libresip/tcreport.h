@@ -1,6 +1,7 @@
 #ifndef TCREPORT_H
 #define TCREPORT_H
 enum reg_state;
+struct hist_el;
 struct tcsipcall;
 struct uplink;
 struct pl;
@@ -14,6 +15,7 @@ void report_up(struct uplink *up, int op, void*arg);
 void report_cert(int err, struct pl*name, void*arg);
 void report_hist(int err, char *idx, struct list*hlist, void*arg);
 void report_ctlist(int err, struct list*ctlist, void*arg);
+void report_histel(int err, int op, struct hist_el*, void*arg);
 
 bool write_history_el(struct le *le, void *arg);
 

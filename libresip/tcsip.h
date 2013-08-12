@@ -10,6 +10,8 @@ enum reg_state;
 struct tcsipcall;
 struct uplink;
 
+struct hist_el;
+
 struct sip_handlers {
     void *arg;
     void(*reg_h)(enum reg_state, void*arg);
@@ -18,6 +20,7 @@ struct sip_handlers {
     void(*up_h)(struct uplink *up, int op, void*arg);
     void(*cert_h)(int err, struct pl*name, void*arg);
     void(*hist_h)(int err, char*idx, struct list*hlist, void*arg);
+    void(*histel_h)(int err, int op, struct hist_el*el, void *arg);
     void(*ctlist_h)(int err, struct list*ctlist, void *arg);
 };
 

@@ -89,17 +89,23 @@ void report_cert(int err, struct pl*name, void*arg)
         push_pl((*name));
 }
 
-bool write_history_el(struct le *le, void *arg)
+static inline void do_write_history_el(msgpack_packer *pk, struct hist_el *hel)
 {
-    msgpack_packer *pk = arg;
-    struct hist_el *hel = le->data;
-
     msgpack_pack_array(pk, 5);
     msgpack_pack_int(pk, hel->event);
     msgpack_pack_int(pk, hel->time);
     push_cstr_len(hel->key);
     push_cstr_len(hel->login);
     push_cstr_len(hel->name);
+
+}
+
+bool write_history_el(struct le *le, void *arg)
+{
+    msgpack_packer *pk = arg;
+    struct hist_el *hel = le->data;
+
+    do_write_history_el(pk, hel);
 
     return false;
 }
@@ -148,4 +154,16 @@ void report_ctlist(int err, struct list*ctlist, void*arg)
 
     list_apply(ctlist, true, ct_el, arg);
 
+}
+
+void report_histel(int err, int op, struct hist_el* hel, void*arg)
+{
+    msgpack_packer *pk = arg;
+    msgpack_pack_array(pk, err ? 2 : 4);
+    push_cstr("hist.add");
+    msgpack_pack_int(pk, err);
+    if(err) return;
+
+    msgpack_pack_int(pk, op);
+    do_write_history_el(pk, hel);
 }

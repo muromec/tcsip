@@ -26,6 +26,8 @@ struct hist_el {
     int time;
 };
 
+typedef void(histel_h)(int err, int op, struct hist_el*, void*arg);
+
 int history_alloc(struct history **rp, struct store_client*s);
 int history_fetch(struct history *hist, const char *start_idx, char* *idx, struct list**);
 int history_next(struct history *hist, char**idx, struct list **bulk);

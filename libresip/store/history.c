@@ -11,6 +11,8 @@ struct history {
     char *iter;
     struct list *top;
     char *top_idx;
+    histel_h *hel_h;
+    void *hel_arg;
 };
 
 
@@ -52,6 +54,15 @@ fail_rel:
     mem_deref(hist);
 fail:
     return err;
+}
+
+void history_report(struct history *hist, histel_h* hel_h, void *arg)
+{
+    if(!hist)
+        return;
+
+    hist->hel_h = hel_h;
+    hist->hel_arg = arg;
 }
 
 int history_reset(struct history *hist)
@@ -203,6 +214,10 @@ int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct 
     re_sdprintf(&hel->login, "%r", login);
     re_sdprintf(&hel->name, "%r", name);
     re_sdprintf(&hel->key, "%r", ckey);
+
+    if(hist->hel_h) {
+        hist->hel_h(0, 0, hel, hist->hel_arg);
+    }
 
     list_append(hlist, &hel->le, hel);
 

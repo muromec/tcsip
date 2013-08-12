@@ -83,6 +83,7 @@ static struct sip_handlers msgpack_handlers = {
     .up_h = report_up,
     .cert_h = report_cert,
     .hist_h = report_hist,
+    .histel_h = report_histel,
     .ctlist_h = report_ctlist,
 };
 
@@ -409,6 +410,7 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 
     if(sip->rarg) {
         contacts_handler(sip->contacts, sip->rarg->ctlist_h, sip->rarg->arg);
+        history_report(sip->hist, sip->rarg->histel_h, sip->rarg->arg);
     }
 
     mem_deref(capath);
