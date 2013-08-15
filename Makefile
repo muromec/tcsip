@@ -5,8 +5,7 @@ RE_CFLAGS = -DHAVE_INTTYPES_H -DHAVE_STDBOOL_H \
     -DHAVE_INET6 -DHAVE_GAI_STRERROR -DRELEASE
 
 INCL = -Ideps/include/ -I./src -I./src/util -I../srtp/include/ -I../srtp/crypto/include/ \
-   -I../opus/include/ -I../speex/include  -Ig711 -I./rehttp/ \
-   -I../json-c/
+   -I../opus/include/ -I../speex/include  -Ig711 -I./src/rehttp/
 
 
 LIBS = -lm -lz 
@@ -35,8 +34,6 @@ all: texr-cli
 
 OPT_FLAGS := -fPIC -O2
 sources = $(patsubst %,src/%.c,$(lobj))
-sources += g711/g711.c
-sources += rehttp/http.c rehttp/auth.c
 
 sources_cli = $(sources) cli.c
 sources_libdriver = $(sources) driver.c
