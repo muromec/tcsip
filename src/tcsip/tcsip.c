@@ -19,7 +19,7 @@
 #include "tcsipcall.h"
 #include "tcuplinks.h"
 #include "tcsip.h"
-#include "x509util.h"
+#include "x509/x509util.h"
 #include "platpath.h"
 #include "http.h"
 

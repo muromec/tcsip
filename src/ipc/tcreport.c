@@ -3,11 +3,13 @@
 
 #include "strmacro.h"
 #include "tcreport.h"
-#include "tcsipreg.h"
-#include "tcsipcall.h"
-#include "txsip_private.h"
+#include "tcsip/tcsipreg.h"
+#include "tcsip/tcsipcall.h"
+#include "tcsip/txsip_private.h"
+
 #include "store/history.h"
 #include "store/contacts.h"
+
 #include <msgpack.h>
 
 void report_call_change(struct tcsipcall* call, void *arg) {

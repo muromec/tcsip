@@ -12,7 +12,7 @@
 #include <AudioToolbox/AudioServices.h>
 #endif
 #include <speex/speex_resampler.h>
-#include "ajitter.h"
+#include "jitter/ajitter.h"
 
 typedef enum {
 	DIR_CAP=1,

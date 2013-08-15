@@ -4,7 +4,8 @@
 #include "store.h"
 #include "sqlite3.h"
 #include <msgpack.h>
-#include "tcreport.h"
+
+#include "ipc/tcreport.h"
 
 struct history {
     struct store_client *store;

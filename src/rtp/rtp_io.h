@@ -2,7 +2,7 @@
 #include <speex/speex.h>
 
 #include "re.h"
-#include "ajitter.h"
+#include "jitter/ajitter.h"
 
 #if __APPLE__
 #define send_tmr(_f) tmr_start(&arg->tmr, 4, _f, varg);

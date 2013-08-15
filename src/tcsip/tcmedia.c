@@ -1,11 +1,13 @@
-#include "re.h"
-#include "ajitter.h"
-#include "txsip_private.h"
-#include "rtp_io.h"
 #include <srtp/srtp.h>
+#include <sys/time.h>
+
+#include "re.h"
+#include "jitter/ajitter.h"
+#include "txsip_private.h"
+#include "rtp/rtp_io.h"
+
 #include "tcsipcall.h"
 #include "tcmedia.h"
-#include <sys/time.h>
 
 #define O_LIM (320*12)
 
