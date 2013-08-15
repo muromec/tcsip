@@ -1,3 +1,3 @@
-[submodule "rehttp"]
-	path = rehttp
-        url = https://github.com/muromec/rehttp.git
+[submodule "src/rehttp"]
+	path = src/rehttp
+	url = https://github.com/muromec/rehttp.git
