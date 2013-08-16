@@ -13,7 +13,8 @@
 
 #include "txsip_private.h"
 
-#include "tcreport.h"
+#include "ipc/tcreport.h"
+
 #include "tcsipuser.h"
 #include "tcsipreg.h"
 #include "tcsipcall.h"
@@ -21,7 +22,7 @@
 #include "tcsip.h"
 #include "x509/x509util.h"
 #include "platpath.h"
-#include "http.h"
+#include "rehttp/http.h"
 
 #include "store/store.h"
 #include "store/history.h"

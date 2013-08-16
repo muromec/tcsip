@@ -1,17 +1,18 @@
 #include <errno.h>
 
 #include "re.h"
-#include "tcsip.h"
-#include "tcsipuser.h"
-#include "tcsipreg.h"
-#include "tcsipcall.h"
-#include "x509util.h"
+#include "tcsip/tcsip.h"
+#include "tcsip/tcsipuser.h"
+#include "tcsip/tcsipreg.h"
+#include "tcsip/tcsipcall.h"
+#include "x509/x509util.h"
+#include "store/history.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
-#include <store/history.h>
 
 #define USER_AGENT "Linux re"
 

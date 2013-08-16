@@ -1,10 +1,12 @@
 #include "re.h"
-#include "tcsip.h"
-#include "tcipc.h"
-#include "tcsipuser.h"
-#include "tcsipreg.h"
-#include "tcsipcall.h"
-#include "x509util.h"
+
+#include "tcsip/tcsip.h"
+#include "tcsip/tcsipuser.h"
+#include "tcsip/tcsipreg.h"
+#include "tcsip/tcsipcall.h"
+#include "ipc/tcipc.h"
+#include "x509/x509util.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>

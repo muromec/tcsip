@@ -19,6 +19,11 @@ lobj += x509/x509gen
 
 lobj += util/platpath
 
+lobj += g711/g711
+
+lobj += rehttp/http
+lobj += rehttp/auth
+
 lobj-$(linux) += sound/linux/asound
 lobj-$(apple) += sound/apple/sound
 lobj-$(apple) += sound/apple/sound_utils
