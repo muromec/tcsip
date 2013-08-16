@@ -18,6 +18,7 @@ void report_ctlist(int err, struct list*ctlist, void*arg);
 void report_histel(int err, int op, struct hist_el*, void*arg);
 
 bool write_history_el(struct le *le, void *arg);
+bool write_contact_el(struct le *le, void *arg);
 
 #define push_str(__s) {\
     msgpack_pack_raw(pk, [__s length]);\

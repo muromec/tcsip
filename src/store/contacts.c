@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include "contacts.h"
 #include "store.h"
+#include "ipc/tcreport.h"
 
 #include <msgpack.h>
 
@@ -14,6 +15,8 @@ struct contacts {
     contact_h *ch;
     void *ch_arg;
 };
+
+static void* ctel_parse(void *_arg);
 
 static void ctel_distruct(void *arg) {
     struct contact_el* ctel = arg;
@@ -89,28 +92,12 @@ static struct list* blob_parse(struct mbuf *buf)
     ob_list = &arg->via.array;
     ob_ct = ob_list->ptr;
 
-#define get_str(__dest) {\
-        msgpack_object_raw bstr;\
-        bstr = arg->via.raw;\
-        if(bstr.size > 0) {\
-            __dest = mem_alloc(bstr.size+1, NULL);\
-            __dest[bstr.size] = '\0';\
-            memcpy(__dest, bstr.ptr, bstr.size);\
-        } else {\
-            __dest = NULL;\
-        }}
 
     for(i=0; i<ob_list->size;i++) {
 
-        ctel = mem_zalloc(sizeof(struct contact_el), ctel_distruct);
+        ctel = ctel_parse(ob_ct->via.array.ptr);
         if(!ctel)
           goto skip;
-
-        arg = ob_ct->via.array.ptr;
-
-        get_str(ctel->login); arg++;
-        get_str(ctel->name); arg++;
-        get_str(ctel->phone); 
 
         list_append(ctlist, &ctel->le, ctel);
 
@@ -123,6 +110,66 @@ out:
 out2:
     return ctlist;
 };
+
+static bool sort_handler(struct le *le1, struct le *le2, void *arg)
+{
+	struct contact_el *cel1 = (struct contact_el *)le1->data;
+	struct contact_el *cel2 = (struct contact_el *)le2->data;
+	(void)arg;
+
+  char name1_0, name2_0;
+  int n = 0;
+
+  do {
+    name1_0 = cel1->name[n];
+    name2_0 = cel2->name[n];
+
+    if(name1_0 != name2_0) {
+      break;
+    }
+
+    n++;
+  } while((name1_0!='\0')&&(name2_0!='\0'));
+
+  return name1_0 < name2_0;
+}
+
+static int store_contacts(struct contacts *ct, struct list *ctlist)
+{
+    int err;
+    struct mbuf re_buf;
+    struct contact_el *ctel = NULL;
+    struct le *head_el;
+
+    char *key;
+
+    head_el = list_head(ctlist);
+    if(!head_el)
+      return -EINVAL;
+
+    ctel = head_el->data;
+
+    msgpack_sbuffer* buffer = msgpack_sbuffer_new();
+    msgpack_packer* pk = msgpack_packer_new(buffer, msgpack_sbuffer_write);
+
+    msgpack_pack_array(pk, list_count(ctlist));
+    list_apply(ctlist, true, write_contact_el, pk);
+
+    key = store_key(ct->store);
+    re_buf.buf = buffer->data;
+    re_buf.size = buffer->size;
+
+    err = store_add(ct->store, key, ctel->login, &re_buf);
+
+out:
+    mem_deref(key);
+
+    msgpack_sbuffer_free(buffer);
+    msgpack_packer_free(pk);
+
+
+    return err;
+}
 
 static void http_ct_done(struct request *req, int code, void *arg) {
     int err = -1;
@@ -138,6 +185,14 @@ static void http_ct_done(struct request *req, int code, void *arg) {
     break;
 
     }
+    if(err)
+      goto done;
+
+    list_sort(ctlist, sort_handler, NULL);
+
+    store_contacts(ct, ctlist);
+
+done:
 
     if(ct->ch) {
         ct->ch(err, ctlist, ct->ch_arg);
@@ -153,13 +208,63 @@ static void http_ct_err(int err, void *arg) {
 }
 
 
-int contacts_fetch(struct contacts *ct) {
+int contacts_fetch_http(struct contacts *ct) {
     struct request *req;
 
     http_init(ct->http, &req, "https://www.texr.net/api/contacts");
     http_cb(req, ct, http_ct_done, http_ct_err);
     http_header(req, "Accept", "application/msgpack");
     http_send(req);
+
+    return 0;
+}
+
+static void* ctel_parse(void *_arg) {
+    msgpack_object *arg = _arg;
+    struct contact_el *ctel;
+
+#define get_str(__dest) {\
+        msgpack_object_raw bstr;\
+        bstr = arg->via.raw;\
+        if(bstr.size > 0) {\
+            __dest = mem_alloc(bstr.size+1, NULL);\
+            __dest[bstr.size] = '\0';\
+            memcpy(__dest, bstr.ptr, bstr.size);\
+        } else {\
+            __dest = NULL;\
+        }}
+
+    ctel = mem_zalloc(sizeof(struct contact_el), ctel_distruct);
+    if(!ctel)
+      goto skip;
+
+
+    get_str(ctel->login); arg++;
+    get_str(ctel->name); arg++;
+    get_str(ctel->phone); 
+
+skip:
+    return ctel;
+}
+
+int contacts_fetch(struct contacts *ct) {
+    int err;
+    const char *start_idx = NULL;
+    struct list *bulk;
+
+    err = store_fetch(ct->store, start_idx, ctel_parse, &bulk);
+    
+    if(!bulk) {
+      contacts_fetch_http(ct);
+      return 0;
+    }
+
+    if(ct->ch) {
+        ct->ch(err, bulk, ct->ch_arg);
+    }
+
+    list_flush(bulk);
+    mem_deref(bulk);
 
     return 0;
 }

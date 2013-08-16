@@ -129,16 +129,22 @@ void report_hist(int err, char *idx, struct list*hlist, void*arg)
     list_apply(hlist, true, write_history_el, arg);
 }
 
-static bool ct_el(struct le *le, void *arg)
+void do_write_ctel(msgpack_packer *pk, struct contact_el *ctel)
 {
-    msgpack_packer *pk = arg;
-    struct contact_el *ctel = le->data;
-
     msgpack_pack_array(pk, 3);
     push_cstr_len(ctel->login);
     push_cstr_len(ctel->name);
     push_cstr_len(ctel->phone);
 
+}
+
+bool write_contact_el(struct le *le, void *arg)
+{
+    msgpack_packer *pk = arg;
+    struct contact_el *ctel = le->data;
+
+    do_write_ctel(pk, ctel);
+    
     return false;
 }
 
@@ -154,7 +160,7 @@ void report_ctlist(int err, struct list*ctlist, void*arg)
     cnt = list_count(ctlist);
     msgpack_pack_array(pk, cnt);
 
-    list_apply(ctlist, true, ct_el, arg);
+    list_apply(ctlist, true, write_contact_el, arg);
 
 }
 
