@@ -1,8 +1,0 @@
-//
-// Prefix header for all source files of the 'libresip-osx' target in the 'libresip-osx' project
-//
-
-#ifdef __OBJC__
-    #import <Cocoa/Cocoa.h>
-    #import "cross.h"
-#endif
