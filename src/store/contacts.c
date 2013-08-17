@@ -14,6 +14,7 @@ struct contacts {
     struct store_client *store;
     contact_h *ch;
     void *ch_arg;
+    char *cur_idx;
 };
 
 static void* ctel_parse(void *_arg);
@@ -45,6 +46,7 @@ int contacts_alloc(struct contacts **rp, struct store_client *stc, struct httpc*
 
     ct->http = mem_ref(http);
     ct->store = stc;
+    store_order(stc, 1);
 
     *rp = ct;
 
@@ -303,14 +305,22 @@ skip:
 
 int contacts_fetch(struct contacts *ct) {
     int err;
-    const char *start_idx = NULL;
     struct list *bulk;
+    struct le *le;
+    struct contact_el *ctel;
 
-    err = store_fetch(ct->store, start_idx, ctel_parse, &bulk);
+    err = store_fetch(ct->store, ct->cur_idx, ctel_parse, &bulk);
     
-    if(!bulk) {
+    if(!bulk && (ct->cur_idx == NULL)) {
       contacts_fetch_http(ct);
       return 0;
+    }
+
+    le = list_head(bulk);
+    if(le && le->data) {
+      ctel = le->data;
+      mem_deref(ct->cur_idx);
+      ct->cur_idx = mem_ref(ctel->login);
     }
 
     if(ct->ch) {

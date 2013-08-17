@@ -25,6 +25,18 @@ static char *FETCH_SQL_N = "SELECT blob, idx, blob_key from blob \
             ORDER BY idx DESC \
             LIMIT 1";
 
+static char *FETCH_SQL_ASC = "SELECT blob, idx, blob_key from blob \
+            where blob_key GLOB ? \
+            and idx > ? \
+            and curnt=1 \
+            ORDER BY idx ASC \
+            LIMIT 1";
+
+static char *FETCH_SQL_ASC_N = "SELECT blob, idx, blob_key from blob \
+            where blob_key GLOB ? \
+            and curnt=1 \
+            ORDER BY idx ASC \
+            LIMIT 1";
 
 struct store {
     sqlite3 *db;
@@ -36,6 +48,7 @@ struct store_client {
     char *key_glob;
     char *prefix;
     struct store *store;
+    int order;
 };
 
 int store_obsolete(struct store_client *stc, char *key, char *idx);
@@ -157,6 +170,14 @@ char *store_key(struct store_client *stc)
         NULL;
 }
 
+void store_order(struct store_client *stc, int val)
+{
+    if(!stc)
+        return;
+
+    stc->order = val;
+}
+
 static void destruct_stc(void *arg)
 {
     struct store_client *stc = arg;
@@ -247,7 +268,11 @@ int store_fetch(struct store_client *stc, const char *start_idx, parse_h *parse_
     *rp = NULL;
 
     err = sqlite3_prepare_v2(stc->db,
-            start_idx ? FETCH_SQL : FETCH_SQL_N,
+            stc->order ? (
+              start_idx ? FETCH_SQL_ASC : FETCH_SQL_ASC_N
+            ) : (
+              start_idx ? FETCH_SQL : FETCH_SQL_N
+            ),
             -1,
             &stmt, 0);
 
