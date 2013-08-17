@@ -171,11 +171,55 @@ out:
     return err;
 }
 
+struct slice_state {
+    struct list *list;
+    int limit;
+};
+
+static bool do_slice(struct le *le, void *arg)
+{
+    struct slice_state *state = arg;
+    struct list *orig, *new;
+
+    state->limit --;
+
+    if(state->limit > 0) 
+      return false;
+
+    orig = le->list;
+    new = state->list;
+
+    new->tail = orig->tail;
+    orig->tail = le->prev;
+
+    new->head = le;
+
+    le->prev->next = NULL;
+    le->prev = NULL;
+
+    return true;
+}
+
+static bool list_slice(struct list *orig, struct list *rp, int limit)
+{
+    struct le *head;
+    struct slice_state state;
+    state.limit = limit;
+    state.list = rp;
+
+    head = list_head(orig);
+    rp->head = NULL;
+    rp->tail = NULL;
+
+    list_apply(orig, true, do_slice, &state);
+    return (head != NULL);
+}
+
 static void http_ct_done(struct request *req, int code, void *arg) {
     int err = -1;
     struct contacts *ct = arg; 
     struct mbuf *data = NULL;
-    struct list *ctlist = NULL;
+    struct list *ctlist = NULL, head, tail;
 
     switch(code) {
     case 200:
@@ -190,13 +234,23 @@ static void http_ct_done(struct request *req, int code, void *arg) {
 
     list_sort(ctlist, sort_handler, NULL);
 
-    store_contacts(ct, ctlist);
+    head.head = ctlist->head;
+    head.tail = ctlist->tail;
+
+    while(list_slice(&head, &tail, 3)) {
+      if(ct->ch) {
+          ct->ch(err, &head, ct->ch_arg);
+      }
+
+      store_contacts(ct, &head);
+
+      list_flush(&head);
+
+      head.head = tail.head;
+      head.tail = tail.tail;
+    }
 
 done:
-
-    if(ct->ch) {
-        ct->ch(err, ctlist, ct->ch_arg);
-    }
 
     list_flush(ctlist);
     mem_deref(ctlist);
