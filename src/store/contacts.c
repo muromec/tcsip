@@ -9,6 +9,8 @@
 
 #include "http.h"
 
+#define BUNDLE_SIZE 30
+
 struct contacts {
     struct httpc* http;
     struct store_client *store;
@@ -254,7 +256,7 @@ static void http_ct_done(struct request *req, int code, void *arg) {
     head.head = ctlist->head;
     head.tail = ctlist->tail;
 
-    while(list_slice(&head, &tail, 3)) {
+    while(list_slice(&head, &tail, BUNDLE_SIZE)) {
       if(cb && ct->ch) {
           ct->ch(err, &head, ct->ch_arg);
           cb = 0;
