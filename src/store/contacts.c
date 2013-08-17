@@ -217,8 +217,23 @@ static bool list_slice(struct list *orig, struct list *rp, int limit)
     return (head != NULL);
 }
 
+inline static void cur_idx(struct contacts *ct, struct list *list)
+{
+
+    struct le *le;
+    struct contact_el *ctel;
+
+    le = list_head(list);
+    if(le && le->data) {
+      ctel = le->data;
+      mem_deref(ct->cur_idx);
+      ct->cur_idx = mem_ref(ctel->login);
+    }
+
+}
+
 static void http_ct_done(struct request *req, int code, void *arg) {
-    int err = -1;
+    int err = -1, cb = 1;
     struct contacts *ct = arg; 
     struct mbuf *data = NULL;
     struct list *ctlist = NULL, head, tail;
@@ -240,8 +255,10 @@ static void http_ct_done(struct request *req, int code, void *arg) {
     head.tail = ctlist->tail;
 
     while(list_slice(&head, &tail, 3)) {
-      if(ct->ch) {
+      if(cb && ct->ch) {
           ct->ch(err, &head, ct->ch_arg);
+          cb = 0;
+          cur_idx(ct, &head);
       }
 
       store_contacts(ct, &head);
@@ -254,7 +271,6 @@ static void http_ct_done(struct request *req, int code, void *arg) {
 
 done:
 
-    list_flush(ctlist);
     mem_deref(ctlist);
 }
 
@@ -306,8 +322,6 @@ skip:
 int contacts_fetch(struct contacts *ct) {
     int err;
     struct list *bulk;
-    struct le *le;
-    struct contact_el *ctel;
 
     err = store_fetch(ct->store, ct->cur_idx, ctel_parse, &bulk);
     
@@ -316,12 +330,7 @@ int contacts_fetch(struct contacts *ct) {
       return 0;
     }
 
-    le = list_head(bulk);
-    if(le && le->data) {
-      ctel = le->data;
-      mem_deref(ct->cur_idx);
-      ct->cur_idx = mem_ref(ctel->login);
-    }
+    cur_idx(ct, bulk);
 
     if(ct->ch) {
         ct->ch(err, bulk, ct->ch_arg);
