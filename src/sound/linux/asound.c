@@ -2,7 +2,7 @@
 #include <alsa/asoundlib.h>
 #include <stdio.h>
 #include "asound.h"
-#include "ajitter.h"
+#include "jitter/ajitter.h"
 #include <sys/time.h>
 
 #define PCM_DEVICE "default"
