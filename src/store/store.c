@@ -38,6 +38,15 @@ static char *FETCH_SQL_ASC_N = "SELECT blob, idx, blob_key from blob \
             ORDER BY idx ASC \
             LIMIT 1";
 
+static char *STORE_TABLES = "CREATE TABLE \
+            IF NOT EXISTS \
+            blob \
+            (id INTEGER PRIMARY KEY AUTOINCREMENT, \
+             blob_key string, \
+             blob blob, \
+             idx string, \
+             curnt INTEGER);";
+
 struct store {
     sqlite3 *db;
     char *login;
@@ -61,6 +70,26 @@ static void destruct(void *arg)
     mem_deref(store->login);
 }
 
+int store_create_table(sqlite3 *db) {
+    int err;
+    sqlite3_stmt *stmt;
+
+    err = sqlite3_prepare_v2(db, STORE_TABLES, -1, &stmt, 0);
+    if(err)
+        goto done;
+
+    err = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    switch(err) {
+    case SQLITE_DONE:
+    case SQLITE_ROW:
+        err = 0;
+    }
+
+done:
+    return err;
+}
 
 int store_alloc(struct store **rp, struct pl *plogin) {
     int err = -1;
@@ -88,6 +117,8 @@ int store_alloc(struct store **rp, struct pl *plogin) {
         goto fail;
 
     pl_strdup(&store->login, plogin);
+
+    store_create_table(store->db);
 
     *rp = store;
 
