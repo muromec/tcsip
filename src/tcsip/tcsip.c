@@ -2,9 +2,6 @@
 #include <sys/time.h>
 #include <msgpack.h>
 #include "strmacro.h"
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #define DEBUG_MODULE "txsip"
 #define DEBUG_LEVEL 5
@@ -21,12 +18,15 @@
 #include "tcuplinks.h"
 #include "tcsip.h"
 #include "x509/x509util.h"
-#include "platpath.h"
+#include "util/platpath.h"
 #include "rehttp/http.h"
 
 #include "store/store.h"
 #include "store/history.h"
 #include "store/contacts.h"
+
+#include "api/login.h"
+#include "api/api.h"
 
 #if __APPLE__
 #include "sound/apple/sound.h"
@@ -47,14 +47,6 @@
 
 int ui_idiom;
 
-struct tchttp {
-    struct dnsc *dnsc;
-    struct tls *tls;
-    struct sa nsv[16];
-    uint32_t nsc;
-    char* login;
-    char* password;
-};
 
 struct tcsip {
 
@@ -74,7 +66,6 @@ struct tcsip {
     struct sip_handlers *rarg;
     void *xdnsc; // XXX we have two dns clients
     struct tchttp *http;
-    void *priv_key;
 };
 
 static struct sip_handlers msgpack_handlers = {
@@ -88,13 +79,10 @@ static struct sip_handlers msgpack_handlers = {
     .ctlist_h = report_ctlist,
 };
 
-static void tcsip_savecert(struct tcsip*sip, char *login, struct mbuf*data);
-static void inline h_cert(struct tcsip*sip, int code, struct pl *name);
 void tcsip_call_incoming(struct tcsip* sip, const struct sip_msg *msg);
 static void sip_init(struct tcsip*sip);
 static void create_ua(struct tcsip*sip);
 void listen_laddr(struct tcsip*sip);
-static struct tchttp * get_http(char *login);
 
 /* called upon incoming calls */
 static void connect_handler(const struct sip_msg *msg, void *arg)
@@ -149,13 +137,6 @@ void sipc_destruct(void *arg)
 
 }
 
-static void tchttp_destruct(void *arg) {
-  struct tchttp *http = arg;
-
-  mem_deref(http->tls);
-  mem_deref(http->dnsc);
-
-}
 
 int tcsip_alloc(struct tcsip**rp, int mode, void *rarg)
 {
@@ -327,16 +308,6 @@ void tcsip_uuid(struct tcsip *sip, struct pl *uuid)
     pl_dup(&uac->instance_id, uuid);
 }
 
-static inline void h_cert(struct tcsip*sip, int code, struct pl *name)
-{
-#define cert_h(_code, _name) {\
-    if(sip->rarg && sip->rarg->cert_h){\
-        sip->rarg->cert_h(_code, _name, sip->rarg->arg);\
-    }}
-
-    cert_h(code, name);
-}
-
 
 int tcsip_local(struct tcsip* sip, struct pl* login)
 {
@@ -400,7 +371,7 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
     sip->hist = mem_deref(sip->hist);
     sip->contacts = mem_deref(sip->contacts);
 
-    sip->http = get_http(certpath);
+    sip->http = tchttp_alloc(certpath);
 
     struct store *st;
     store_alloc(&st, login);
@@ -471,139 +442,19 @@ fail:
     return;
 }
 
-static struct tchttp * get_http(char *cert) {
-    int err;
-    struct tchttp *http;
-    int nsv;
-    http = mem_zalloc(sizeof(struct tchttp), tchttp_destruct);
-    if(!http)
-        return NULL;
-
-    char *home, *ca_cert;
-    home = getenv("HOME");
-
-    re_sdprintf(&ca_cert, "%s/STARTSSL.cert", home);
-
-    http->nsc = ARRAY_SIZE(http->nsv);
-
-    err = tls_alloc(&http->tls, TLS_METHOD_SSLV23, cert, NULL);
-    tls_add_ca(http->tls, ca_cert);
-
-    mem_deref(ca_cert);
-
-    err = dns_srv_get(NULL, 0, http->nsv, &http->nsc);
-    if(err) {
-        http->nsc = 0;
-    }
-    err = dnsc_alloc(&http->dnsc, NULL, http->nsv, http->nsc);
-
-    if(http->dnsc && !http->nsc) {
-        sa_set_str(http->nsv, "8.8.8.8", 53);
-        http->nsc = 1;
-    }
-    dnsc_srv_set(http->dnsc, http->nsv, http->nsc);
-
-    return http;
-}
-
-static void http_cert_done(struct request *req, int code, void *arg) {
-    struct tcsip *sip = arg;
-    struct tchttp *http = sip->http;
-    struct mbuf *data;
-
-    struct request *new_req;
-    int err;
-
-    switch(code) {
-    case 401:
-        err = http_auth(req, &new_req, http->login, http->password);
-        if(err) {
-            h_cert(sip, 403, NULL);
-        } else {
-            http_header(new_req, "Accept", "application/x-x509-user-cert");
-            http_send(new_req);
-        }
-        return;
-    case 200:
-        data = http_data(req);
-        tcsip_savecert(sip, http->login, data);
-        return;
-    default:
-        h_cert(sip, code, NULL);
-    }
-}
-
-static void http_cert_err(int err, void *arg) {
-    struct tcsip *sip = arg;
-    h_cert(sip, err, NULL);
-}
 
 int tcsip_get_cert(struct tcsip* sip, struct pl* login, struct pl*password) {
-    int err;
-    struct mbuf *pub, *priv;
-    struct tchttp *http;
-    struct request *req;
-
-    x509_pub_priv(&priv, &pub);
-    if(sip->http) {
-        http = sip->http;
-    } else {
-        http = get_http(NULL);
-        if(!http) {
-            err = -ENOMEM;
-            goto fail;
-        }
-        sip->http = http;
-    }
-
-    re_sdprintf(&http->login, "%r", login);
-    re_sdprintf(&http->password, "%r", password);
-
-    http_init((struct httpc*)http, &req, "https://www.texr.net/api/cert");
-    http_cb(req, sip, http_cert_done, http_cert_err);
-    http_post(req, NULL, (char*)mbuf_buf(pub));
-    http_header(req, "Accept", "application/x-x509-user-cert");
-    http_send(req);
-
-    sip->priv_key = priv;
-
-    mem_deref(pub);
-
-    return 0;
-
-fail:
-    return err;
+    tcapi_login(sip, login, password);
 }
 
-static void tcsip_savecert(struct tcsip*sip, char *clogin, struct mbuf*data) {
+int tcsip_report_cert(struct tcsip*sip, int code, struct pl *name)
+{
+#define cert_h(_code, _name) {\
+    if(sip->rarg && sip->rarg->cert_h){\
+        sip->rarg->cert_h(_code, _name, sip->rarg->arg);\
+    }}
 
-    int wfd;
-    struct pl login;
-    char *certpath, *capath;
-    struct mbuf *priv = sip->priv_key;
-
-    pl_set_str(&login, clogin);
-
-    platpath(&login, &certpath, &capath);
-
-    unlink(certpath);
-    wfd = open(certpath, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
-    if(wfd < 0) {
-        printf("failed to open %s\n", certpath);
-        h_cert(sip, 10, NULL);
-        return;
-    }
-    fchmod(wfd, S_IRUSR | S_IRUSR);
-
-    write(wfd, mbuf_buf(data), mbuf_get_left(data));
-    write(wfd, "\n", 1);
-    write(wfd, mbuf_buf(priv), mbuf_get_left(priv));
-    close(wfd);
-
-    mem_deref(priv);
-    sip->priv_key = NULL;
-
-    tcsip_local(sip, &login);
+    cert_h(code, name);
 }
 
 struct sip_addr *tcsip_user(struct tcsip*sip)

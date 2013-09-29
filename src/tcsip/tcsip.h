@@ -39,5 +39,7 @@ struct sip_addr *tcsip_user(struct tcsip*sip);
 int tcsip_hist_fetch(struct tcsip* sip, char **pidx, struct list **);
 void tcsip_hist_ipc(struct tcsip* sip, int flag);
 void tcsip_contacts_ipc(struct tcsip* sip);
+int tcsip_report_cert(struct tcsip*sip, int code, struct pl *name);
+
 
 #endif

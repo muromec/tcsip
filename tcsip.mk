@@ -14,6 +14,9 @@ lobj += tcsip/tcsip
 lobj += ipc/tcipc
 lobj += ipc/tcreport
 
+lobj += api/http
+lobj += api/login
+
 lobj += x509/x509util
 lobj += x509/x509gen
 
