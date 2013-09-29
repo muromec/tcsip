@@ -99,14 +99,18 @@ void one_add(struct tcuplinks *ups, struct uplink*up)
     void *found;
     found = hash_lookup(ups->data_c, hash, apply_find, NULL);
 
-    if(found) {
-	ups->up_h(up, 2, ups->up_arg);
-    } else {
-	ups->up_h(up, 1, ups->up_arg);
+    hash_append(ups->uris_c, hash, &nup->le, nup);
 
+    if (ups->up_h == NULL) {
+        return;
     }
 
-    hash_append(ups->uris_c, hash, &nup->le, nup);
+    if(found) {
+	      ups->up_h(up, 2, ups->up_arg);
+    } else {
+	      ups->up_h(up, 1, ups->up_arg);
+    }
+
 }
 
 static void upd(struct tcuplinks *ups, struct list*upl)
