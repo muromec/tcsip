@@ -20,6 +20,10 @@
 #include <msgpack.h>
 #include "driver.h"
 
+#if __APPLE__
+#include "sound/apple/sound.h"
+#endif
+
 struct cli_app {
     struct tcsip *sip;
     struct sip_handlers *handlers;

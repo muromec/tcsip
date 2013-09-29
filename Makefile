@@ -55,7 +55,7 @@ endif
 
 $(B)/%.o: %.c
 	[ -d $(shell dirname $@) ] || mkdir -p $(shell dirname $@)
-	$(CC) -std=gnu99  $< -o $@ -c $(INCL) $(ADD_INCL) $(RE_CFLAGS) $(OPT_FLAGS)
+	$(CC) -std=gnu99 -Werror $< -o $@ -c $(INCL) $(ADD_INCL) $(RE_CFLAGS) $(OPT_FLAGS)
 
 
 texr-cli: $(objects_cli) $(LIBS-static)

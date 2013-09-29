@@ -38,9 +38,6 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
 #define shift(__x, __y) ({__x.p = __y->via.raw.ptr;\
 		__x.l = __y->via.raw.size; arg++;})
 
-    msgpack_object_print(stdout, ob);
-    printf("\n");
-
     switch(cmdid) {
     case SIP_ONLINE:
     {

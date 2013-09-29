@@ -33,5 +33,6 @@ int history_fetch(struct history *hist, const char *start_idx, char* *idx, struc
 int history_next(struct history *hist, char**idx, struct list **bulk);
 int history_add(struct history *hist, int event, int ts, struct pl*key, struct pl *login, struct pl *name);
 int history_reset(struct history *hist);
+void history_report(struct history *hist, histel_h* hel_h, void *arg);
 
 #endif

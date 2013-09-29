@@ -1,7 +1,9 @@
 #ifndef TCREPORT_H
 #define TCREPORT_H
 enum reg_state;
+struct msgpack_packer;
 struct hist_el;
+struct contact_el;
 struct tcsipcall;
 struct uplink;
 struct pl;
