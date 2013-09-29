@@ -95,7 +95,6 @@ int store_alloc(struct store **rp, struct pl *plogin) {
     int err = -1;
     struct store *store;
     char *path = NULL;
-    char *login = NULL;
 
     *rp = NULL;
 
@@ -106,7 +105,6 @@ int store_alloc(struct store **rp, struct pl *plogin) {
     }
 
     err = platpath_db(plogin, &path);
-    err |= re_sdprintf(&login, "%r", plogin);
     if(err)
         goto fail;
 
@@ -123,7 +121,6 @@ int store_alloc(struct store **rp, struct pl *plogin) {
     *rp = store;
 
     mem_deref(path);
-    mem_deref(login);
 
     return 0;
 
