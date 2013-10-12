@@ -91,6 +91,17 @@ void report_cert(int err, struct pl*name, void*arg)
         push_pl((*name));
 }
 
+void report_lp(int err, struct pl*token, void*arg)
+{
+    msgpack_packer *pk = arg;
+    msgpack_pack_array(pk, err ? 3 : 2);
+    push_cstr("api.login_phone");
+    msgpack_pack_int(pk, err);
+    if(err==1)
+        push_pl((*token));
+}
+
+
 static inline void do_write_history_el(msgpack_packer *pk, struct hist_el *hel)
 {
     msgpack_pack_array(pk, 5);
@@ -98,8 +109,12 @@ static inline void do_write_history_el(msgpack_packer *pk, struct hist_el *hel)
     msgpack_pack_int(pk, hel->time);
     push_cstr_len(hel->key);
     push_cstr_len(hel->login);
-    push_cstr_len(hel->name);
 
+    if(hel->name) {
+        push_cstr_len(hel->name);
+    } else {
+        push_cstr_len(hel->login);
+    }
 }
 
 bool write_history_el(struct le *le, void *arg)

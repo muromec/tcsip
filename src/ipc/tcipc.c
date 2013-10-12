@@ -16,6 +16,7 @@ enum ipc_command {
     CERT_GET = 0x01df,
     HIST_FETCH = 0x0193,
     CONTACTS_FETCH = 0x045a,
+    API_LOGIN_PHONE = 0x0111,
     NONE_COMMAND = 0
 };
 
@@ -133,6 +134,10 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
         password.p = arg->via.raw.ptr;
         password.l = arg->via.raw.size;
         tcsip_get_cert(sip, &login, &password);
+
+        login.l--;
+        password.l--;
+
     }
     break;
     case HIST_FETCH:
@@ -150,6 +155,21 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
     break;
     case CONTACTS_FETCH:
         tcsip_contacts_ipc(sip);
+    break;
+    case API_LOGIN_PHONE:
+    {
+        if(ob.via.array.size != 2) {
+            return;
+        }
+        arg++;
+        struct pl phone;
+        phone.p = arg->via.raw.ptr;
+        phone.l = arg->via.raw.size;
+
+        tcsip_login_phone(sip, &phone);
+
+        phone.l--;
+    }
     break;
     default:
         re_printf("hash %04x, cmd %b\n", cmdid, cmd.ptr, cmd.size);

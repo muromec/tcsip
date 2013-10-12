@@ -26,6 +26,7 @@
 #include "store/contacts.h"
 
 #include "api/login.h"
+#include "api/login_phone.h"
 #include "api/api.h"
 
 #if __APPLE__
@@ -74,6 +75,7 @@ static struct sip_handlers msgpack_handlers = {
     .call_h = report_call,
     .up_h = report_up,
     .cert_h = report_cert,
+    .lp_h = report_lp,
     .hist_h = report_hist,
     .histel_h = report_histel,
     .ctlist_h = report_ctlist,
@@ -447,6 +449,11 @@ int tcsip_get_cert(struct tcsip* sip, struct pl* login, struct pl*password) {
     tcapi_login(sip, login, password);
 }
 
+void tcsip_login_phone(struct tcsip* sip, struct pl *phone)
+{
+    tcapi_login_phone(sip, phone);
+}
+
 int tcsip_report_cert(struct tcsip*sip, int code, struct pl *name)
 {
 #define cert_h(_code, _name) {\
@@ -455,6 +462,17 @@ int tcsip_report_cert(struct tcsip*sip, int code, struct pl *name)
     }}
 
     cert_h(code, name);
+}
+
+int tcsip_report_login(struct tcsip*sip, int code, struct pl *token) {
+
+#define lp_h(_code, _token) {\
+    if(sip->rarg && sip->rarg->lp_h){\
+        sip->rarg->lp_h(_code, _token, sip->rarg->arg);\
+    }}
+
+    lp_h(code, token);
+
 }
 
 struct sip_addr *tcsip_user(struct tcsip*sip)

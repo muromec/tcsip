@@ -65,8 +65,11 @@ out:
 }
 
 static void http_cert_err(int err, void *arg) {
-    struct tcsip *sip = arg;
+    struct login_op *op = arg;
+    struct tcsip *sip = op->sip;
+
     tcsip_report_cert(sip, err, NULL);
+    mem_deref(op);
 }
 
 
