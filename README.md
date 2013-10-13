@@ -23,7 +23,7 @@ Tcsip proven to work on such platforms:
 - Android
 - Linux
 
-# Codes
+# Codecs
 
 Supported codecs
 
