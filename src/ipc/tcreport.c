@@ -10,6 +10,8 @@
 #include "store/history.h"
 #include "store/contacts.h"
 
+#include "api/signup.h"
+
 #include <msgpack.h>
 
 void report_call_change(struct tcsipcall* call, void *arg) {
@@ -101,6 +103,39 @@ void report_lp(int err, struct pl*token, void*arg)
         push_pl((*token));
 }
 
+bool write_field_err(struct le *le, void *arg)
+{
+
+    msgpack_packer *pk = arg;
+    struct field_error *fe = le->data;
+
+    printf("write field err %p\n", fe);
+
+    msgpack_pack_array(pk, 3);
+    push_cstr_len(fe->field);
+    push_cstr_len(fe->code);
+    push_cstr_len(fe->desc);
+
+    return false;
+}
+
+void report_signup(int err, struct list*elist, void *arg)
+{
+    msgpack_packer *pk = arg;
+    if(err == 1) {
+        msgpack_pack_array(pk, 3);
+    } else {
+        msgpack_pack_array(pk, 2);
+    }
+
+    push_cstr("api.signup");
+    msgpack_pack_int(pk, err);
+
+    if(err==1) {
+        msgpack_pack_array(pk, list_count(elist));
+        list_apply(elist, true, write_field_err, arg);
+    }
+}
 
 static inline void do_write_history_el(msgpack_packer *pk, struct hist_el *hel)
 {

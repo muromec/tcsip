@@ -77,6 +77,7 @@ static struct sip_handlers msgpack_handlers = {
     .up_h = report_up,
     .cert_h = report_cert,
     .lp_h = report_lp,
+    .signup_h = report_signup,
     .hist_h = report_hist,
     .histel_h = report_histel,
     .ctlist_h = report_ctlist,
@@ -480,6 +481,16 @@ int tcsip_report_login(struct tcsip*sip, int code, struct pl *token) {
     lp_h(code, token);
 
 }
+
+int tcsip_report_signup(struct tcsip*sip, int code, struct list*elist) {
+#define signup_h(_code, _list) {\
+    if(sip->rarg && sip->rarg->signup_h){\
+        sip->rarg->signup_h(_code, _list, sip->rarg->arg);\
+    }}
+
+    signup_h(code, elist);
+}
+
 
 struct sip_addr *tcsip_user(struct tcsip*sip)
 {

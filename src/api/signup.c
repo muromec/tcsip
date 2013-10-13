@@ -12,19 +12,15 @@
 
 #include "http.h"
 #include "api.h"
+#include "signup.h"
 
 struct tcsip;
 
-struct field_error {
-    struct le le;
-    char *field;
-    char *code;
-    char *desc;
-};
 
 enum signup_e {
     SIGNUP_OK=0,
-    SIGNUP_FAIL=1,
+    SIGNUP_ERRORS=1,
+    SIGNUP_FAIL=2,
 };
 
 struct signup_op {
@@ -68,7 +64,7 @@ static void handle_response(struct tcsip *sip, struct mbuf *data){
     msgpack_object_raw bstr;
 
     if(obj.type != MSGPACK_OBJECT_ARRAY) {
-        goto out;
+        goto fail;
     }
 
     arg = obj.via.array.ptr;
@@ -80,30 +76,24 @@ static void handle_response(struct tcsip *sip, struct mbuf *data){
     cmd_err = arg->via.i64;
 
     if(cmd_err==0) {
-        re_printf("created successfully\n");
-//        tcsip_report_login(sip, LP_OK, NULL);
+        tcsip_report_signup(sip, SIGNUP_OK, NULL);
         goto out;
     }
 
 
     if(obj.via.array.size < 2) {
-        re_printf("signup failed with not reason\n");
-        goto out;
+        goto fail;
     }
 
     arg++;
     if(arg->type != MSGPACK_OBJECT_ARRAY) {
-        re_printf("broken reason arg\n");
-        goto out;
+        goto fail;
     }
-
-    re_printf("signup error %d\n", cmd_err);
 
     ob_list = &arg->via.array;
     
     if(ob_list->ptr->type != MSGPACK_OBJECT_ARRAY) {
-        re_printf("broken field format\n");
-        goto out;
+        goto fail;
     }
 
     ob_field = ob_list->ptr;
@@ -135,21 +125,18 @@ static void handle_response(struct tcsip *sip, struct mbuf *data){
 
         list_append(errlist, &fe->le, fe);
 skip:
-        fe = mem_deref(fe);
         ob_field ++;
-
     }
+    tcsip_report_signup(sip, SIGNUP_ERRORS, errlist);
 
     list_flush(errlist);
-//        tcsip_report_login(sip, LP_TOKEN, &token);
-    return;
 
+    goto out;
 
-    printf("signup error wtf %d\n", cmd_err);
+fail:
+    tcsip_report_signup(sip, SIGNUP_FAIL, NULL);
 
 out:
-
-//    tcsip_report_login(sip, LP_FAIL, NULL);
     msgpack_unpacked_destroy(&msg);
 out2:
     return;
@@ -166,12 +153,11 @@ static void http_api_done(struct request *req, int code, void *arg) {
     switch(code) {
     case 200:
         data = http_data(req);
-        re_printf("signup ret %b\n", mbuf_buf(data), mbuf_get_left(data));
         handle_response(op->sip, data);
 
         break;
     default:
-        printf("signup failed %d\n", code);
+        tcsip_report_signup(op->sip, SIGNUP_FAIL, NULL);
     }
 
     mem_deref(op);
@@ -183,7 +169,7 @@ static void http_api_err(int err, void *arg) {
     struct signup_op *op = arg;
     struct tcsip *sip = op->sip;
 
-    re_printf("api error %d\n", err);
+    tcsip_report_signup(sip, SIGNUP_FAIL, NULL);
 
     mem_deref(op);
 }

@@ -20,6 +20,7 @@ struct sip_handlers {
     void(*up_h)(struct uplink *up, int op, void*arg);
     void(*cert_h)(int err, struct pl*name, void*arg);
     void(*lp_h)(int err, struct pl*token, void*arg);
+    void(*signup_h)(int code, struct list*, void *arg);
     void(*hist_h)(int err, char*idx, struct list*hlist, void*arg);
     void(*histel_h)(int err, int op, struct hist_el*el, void *arg);
     void(*ctlist_h)(int err, struct list*ctlist, void *arg);
@@ -42,6 +43,7 @@ void tcsip_hist_ipc(struct tcsip* sip, int flag);
 void tcsip_contacts_ipc(struct tcsip* sip);
 int tcsip_report_cert(struct tcsip*sip, int code, struct pl *name);
 int tcsip_report_login(struct tcsip*sip, int code, struct pl *token);
+int tcsip_report_signup(struct tcsip*sip, int code, struct list*);
 void tcsip_login_phone(struct tcsip* sip, struct pl *phone);
 void tcsip_signup(struct tcsip* sip, struct pl *token, struct pl *otp, struct pl*login, struct pl* name);
 
