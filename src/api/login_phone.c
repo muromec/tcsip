@@ -63,7 +63,7 @@ static void handle_response(struct login_phone_op*op, struct mbuf *buf) {
 
     if((obj.via.array.size == 1) && (cmd_err==0)) {
         tcsip_report_login(sip, LP_OK, NULL);
-        return;
+        goto out;
     }
 
     if((obj.via.array.size == 2) && (cmd_err==0)) {
@@ -76,7 +76,7 @@ static void handle_response(struct login_phone_op*op, struct mbuf *buf) {
 
         tcsip_report_login(sip, LP_TOKEN, &token);
         token.l--;
-        return;
+        goto out;
     }
 
 

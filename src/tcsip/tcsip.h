@@ -43,6 +43,7 @@ void tcsip_contacts_ipc(struct tcsip* sip);
 int tcsip_report_cert(struct tcsip*sip, int code, struct pl *name);
 int tcsip_report_login(struct tcsip*sip, int code, struct pl *token);
 void tcsip_login_phone(struct tcsip* sip, struct pl *phone);
+void tcsip_signup(struct tcsip* sip, struct pl *token, struct pl *otp, struct pl*login, struct pl* name);
 
 
 #endif

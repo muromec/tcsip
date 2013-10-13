@@ -17,6 +17,7 @@ enum ipc_command {
     HIST_FETCH = 0x0193,
     CONTACTS_FETCH = 0x045a,
     API_LOGIN_PHONE = 0x0111,
+    API_SIGNUP = 0x0759,
     NONE_COMMAND = 0
 };
 
@@ -169,6 +170,32 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
         tcsip_login_phone(sip, &phone);
 
         phone.l--;
+    }
+    break;
+    case API_SIGNUP:
+    {
+        if(ob.via.array.size !=5) {
+            return;
+        }
+        struct pl token, otp, login, name;
+
+        arg++;
+        token.p = arg->via.raw.ptr;
+        token.l = arg->via.raw.size;
+
+        arg++;
+        otp.p = arg->via.raw.ptr;
+        otp.l = arg->via.raw.size;
+
+        arg++;
+        login.p = arg->via.raw.ptr;
+        login.l = arg->via.raw.size;
+
+        arg++;
+        name.p = arg->via.raw.ptr;
+        name.l = arg->via.raw.size;
+
+        tcsip_signup(sip, &token, &otp, &login, &name);
     }
     break;
     default:

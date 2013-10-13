@@ -17,6 +17,7 @@ lobj += ipc/tcreport
 lobj += api/http
 lobj += api/login
 lobj += api/login_phone
+lobj += api/signup
 
 lobj += x509/x509util
 lobj += x509/x509gen

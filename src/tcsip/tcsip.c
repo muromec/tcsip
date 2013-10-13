@@ -27,6 +27,7 @@
 
 #include "api/login.h"
 #include "api/login_phone.h"
+#include "api/signup.h"
 #include "api/api.h"
 
 #if __APPLE__
@@ -452,6 +453,11 @@ int tcsip_get_cert(struct tcsip* sip, struct pl* login, struct pl*password) {
 void tcsip_login_phone(struct tcsip* sip, struct pl *phone)
 {
     tcapi_login_phone(sip, phone);
+}
+
+void tcsip_signup(struct tcsip* sip, struct pl *token, struct pl *otp, struct pl*login, struct pl* name)
+{
+    tcapi_signup(sip, token, otp, login, name);
 }
 
 int tcsip_report_cert(struct tcsip*sip, int code, struct pl *name)
