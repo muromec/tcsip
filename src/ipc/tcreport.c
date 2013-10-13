@@ -96,7 +96,11 @@ void report_cert(int err, struct pl*name, void*arg)
 void report_lp(int err, struct pl*token, void*arg)
 {
     msgpack_packer *pk = arg;
-    msgpack_pack_array(pk, err ? 3 : 2);
+    if(err ==1 ) {
+        msgpack_pack_array(pk, 3);
+    } else {
+        msgpack_pack_array(pk, 2);
+    }
     push_cstr("api.login_phone");
     msgpack_pack_int(pk, err);
     if(err==1)
