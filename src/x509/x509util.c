@@ -10,6 +10,10 @@
 #include <openssl/engine.h>
 #endif
 
+#if ANDROID
+time_t timegm(struct tm * const t);
+#endif
+
 int cert_time(ASN1_TIME* asntime)
 {
 	int time=0;

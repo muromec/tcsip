@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "re.h"
-#include "ajitter.h"
+#include "jitter/ajitter.h"
 
 #include "opensl_io.h"
 #define CONV16BIT 32768
