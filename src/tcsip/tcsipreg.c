@@ -179,8 +179,14 @@ void tcsreg_resend(struct tcsipreg *reg) {
     if(err) {
         reg->reg = mem_deref(reg->reg);
         report(REG_NONE);
+    } else {
+        if(reg->rstate & REG_AUTH) {
+            report(REG_ONLINE);
+        } else {
+            report(REG_TRY);
+        }
+
     }
-    // delegate TRY
 }
 
 
