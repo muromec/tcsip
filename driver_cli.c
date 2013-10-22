@@ -6,15 +6,18 @@
 
 #define SOCK_RELATIVE "/.texr.sock"
 
-int main() {
+int main(int argc, char **argv) {
     int len;
     char *home, *sock;
 
-    home = getenv("HOME");
-    len = strlen(home) + sizeof(SOCK_RELATIVE) + 1;
-    sock = malloc(len);
-
-    len = snprintf(sock, len, "%s%s", home, SOCK_RELATIVE);
+    if(argc ==1) {
+        home = getenv("HOME");
+        len = strlen(home) + sizeof(SOCK_RELATIVE) + 1;
+        sock = malloc(len);
+        len = snprintf(sock, len, "%s%s", home, SOCK_RELATIVE);
+    } else {
+        sock = argv[1];
+    }
 
     libresip_driver(sock);
 
