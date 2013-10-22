@@ -143,6 +143,9 @@ int tcapi_login_phone(struct tcsip* sip, struct pl*phone) {
         goto fail;
     }
 
+    op->http = http;
+    op->sip = mem_ref(sip);
+
     http_init((struct httpc*)http, &req, "https://www.texr.net/api/login_phone");
     http_cb(req, op, http_api_done, http_api_err);
 
@@ -151,9 +154,6 @@ int tcapi_login_phone(struct tcsip* sip, struct pl*phone) {
     http_post(req, "phone", c_phone);
     http_header(req, "Accept", "application/msgpack");
     http_send(req);
-
-    op->http = http;
-    op->sip = mem_ref(sip);
 
     mem_deref(c_phone);
 
