@@ -83,6 +83,16 @@ void report_up(struct uplink *up, int op, void*arg) {
 	msgpack_pack_int(pk, up->ok);
 }
 
+void report_msg(const struct sip_taddr *from, struct mbuf *data, void *arg)
+{
+    msgpack_packer *pk = arg;
+    msgpack_pack_array(pk, 3);
+    push_cstr("msg.in");
+    push_pl(from->auri);
+    msgpack_pack_raw(pk, mbuf_get_left(data));
+    msgpack_pack_raw_body(pk, mbuf_buf(data), mbuf_get_left(data));
+}
+
 void report_cert(int err, struct pl*name, void*arg)
 {
     msgpack_packer *pk = arg;

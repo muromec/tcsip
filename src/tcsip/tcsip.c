@@ -14,6 +14,7 @@
 
 #include "tcsipuser.h"
 #include "tcsipreg.h"
+#include "tcmessage.h"
 #include "tcsipcall.h"
 #include "tcuplinks.h"
 #include "tcsip.h"
@@ -56,6 +57,7 @@ struct tcsip {
 
     struct tcsipreg *sreg_c;
     struct tcuplinks *uplinks_c;
+    struct tcmessages *msg;
     struct sip_addr *user_c;
     char *cname;
 
@@ -74,6 +76,7 @@ static struct sip_handlers msgpack_handlers = {
     .reg_h = report_reg,
     .call_ch = report_call_change,
     .call_h = report_call,
+    .msg_h = report_msg,
     .up_h = report_up,
     .cert_h = report_cert,
     .lp_h = report_lp,
@@ -126,6 +129,7 @@ void sipc_destruct(void *arg)
     mbuf_reset(&uac->apns);
     mem_deref(sip->user_c);
     mem_deref(sip->sreg_c);
+    mem_deref(sip->msg);
     list_flush(sip->calls_c);
     mem_deref(sip->calls_c);
     sip->hist = mem_deref(sip->hist);
@@ -240,7 +244,13 @@ void listen_laddr(struct tcsip*sip)
     DEBUG_INFO("got laddr %J, listen %d\n", &uac->laddr, err);
 }
 
-
+void tcsip_message(struct tcsip* sip, struct sip_addr* dest, struct pl* text)
+{
+    char *c_text;
+    pl_strdup(&c_text, text);
+    tcmessage(sip->msg, dest, c_text);
+    mem_deref(c_text);
+}
 
 void tcsip_set_online(struct tcsip *sip, int state)
 {
@@ -283,6 +293,11 @@ void tcsip_set_online(struct tcsip *sip, int state)
 
         if(sip->rarg && sip->rarg->reg_h)
             tcsreg_handler(sip->sreg_c, sip->rarg->reg_h, sip->rarg->arg);
+    }
+
+    if(!sip->msg) {
+        tcmessage_alloc(&sip->msg, uac, sip->user_c);
+        tcmessage_handler(sip->msg, NULL, sip);
     }
 
     if(sip->sreg_c)
@@ -489,6 +504,13 @@ int tcsip_report_signup(struct tcsip*sip, int code, struct list*elist) {
     }}
 
     signup_h(code, elist);
+}
+
+int tcsip_report_message(struct tcsip*sip, const struct sip_taddr *from, struct mbuf* data)
+{
+    if(sip->rarg && sip->rarg->msg_h) {
+        sip->rarg->msg_h(from, data, sip->rarg->arg);
+    }
 }
 
 

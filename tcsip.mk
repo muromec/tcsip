@@ -9,6 +9,7 @@ lobj += tcsip/tcsipuser
 lobj += tcsip/tcsipreg
 lobj += tcsip/tcsipcall
 lobj += tcsip/tcuplinks
+lobj += tcsip/tcmessage
 lobj += tcsip/tcsip
 
 lobj += ipc/tcipc

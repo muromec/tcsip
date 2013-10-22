@@ -13,6 +13,7 @@ enum ipc_command {
     SIP_CALL_PLACE = 0x0449,
     SIP_CALL_CONTROL = 0x0006,
     SIP_ME = 0x0be5,
+    SEND_MESSAGE = 0x0c27,
     CERT_GET = 0x01df,
     HIST_FETCH = 0x0193,
     CONTACTS_FETCH = 0x045a,
@@ -68,6 +69,25 @@ void tcsip_ob_cmd(struct tcsip* sip, struct msgpack_object ob)
 	shift(dest->dname, arg);
         tcsip_start_call(sip, dest);
         mem_deref(dest);
+    }
+    break;
+    case SEND_MESSAGE:
+    {
+        if(ob.via.array.size != 3) {
+            return;
+        }
+        arg++;
+
+        struct sip_addr* dest;
+        struct pl tmp, text;
+        char *tmp_char;
+        shift(tmp, arg);
+        pl_strdup(&tmp_char, &tmp);
+        sippuser_by_name(&dest, tmp_char);
+        mem_deref(tmp_char);
+
+        shift(text, arg);
+        tcsip_message(sip, dest, &text);
     }
     break;
     case SIP_CALL_CONTROL:
