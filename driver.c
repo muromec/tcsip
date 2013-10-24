@@ -63,7 +63,7 @@ int svc_make(const char *pathname)
 int write_fd(void* data, const char* buf, unsigned int len)
 {
     struct cli_app *app = data;
-    if(!app->client_fd) return len;
+    if(app->client_fd < 0) return len;
 
     return (int)write(app->client_fd, buf, len);
 }
@@ -88,7 +88,7 @@ static void read_cb(int flags, void *arg)
         shutdown(app->client_fd, 1);
         close(app->client_fd);
         fd_close(app->client_fd);
-        app->client_fd = 0;
+        app->client_fd = -1;
     }
     
     if(rsize <= 0)
@@ -122,7 +122,7 @@ static void accept_cb(int flags, void *arg)
     struct cli_app *app = arg;
 
     fd = accept(app->control_fd, &addr, &addrlen);
-    if(app->client_fd) {
+    if(app->client_fd >= 0) {
         shutdown(fd, 1);
         close(fd);
         return;
@@ -165,7 +165,7 @@ int libresip_driver(char *sock_path) {
         goto fail;
     }
     app->control_fd = sock;
-    app->client_fd = 0;
+    app->client_fd = -1;
     app->up = up;
 
     packer = msgpack_packer_new(app, write_fd);
@@ -183,7 +183,15 @@ int libresip_driver(char *sock_path) {
 
     re_main(signal_handler);
 
+    shutdown(sock, 1);
+    close(sock);
     fd_close(sock);
+
+    if(app->client_fd >= 0) {
+        shutdown(app->client_fd, 1);
+        close(app->client_fd);
+        fd_close(app->client_fd);
+    }
 
     mem_deref(sip);
     mem_deref(app);
