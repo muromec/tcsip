@@ -70,6 +70,8 @@ struct tcsip {
     struct sip_handlers *rarg;
     void *xdnsc; // XXX we have two dns clients
     struct tchttp *http;
+
+    struct store *st;
 };
 
 static struct sip_handlers msgpack_handlers = {
@@ -130,6 +132,7 @@ void sipc_destruct(void *arg)
     mem_deref(sip->user_c);
     mem_deref(sip->sreg_c);
     mem_deref(sip->msg);
+    mem_deref(sip->st);
     list_flush(sip->calls_c);
     mem_deref(sip->calls_c);
     sip->hist = mem_deref(sip->hist);
@@ -295,11 +298,6 @@ void tcsip_set_online(struct tcsip *sip, int state)
             tcsreg_handler(sip->sreg_c, sip->rarg->reg_h, sip->rarg->arg);
     }
 
-    if(!sip->msg) {
-        tcmessage_alloc(&sip->msg, uac, sip->user_c);
-        tcmessage_handler(sip->msg, NULL, sip);
-    }
-
     if(sip->sreg_c)
         tcsreg_state(sip->sreg_c, state);
 }
@@ -391,13 +389,19 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
     sip->contacts = mem_deref(sip->contacts);
 
     sip->http = tchttp_alloc(certpath);
+    sip->st = mem_deref(sip->st);
+    sip->msg = mem_deref(sip->msg);
 
-    struct store *st;
-    store_alloc(&st, login);
+    store_alloc(&sip->st, login);
 
-    err = history_alloc(&sip->hist, store_open(st, 'h'));
+    err = history_alloc(&sip->hist, store_open(sip->st, 'h'));
 
-    contacts_alloc(&sip->contacts, store_open(st, 'c'), (struct httpc *) sip->http);
+    err |= contacts_alloc(&sip->contacts, store_open(sip->st, 'c'), (struct httpc *) sip->http);
+
+    err |= tcmessage_alloc(&sip->msg, uac, sip->user_c, store_open(sip->st, 'm'));
+    if(sip->msg) {
+        tcmessage_handler(sip->msg, NULL, sip);
+    }
 
     if(sip->rarg) {
         contacts_handler(sip->contacts, sip->rarg->ctlist_h, sip->rarg->arg);
@@ -406,7 +410,6 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 
     mem_deref(capath);
     mem_deref(certpath);
-    mem_deref(st);
 
     return 0;
 }

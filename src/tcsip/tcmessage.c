@@ -2,13 +2,25 @@
 #include "tcsip.h"
 #include "tcsipuser.h"
 #include "txsip_private.h"
+#include "store/store.h"
+#include "ipc/tcreport.h"
 #include <string.h>
+#include <msgpack.h>
 
 struct tcmessages {
     struct sip_addr *user;
     struct sip_lsnr *lsnr_req;
     struct sip *sip;
+    struct store_client *store;
+    char *login;
     void *arg;
+};
+
+enum msg_state {
+    MSTATE_PENDING,
+    MSTATE_LOCAL,
+    MSTATE_SERVER,
+    MSTATE_SYNC
 };
 
 static int message_sent(enum sip_transp tp, const struct sa *src,
@@ -43,7 +55,7 @@ static void destruct(void *arg)
     tcmsg->lsnr_req = mem_deref(tcmsg->lsnr_req);
 }
 
-int tcmessage_alloc(struct tcmessages **rp, struct uac *uac, struct sip_addr* local_user)
+int tcmessage_alloc(struct tcmessages **rp, struct uac *uac, struct sip_addr* local_user, struct store_client *stc)
 {
     int err;
     struct tcmessages *tcmsg;
@@ -54,6 +66,8 @@ int tcmessage_alloc(struct tcmessages **rp, struct uac *uac, struct sip_addr* lo
 
     tcmsg->sip = mem_ref(uac->sip);
     tcmsg->user = mem_ref(local_user);
+    tcmsg->store = mem_ref(stc);
+    pl_strdup(&tcmsg->login, &local_user->uri.user);
 
     err = sip_listen(&tcmsg->lsnr_req, tcmsg->sip, true, message_incoming, tcmsg);
 	if (err)
@@ -75,7 +89,7 @@ int tcmessage(struct tcmessages *tcmsg, struct sip_addr *to, char *text){
     int err;
     struct sip_request *req;
 
-    char *uri, *to_uri;
+    char *uri, *to_uri, *key = NULL;
     struct pl route_p;
     struct sip_dialog *dlg;
 
@@ -86,7 +100,7 @@ int tcmessage(struct tcmessages *tcmsg, struct sip_addr *to, char *text){
     if(err || !dlg)
         return -ENOMEM;
 
-    struct mbuf* data = mbuf_alloc(100);
+    struct mbuf* data = mbuf_alloc(100), re_buf;
 
     mbuf_printf(data, "%s", text);
     data->pos = 0;
@@ -101,6 +115,23 @@ int tcmessage(struct tcmessages *tcmsg, struct sip_addr *to, char *text){
             mbuf_buf(data),
             mbuf_get_left(data)
     );
+
+    msgpack_sbuffer* buffer = msgpack_sbuffer_new();
+    msgpack_packer* pk = msgpack_packer_new(buffer, msgpack_sbuffer_write);
+
+    msgpack_pack_array(pk,3);
+    push_pl(to->auri);
+    msgpack_pack_raw(pk, mbuf_get_left(data));
+    msgpack_pack_raw_body(pk, mbuf_buf(data), mbuf_get_left(data));
+    msgpack_pack_int(pk, MSTATE_PENDING);
+
+    re_buf.buf = buffer->data;
+    re_buf.size = buffer->size;
+
+    key = store_key(tcmsg->store);
+    err = store_add(tcmsg->store, key, tcmsg->login, &re_buf);
+
+    mem_deref(key);
 
     mem_deref(uri);
     mem_deref(to_uri);
