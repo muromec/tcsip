@@ -300,6 +300,10 @@ void tcsip_set_online(struct tcsip *sip, int state)
 
     if(sip->sreg_c)
         tcsreg_state(sip->sreg_c, state);
+
+    if(state != REG_OFF) {
+        tcmessage_flush(sip->msg);
+    }
 }
 
 void tcsip_apns(struct tcsip *sip, const char*data, size_t length)

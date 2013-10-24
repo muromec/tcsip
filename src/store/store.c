@@ -7,34 +7,34 @@
 
 static char *STORE_SQL = "INSERT into blob \
             (blob_key, idx, blob, curnt) \
-            values (?, ?, ?, 1)";
+            values (?, ?, ?, ?)";
 
 static char *OBSOLETE_SQL = "UPDATE blob set curnt=0 \
             where idx=? and blob_key GLOB ? and blob_key<?";
 
 static char *FETCH_SQL = "SELECT blob, idx, blob_key from blob \
             where blob_key GLOB ? \
+            and curnt = ? \
             and idx < ? \
-            and curnt=1 \
             ORDER BY idx DESC \
             LIMIT 1";
 
 static char *FETCH_SQL_N = "SELECT blob, idx, blob_key from blob \
             where blob_key GLOB ? \
-            and curnt=1 \
+            and curnt = ? \
             ORDER BY idx DESC \
             LIMIT 1";
 
 static char *FETCH_SQL_ASC = "SELECT blob, idx, blob_key from blob \
             where blob_key GLOB ? \
+            and curnt = ? \
             and idx > ? \
-            and curnt=1 \
             ORDER BY idx ASC \
             LIMIT 1";
 
 static char *FETCH_SQL_ASC_N = "SELECT blob, idx, blob_key from blob \
             where blob_key GLOB ? \
-            and curnt=1 \
+            and curnt = ? \
             ORDER BY idx ASC \
             LIMIT 1";
 
@@ -133,6 +133,11 @@ out:
 
 int store_add(struct store_client *stc, char *key, char *idx, struct mbuf *buf)
 {
+    return store_add_state(stc, key, idx, buf, 1);
+}
+
+int store_add_state(struct store_client *stc, char *key, char *idx, struct mbuf *buf, int state)
+{
     int err;
     sqlite3_stmt *stmt;
 
@@ -143,6 +148,7 @@ int store_add(struct store_client *stc, char *key, char *idx, struct mbuf *buf)
     sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, idx, -1, SQLITE_STATIC);
     sqlite3_bind_blob(stmt, 3, buf->buf, buf->size, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 4, state);
 
     err = sqlite3_step(stmt);
     
@@ -285,8 +291,12 @@ out2:
     return hlist;
 }
 
-
 int store_fetch(struct store_client *stc, const char *start_idx, parse_h *parse_fn, struct list **rp)
+{
+    return store_fetch_state(stc, start_idx, parse_fn, rp, 1);
+}
+
+int store_fetch_state(struct store_client *stc, const char *start_idx, parse_h *parse_fn, struct list **rp, int state)
 {
     int err;
     sqlite3_stmt *stmt;
@@ -309,8 +319,9 @@ int store_fetch(struct store_client *stc, const char *start_idx, parse_h *parse_
     }
 
     sqlite3_bind_text(stmt, 1, stc->key_glob, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 2, state);
     if(start_idx) {
-        sqlite3_bind_text(stmt, 2, start_idx, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 3, start_idx, -1, SQLITE_STATIC);
     }
 
     err = sqlite3_step(stmt);
