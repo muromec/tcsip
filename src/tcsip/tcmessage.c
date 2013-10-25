@@ -43,7 +43,7 @@ static int message_sent(enum sip_transp tp, const struct sa *src,
 }
 
 static void flag_sent(struct tcmessages *, struct msg_single*, enum msg_state);
-static void write_db(struct store_client *stc, struct timeval tv, struct sip_addr *from, struct sip_addr *to, struct mbuf*data, enum msg_state state);
+static char* write_db(struct store_client *stc, struct timeval tv, struct sip_addr *from, struct sip_addr *to, struct mbuf*data, enum msg_state state);
 
 static void message_response(int err, const struct sip_msg *smsg, void *arg) {
     struct msg_single *msg = arg;
@@ -59,6 +59,7 @@ static void message_response(int err, const struct sip_msg *smsg, void *arg) {
     if(err==0 && smsg) {
         if(smsg->scode == 200) {
             flag_sent(msg->ctx, msg, MSTATE_SYNC);
+            tcsip_report_message(tcmsg->arg, msg->tv.tv_sec, msg->idx, msg->user, msg->data, MSTATE_SYNC);
         }
 
         /*
@@ -81,12 +82,15 @@ static bool message_incoming(const struct sip_msg *msg, void *arg)
 {
     struct tcmessages *tcmsg = arg;
     struct timeval tv;
+    char *idx;
 
     sipmsg_parse_date(msg, &tv);
+    struct sip_addr* from = (struct sip_addr*)(&msg->from);
 
-    write_db(tcmsg->store, tv, (struct sip_addr*)(&msg->from), tcmsg->user, msg->mb, MSTATE_SYNC);
-
-    tcsip_report_message(tcmsg->arg, tv.tv_sec, &msg->from, msg->mb);
+    idx = write_db(tcmsg->store, tv, from, tcmsg->user, msg->mb, MSTATE_SYNC);
+    if(idx) {
+        tcsip_report_message(tcmsg->arg, tv.tv_sec, idx, from, msg->mb, -1);
+    }
 
     return true;
 }
@@ -144,7 +148,7 @@ void tcmessage_handler(struct tcmessages *tcmsg, void *fn, void *arg)
 char *message_idx(struct timeval tv, struct sip_addr *from, struct sip_addr *to)
 {
     char *ret;
-    re_sdprintf(&ret, "%d@%r->%r", tv.tv_sec, &from->auri, &to->auri);
+    re_sdprintf(&ret, "%d.%06u@%r->%r", tv.tv_sec, tv.tv_usec, &from->auri, &to->auri);
     return ret;
 }
 
@@ -190,7 +194,7 @@ static int msend(struct tcmessages *tcmsg, struct sip_addr *to, struct mbuf *dat
     return err;
 }
 
-static void write_db(struct store_client *stc, struct timeval tv, struct sip_addr *from, struct sip_addr *to, struct mbuf*data, enum msg_state state)
+static char *write_db(struct store_client *stc, struct timeval tv, struct sip_addr *from, struct sip_addr *to, struct mbuf*data, enum msg_state state)
 {
 
     struct mbuf re_buf;
@@ -203,8 +207,9 @@ static void write_db(struct store_client *stc, struct timeval tv, struct sip_add
     msgpack_packer* pk = msgpack_packer_new(buffer, msgpack_sbuffer_write);
 
     msgpack_pack_array(pk, 1);
-    msgpack_pack_array(pk, 4);
+    msgpack_pack_array(pk, 5);
     msgpack_pack_int(pk, tv.tv_sec);
+    msgpack_pack_int(pk, tv.tv_usec);
     push_pl(to->auri);
     msgpack_pack_raw(pk, mbuf_get_left(data));
     msgpack_pack_raw_body(pk, mbuf_buf(data), mbuf_get_left(data));
@@ -216,11 +221,13 @@ static void write_db(struct store_client *stc, struct timeval tv, struct sip_add
     key = store_key(stc);
 
     err = store_add_state(stc, key, idx, &re_buf, state);
+
+    return idx;
 }
 
 static void flag_sent(struct tcmessages *tcmsg, struct msg_single*msg, enum msg_state state)
 {
-    write_db(tcmsg->store, msg->tv, tcmsg->user, msg->user, msg->data, state);
+    msg->idx = write_db(tcmsg->store, msg->tv, tcmsg->user, msg->user, msg->data, state);
 }
 
 
@@ -251,6 +258,8 @@ int tcmessage(struct tcmessages *tcmsg, struct sip_addr *to, char *text){
     err = msend(tcmsg, to, data, msg->tv, mem_ref(msg));
 
     flag_sent(tcmsg, msg, MSTATE_PENDING);
+
+    tcsip_report_message(tcmsg->arg, msg->tv.tv_sec, msg->idx, to, data, MSTATE_PENDING);
 
 out:
     mem_deref(msg);
@@ -283,6 +292,7 @@ static void* msg_parse(void *_arg)
         }}
 
     msg->tv.tv_sec = arg->via.i64; arg++;
+    msg->tv.tv_usec = arg->via.i64; arg++;
 
     struct pl plogin;
     get_str(msg->login, plogin); arg++;

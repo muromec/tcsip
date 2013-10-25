@@ -513,10 +513,10 @@ int tcsip_report_signup(struct tcsip*sip, int code, struct list*elist) {
     signup_h(code, elist);
 }
 
-int tcsip_report_message(struct tcsip*sip, time_t ts, const struct sip_taddr *from, struct mbuf* data)
+int tcsip_report_message(struct tcsip*sip, time_t ts, char *idx, const struct sip_addr *from, struct mbuf* data, int state)
 {
     if(sip->rarg && sip->rarg->msg_h) {
-        sip->rarg->msg_h(ts, from, data, sip->rarg->arg);
+        sip->rarg->msg_h(ts, idx, from, data, state, sip->rarg->arg);
     }
 }
 

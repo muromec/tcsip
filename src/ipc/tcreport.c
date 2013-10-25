@@ -83,15 +83,22 @@ void report_up(struct uplink *up, int op, void*arg) {
 	msgpack_pack_int(pk, up->ok);
 }
 
-void report_msg(time_t ts, const struct sip_taddr *from, struct mbuf *data, void *arg)
+void report_msg(time_t ts, char *idx, const struct sip_addr *from, struct mbuf *data, int state, void *arg)
 {
     msgpack_packer *pk = arg;
-    msgpack_pack_array(pk, 4);
-    push_cstr("msg.in");
+    msgpack_pack_array(pk, 6);
+    if(state < 0) {
+        push_cstr("msg.in");
+        state = -state;
+    } else {
+        push_cstr("msg.out");
+    }
     msgpack_pack_int(pk, ts);
+    push_cstr_len(idx);
     push_pl(from->auri);
     msgpack_pack_raw(pk, mbuf_get_left(data));
     msgpack_pack_raw_body(pk, mbuf_buf(data), mbuf_get_left(data));
+    msgpack_pack_int(pk, state);
 }
 
 void report_cert(int err, struct pl*name, void*arg)
