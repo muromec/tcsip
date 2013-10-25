@@ -97,7 +97,7 @@ void histel_distruct(void *arg) {
 
   hel->key = mem_deref(hel->key);
   hel->name = mem_deref(hel->name);
-  hel->login = mem_deref(hel->login);
+  hel->uri = mem_deref(hel->uri);
 
 }
 
@@ -127,7 +127,7 @@ static void* hel_parse(void *_arg) {
     hel->time = (int)arg->via.i64; arg++;
 
     get_str(hel->key); arg++;
-    get_str(hel->login); arg++;
+    get_str(hel->uri); arg++;
     get_str(hel->name); 
 
     return (void*)hel;
@@ -177,7 +177,7 @@ int history_fetch(struct history *hist, const char *start_idx, char**idx, struct
     return err;
 }
 
-int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct pl *login, struct pl *name)
+int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct pl *uri, struct pl *name)
 {
     int err;
     char *key=NULL, *key_c=NULL, *idx=NULL;
@@ -212,9 +212,9 @@ int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct 
     hel->time = ts;
     hel->event = event;
 
-    re_sdprintf(&hel->login, "%r", login);
-    re_sdprintf(&hel->name, "%r", name);
-    re_sdprintf(&hel->key, "%r", ckey);
+    pl_strdup(&hel->uri, uri);
+    pl_strdup(&hel->name, name);
+    pl_strdup(&hel->key, ckey);
 
     if(hist->hel_h) {
         hist->hel_h(0, 0, hel, hist->hel_arg);

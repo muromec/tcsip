@@ -566,7 +566,7 @@ void tcsip_call_history(struct tcsip* sip, struct tcsipcall *call)
     pl_set_str(&ckey, tmp);
     tcop_lr((void*)call, NULL, &remote);
 
-    err = history_add(sip->hist, event, ts, &ckey, &remote->uri.user, &remote->dname);
+    err = history_add(sip->hist, event, ts, &ckey, &remote->auri, &remote->dname);
 
 }
 

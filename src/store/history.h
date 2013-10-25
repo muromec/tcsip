@@ -20,7 +20,7 @@ enum hist_event {
 struct hist_el {
     struct le le;
     char *key;
-    char *login;
+    char *uri;
     char *name;
     enum hist_event event;
     int time;
