@@ -24,6 +24,7 @@ lobj += x509/x509util
 lobj += x509/x509gen
 
 lobj += util/platpath
+lobj += util/ctime
 
 lobj += g711/g711
 

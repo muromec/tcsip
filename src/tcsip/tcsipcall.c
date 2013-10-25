@@ -5,6 +5,7 @@
 #include "tcmedia.h"
 #include <sys/time.h>
 #include <time.h>
+#include "util/ctime.h"
 #include <string.h>
 
 struct tcsipcall {
@@ -87,40 +88,6 @@ static void close_handler(int err, const struct sip_msg *msg, void *arg)
     tcsipcall_hangup(call);
 }
 
-#if ANDROID
-#define CHAR_BIT 8
-#include <time64.h>
-time_t timegm(struct tm * const t) {
-    static const time_t kTimeMax = ~(1 << (sizeof (time_t) * CHAR_BIT - 1));
-    static const time_t kTimeMin = (1 << (sizeof (time_t) * CHAR_BIT - 1));
-    time64_t result = timegm64(t);
-    if (result < kTimeMin || result > kTimeMax)
-        return -1;
-    return result;
-}
-#endif
-
-static bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg,
-			  void *arg)
-{
-	int *stamp = arg;
-	char *ret;
-	struct tm tv;
-	struct pl tmp;
-	pl_dup(&tmp, &hdr->val);
-	ret = strptime(tmp.p, "%a, %d %b %Y %H:%M:%S GMT", &tv);
-
-	mem_deref((void*)tmp.p);
-
-	if(ret) {
-	    *stamp = (int)timegm(&tv);
-	    return false;
-	}
-
-	return true;
-}
-
-
 int tcsipcall_alloc(struct tcsipcall**rp, struct uac *uac)
 {
     int err;
@@ -184,21 +151,6 @@ void tcsipcall_parse_from(struct tcsipcall*call)
     memcpy(call->remote, &call->msg->from, sizeof(struct sip_taddr));
 }
 
-void tcsipcall_parse_date(struct tcsipcall*call)
-{
-    int timestamp = 0;
-    struct timeval now;
-
-    sip_msg_hdr_apply(call->msg, true, SIP_HDR_DATE, find_date, &timestamp);
-    if(timestamp)
-	call->ts = timestamp;
-    else {
-        gettimeofday(&now, NULL);
-        call->ts = now.tv_sec;
-    }
-}
-
-
 int tcsipcall_incomfing(struct tcsipcall*call, const struct sip_msg* msg)
 {
     int err = 0;
@@ -213,7 +165,7 @@ int tcsipcall_incomfing(struct tcsipcall*call, const struct sip_msg* msg)
         call->cstate |= CSTATE_ERR;
 
     tcsipcall_parse_from(call);
-    tcsipcall_parse_date(call);
+    call->ts = sipmsg_parse_date(msg);
 
     tcsipcall_key(call);
 

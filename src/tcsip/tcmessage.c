@@ -5,6 +5,9 @@
 #include "store/store.h"
 #include "ipc/tcreport.h"
 #include "tcmessage.h"
+#include "util/ctime.h"
+#include <sys/time.h>
+#include <time.h>
 #include <string.h>
 #include <msgpack.h>
 
@@ -29,6 +32,7 @@ struct msg_single {
     struct sip_addr *user;
     struct mbuf *data;
     char *login;
+    time_t ts;
     char *idx;
     void *ctx;
 };
@@ -75,8 +79,9 @@ static void message_response(int err, const struct sip_msg *smsg, void *arg) {
 static bool message_incoming(const struct sip_msg *msg, void *arg)
 {
     struct tcmessages *tcmsg = arg;
+    time_t ts = sipmsg_parse_date(msg);
 
-    tcsip_report_message(tcmsg->arg, &msg->from, msg->mb);
+    tcsip_report_message(tcmsg->arg, ts, &msg->from, msg->mb);
 
     return true;
 }
@@ -131,7 +136,7 @@ void tcmessage_handler(struct tcmessages *tcmsg, void *fn, void *arg)
     tcmsg->arg = mem_ref(arg);
 }
 
-static int msend(struct tcmessages *tcmsg, struct sip_addr *to, struct mbuf *data, void *ctx)
+static int msend(struct tcmessages *tcmsg, struct sip_addr *to, struct mbuf *data, time_t ts, void *ctx)
 {
     int err;
     struct sip_request *req;
@@ -147,12 +152,20 @@ static int msend(struct tcmessages *tcmsg, struct sip_addr *to, struct mbuf *dat
     if(err || !dlg)
         return -ENOMEM;
 
+    char date[100];
+    struct tm *tv;
+
+    tv = gmtime(&ts);
+    strftime(date, sizeof(date), "Date: %a, %d %b %Y %H:%M:%S GMT\r\n", tv);
+
     err = sip_drequestf(&req, tcmsg->sip, true, "MESSAGE", dlg,
             0, NULL, message_sent, message_response, ctx,
+            "%s"
             "Content-Type: text/plain\r\n"
             "Content-Length: %zu\r\n"
             "\r\n"
             "%b",
+            date ? date : "",
             mbuf_get_left(data),
             mbuf_buf(data),
             mbuf_get_left(data)
@@ -174,7 +187,8 @@ static void flag_sent(struct tcmessages *tcmsg, struct msg_single*msg, enum msg_
     msgpack_packer* pk = msgpack_packer_new(buffer, msgpack_sbuffer_write);
 
     msgpack_pack_array(pk, 1);
-    msgpack_pack_array(pk, 3);
+    msgpack_pack_array(pk, 4);
+    msgpack_pack_int(pk, msg->ts);
     push_pl(msg->user->auri);
     msgpack_pack_raw(pk, mbuf_get_left(msg->data));
     msgpack_pack_raw_body(pk, mbuf_buf(msg->data), mbuf_get_left(msg->data));
@@ -192,12 +206,15 @@ static void flag_sent(struct tcmessages *tcmsg, struct msg_single*msg, enum msg_
 int tcmessage(struct tcmessages *tcmsg, struct sip_addr *to, char *text){
     int err;
     char *idx = NULL;
+    struct timeval now;
+    struct mbuf* data;
+    struct msg_single *msg;
 
     if(!tcmsg)
         return -EINVAL;
 
-    struct mbuf* data = mbuf_alloc(100);
-    struct msg_single *msg = mem_zalloc(sizeof(struct msg_single), msg_destruct);
+    data = mbuf_alloc(100);
+    msg = mem_zalloc(sizeof(struct msg_single), msg_destruct);
     if(!msg)
         goto out;
 
@@ -207,12 +224,15 @@ int tcmessage(struct tcmessages *tcmsg, struct sip_addr *to, char *text){
 
     idx = store_key(tcmsg->store);
 
+    gettimeofday(&now, NULL);
+
+    msg->ts = now.tv_sec;
     msg->data = mem_ref(data);
     msg->idx = mem_ref(idx);
     msg->user = mem_ref(to);
     msg->ctx = mem_ref(tcmsg);
 
-    err = msend(tcmsg, to, data, mem_ref(msg));
+    err = msend(tcmsg, to, data, msg->ts, mem_ref(msg));
 
     flag_sent(tcmsg, msg, MSTATE_PENDING);
 
@@ -232,6 +252,8 @@ static void* msg_parse(void *_arg)
         goto out;
 
     msg->user = mem_alloc(sizeof(struct sip_addr), NULL);
+    if(!msg->user)
+        goto out;
 
 #define get_str(__dest, __pdest) {\
         msgpack_object_raw bstr;\
@@ -245,6 +267,8 @@ static void* msg_parse(void *_arg)
         } else {\
             __dest = NULL;\
         }}
+
+    msg->ts = arg->via.i64; arg++;
 
     struct pl plogin;
     get_str(msg->login, plogin); arg++;
@@ -277,7 +301,7 @@ static bool send_pending(struct le *le, void *arg)
     struct msg_single *msg = le->data;
 
     msg->ctx = mem_ref(tcmsg);
-    err = msend(tcmsg, msg->user, msg->data, mem_ref(msg));
+    err = msend(tcmsg, msg->user, msg->data, msg->ts, mem_ref(msg));
     tcmsg->flush ++;
 
     return false;
