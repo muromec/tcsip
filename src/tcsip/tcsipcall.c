@@ -22,7 +22,7 @@ struct tcsipcall {
     int cdir;
     int cstate;
     int reason;
-    time_t ts;
+    struct timeval tv;
     struct tmr tmr;
 };
 
@@ -119,7 +119,7 @@ void tcsipcall_remove(struct tcsipcall*call)
 
 void tcsipcall_key(struct tcsipcall*call)
 {
-    re_sdprintf(&call->ckey, "%d@%r->%r", call->ts,
+    re_sdprintf(&call->ckey, "%d@%r->%r", call->tv.tv_sec,
        call->cdir ? &call->local->auri: &call->remote->auri,
        call->cdir ? &call->remote->auri : &call->local->auri
     );
@@ -133,8 +133,7 @@ void tcsipcall_out(struct tcsipcall*call)
 
     call->cstate = CSTATE_STOP;
     call->cdir = CALL_OUT;
-    gettimeofday(&now, NULL);
-    call->ts = now.tv_sec;
+    gettimeofday(&call->tv, NULL);
 
     err = tcmedia_alloc(&call->media, call->uac, CALL_OUT);
     if(err)
@@ -165,7 +164,7 @@ int tcsipcall_incomfing(struct tcsipcall*call, const struct sip_msg* msg)
         call->cstate |= CSTATE_ERR;
 
     tcsipcall_parse_from(call);
-    call->ts = sipmsg_parse_date(msg);
+    sipmsg_parse_date(msg, &call->tv);
 
     tcsipcall_key(call);
 
@@ -352,7 +351,7 @@ void tcsipcall_send(struct tcsipcall*call)
 
     char date[100];
     struct tm *tv;
-    tv = gmtime(&call->ts);
+    tv = gmtime(&call->tv.tv_sec);
 
     strftime(date, sizeof(date), "Date: %a, %d %b %Y %H:%M:%S GMT\r\n", tv);
     tcmedia_get_offer(call->media, &mb);
@@ -409,7 +408,7 @@ void tcsipcall_dirs(struct tcsipcall*call, int *dir, int *state, int *reason, in
     if(dir) *dir = call->cdir;
     if(state) *state = call->cstate;
     if(reason) *reason = call->reason;
-    if(ts) *ts = (int)call->ts;
+    if(ts) *ts = (int)call->tv.tv_sec;
 }
 
 char* tcsipcall_ckey(struct tcsipcall*call)

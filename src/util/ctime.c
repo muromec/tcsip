@@ -18,32 +18,37 @@ time_t timegm(struct tm * const t) {
 
 bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg, void *arg)
 {
-	int *stamp = arg;
 	char *ret;
-	struct tm tv;
+	struct tm tm;
+    struct timeval *tv = arg;
 	struct pl tmp;
 	pl_dup(&tmp, &hdr->val);
-	ret = strptime(tmp.p, "%a, %d %b %Y %H:%M:%S GMT", &tv);
+	ret = strptime(tmp.p, "%a, %d %b %Y %H:%M:%S GMT", &tm);
+
+    if(ret) {
+        tv->tv_usec = 0;
+    } else {
+        ret = strptime(tmp.p, "%a, %d %b %Y %H:%M:%S.", &tm);
+        if(ret) {
+            sscanf(ret, "%06u GMT", &tv->tv_usec);
+        }
+    }
 
 	mem_deref((void*)tmp.p);
 
 	if(ret) {
-	    *stamp = (int)timegm(&tv);
+	    tv->tv_sec = timegm(&tm);
 	    return false;
 	}
 
 	return true;
 }
 
-time_t sipmsg_parse_date(const struct sip_msg *msg)
+void sipmsg_parse_date(const struct sip_msg *msg, struct timeval *tv)
 {
-    time_t ts = 0;
-    struct timeval now;
-
-    sip_msg_hdr_apply(msg, true, SIP_HDR_DATE, find_date, &ts);
-    if(ts <= 0) {
-        gettimeofday(&now, NULL);
-        ts = now.tv_sec;
+    tv->tv_sec = 0;
+    sip_msg_hdr_apply(msg, true, SIP_HDR_DATE, find_date, tv);
+    if(tv->tv_sec <= 0) {
+        gettimeofday(tv, NULL);
     }
-    return ts;
 }
