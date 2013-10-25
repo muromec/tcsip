@@ -15,7 +15,7 @@ void report_call_change(struct tcsipcall* call, void *arg);
 void report_call(struct tcsipcall* call, void *arg);
 void report_up(struct uplink *up, int op, void*arg);
 void report_msg(time_t ts, char *idx, const struct sip_addr *from, struct mbuf *data, int state, void *arg);
-void report_cert(int err, struct pl*name, void*arg);
+void report_cert(int err, struct pl*name, struct pl*uri, void*arg);
 void report_lp(int err, struct pl*token, void*arg);
 void report_signup(int code, struct list*, void *arg);
 void report_hist(int err, char *idx, struct list*hlist, void*arg);

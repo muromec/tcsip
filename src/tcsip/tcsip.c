@@ -343,15 +343,16 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
 
     platpath(login, &certpath, &capath);
 
-#define cert_h(_code, _name) {\
+#define cert_h(_code, _name, _uri) {\
     if(sip->rarg && sip->rarg->cert_h){\
-        sip->rarg->cert_h(_code, _name, sip->rarg->arg);\
-    }}
+        sip->rarg->cert_h(_code, _name, _uri, sip->rarg->arg);\
+    }};
+#define cert_e(_code) cert_h(_code, NULL, NULL)
 
     err = x509_info(certpath, &after, &before, &cname);
     if(err) {
         re_printf("cert load failed %s\n", certpath);
-        cert_h(1, NULL);
+        cert_e(1);
         return 1;
     }
 
@@ -361,7 +362,7 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
     err = sip_addr_decode(sip->user_c, &cname_p);
     if(err) {
         re_printf("CN parse failed\n");
-        cert_h(2, NULL);
+        cert_e(2);
         return 2;
     }
 
@@ -370,7 +371,7 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
     if(after < now.tv_sec) {
         re_printf("cert[%d] timed out[%d]. get new\n",
                 after, (int)now.tv_sec);
-        cert_h(3, NULL);
+        cert_e(3);
         return 3;
     }
 
@@ -379,13 +380,13 @@ int tcsip_local(struct tcsip* sip, struct pl* login)
     err = tls_alloc(&uac->tls, TLS_METHOD_SSLV23, certpath, NULL);
     if(err) {
         re_printf("tls failed\n");
-        cert_h(4, NULL);
+        cert_e(4);
         return 4;
     }
     if(capath)
         tls_add_ca(uac->tls, capath);
 
-    cert_h(0, &sip->user_c->dname);
+    cert_h(0, &sip->user_c->dname, &sip->user_c->auri);
 
         
     sip->http = mem_deref(sip->http);
@@ -483,14 +484,9 @@ void tcsip_signup(struct tcsip* sip, struct pl *token, struct pl *otp, struct pl
     tcapi_signup(sip, token, otp, login, name);
 }
 
-int tcsip_report_cert(struct tcsip*sip, int code, struct pl *name)
+int tcsip_report_cert(struct tcsip*sip, int code)
 {
-#define cert_h(_code, _name) {\
-    if(sip->rarg && sip->rarg->cert_h){\
-        sip->rarg->cert_h(_code, _name, sip->rarg->arg);\
-    }}
-
-    cert_h(code, name);
+    cert_e(code);
 }
 
 int tcsip_report_login(struct tcsip*sip, int code, struct pl *token) {

@@ -101,14 +101,16 @@ void report_msg(time_t ts, char *idx, const struct sip_addr *from, struct mbuf *
     msgpack_pack_int(pk, state);
 }
 
-void report_cert(int err, struct pl*name, void*arg)
+void report_cert(int err, struct pl*name, struct pl*uri, void*arg)
 {
     msgpack_packer *pk = arg;
-    msgpack_pack_array(pk, err ? 2 : 3);
+    msgpack_pack_array(pk, err ? 2 : 4);
     push_cstr("cert.ok");
     msgpack_pack_int(pk, err);
-    if(err==0)
+    if(err==0) {
         push_pl((*name));
+        push_pl((*uri));
+    }
 }
 
 void report_lp(int err, struct pl*token, void*arg)

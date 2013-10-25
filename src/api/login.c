@@ -44,7 +44,7 @@ static void http_cert_done(struct request *req, int code, void *arg) {
     case 401:
         err = http_auth(req, &new_req, http->login, http->password);
         if(err) {
-            tcsip_report_cert(op->sip, 403, NULL);
+            tcsip_report_cert(op->sip, 403);
         } else {
             http_header(new_req, "Accept", "application/x-x509-user-cert");
             http_send(new_req);
@@ -56,7 +56,7 @@ static void http_cert_done(struct request *req, int code, void *arg) {
         savecert(op, http->login, data);
         break;
     default:
-        tcsip_report_cert(op->sip, code, NULL);
+        tcsip_report_cert(op->sip, code);
     }
 
     mem_deref(op);
@@ -68,7 +68,7 @@ static void http_cert_err(int err, void *arg) {
     struct login_op *op = arg;
     struct tcsip *sip = op->sip;
 
-    tcsip_report_cert(sip, err, NULL);
+    tcsip_report_cert(sip, err);
     mem_deref(op);
 }
 
@@ -129,7 +129,7 @@ static void savecert(struct login_op *op, char *clogin, struct mbuf*data) {
     wfd = open(certpath, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
     if(wfd < 0) {
         printf("failed to open %s\n", certpath);
-        tcsip_report_cert(op->sip, 10, NULL);
+        tcsip_report_cert(op->sip, 10);
         return;
     }
     fchmod(wfd, S_IRUSR | S_IRUSR);

@@ -19,7 +19,7 @@ struct sip_handlers {
     void(*call_h)(struct tcsipcall* call, void *arg);
     void(*up_h)(struct uplink *up, int op, void*arg);
     void(*msg_h)(time_t, char *idx, const struct sip_addr *, struct mbuf*, int state, void *arg);
-    void(*cert_h)(int err, struct pl*name, void*arg);
+    void(*cert_h)(int err, struct pl*name, struct pl*uri, void*arg);
     void(*lp_h)(int err, struct pl*token, void*arg);
     void(*signup_h)(int code, struct list*, void *arg);
     void(*hist_h)(int err, char*idx, struct list*hlist, void*arg);
@@ -42,7 +42,7 @@ struct sip_addr *tcsip_user(struct tcsip*sip);
 int tcsip_hist_fetch(struct tcsip* sip, char **pidx, struct list **);
 void tcsip_hist_ipc(struct tcsip* sip, int flag);
 void tcsip_contacts_ipc(struct tcsip* sip);
-int tcsip_report_cert(struct tcsip*sip, int code, struct pl *name);
+int tcsip_report_cert(struct tcsip*sip, int code);
 int tcsip_report_login(struct tcsip*sip, int code, struct pl *token);
 int tcsip_report_signup(struct tcsip*sip, int code, struct list*);
 int tcsip_report_message(struct tcsip*sip, time_t ts, char *idx, const struct sip_addr *from, struct mbuf* data, int state);
