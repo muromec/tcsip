@@ -7,6 +7,8 @@ RE_CFLAGS = -DHAVE_INTTYPES_H -DHAVE_STDBOOL_H \
 INCL = -Ideps/include/ -I./src -I./src/util -I../srtp/include/ -I../srtp/crypto/include/ \
    -I../opus/include/ -I../speex/include  -Ig711 -I./src/rehttp/
 
+DEPI = deps/$(OS)-$(ARCH)/
+INCL += -I$(DEPI)/srtp -I$(DEPI)/speex
 
 LIBS = -lm -lz 
 LIBS-$(linux) += -lpthread -lcrypto -lssl  -lresolv
@@ -43,7 +45,7 @@ objects_cli = $(patsubst %.c,$B/%.o,$(sources_cli))
 objects_libdriver = $(patsubst %.c,$B/%.o,$(sources_libdriver))
 objects_daemon = $(patsubst %.c,$B/%.o,$(sources_daemon))
 
-CC := gcc
+CC := $(CC)
 
 all: texr-cli texr-daemon
 	
