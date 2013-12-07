@@ -472,6 +472,7 @@ fail:
 
 int tcsip_get_cert(struct tcsip* sip, struct pl* login, struct pl*password) {
     tcapi_login(sip, login, password);
+    return 0;
 }
 
 void tcsip_login_phone(struct tcsip* sip, struct pl *phone)
@@ -487,6 +488,7 @@ void tcsip_signup(struct tcsip* sip, struct pl *token, struct pl *otp, struct pl
 int tcsip_report_cert(struct tcsip*sip, int code)
 {
     cert_e(code);
+    return 0;
 }
 
 int tcsip_report_login(struct tcsip*sip, int code, struct pl *token) {
@@ -498,6 +500,7 @@ int tcsip_report_login(struct tcsip*sip, int code, struct pl *token) {
 
     lp_h(code, token);
 
+    return 0;
 }
 
 int tcsip_report_signup(struct tcsip*sip, int code, struct list*elist) {
@@ -507,6 +510,8 @@ int tcsip_report_signup(struct tcsip*sip, int code, struct list*elist) {
     }}
 
     signup_h(code, elist);
+
+    return 0;
 }
 
 int tcsip_report_message(struct tcsip*sip, time_t ts, char *idx, const struct sip_addr *from, struct mbuf* data, int state)
@@ -514,6 +519,8 @@ int tcsip_report_message(struct tcsip*sip, time_t ts, char *idx, const struct si
     if(sip->rarg && sip->rarg->msg_h) {
         sip->rarg->msg_h(ts, idx, from, data, state, sip->rarg->arg);
     }
+
+    return 0;
 }
 
 

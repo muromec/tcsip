@@ -201,7 +201,7 @@ char *store_key(struct store_client *stc)
     if(err==0)
         return ret;
     else
-        NULL;
+        return NULL;
 }
 
 void store_order(struct store_client *stc, int val)

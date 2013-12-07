@@ -215,7 +215,7 @@ static char *write_db(struct store_client *stc, struct timeval tv, struct sip_ad
     msgpack_pack_raw_body(pk, mbuf_buf(data), mbuf_get_left(data));
     push_cstr_len(idx);
 
-    re_buf.buf = buffer->data;
+    re_buf.buf = (uint8_t *)buffer->data;
     re_buf.size = buffer->size;
 
     key = store_key(stc);
@@ -304,7 +304,7 @@ static void* msg_parse(void *_arg)
 
     if(bstr.size > 0) {
         msg->data = mbuf_alloc(bstr.size);
-        mbuf_write_mem(msg->data, bstr.ptr, bstr.size);
+        mbuf_write_mem(msg->data, (const uint8_t *)bstr.ptr, bstr.size);
         msg->data->pos = 0;
     }
 
@@ -350,4 +350,5 @@ int tcmessage_flush(struct tcmessages *tcmsg) {
     list_flush(bulk);
     mem_deref(bulk);
 
+    return 0;
 }

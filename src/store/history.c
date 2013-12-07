@@ -225,7 +225,7 @@ int history_add(struct history *hist, int event, int ts, struct pl*ckey, struct 
     msgpack_pack_array(pk, list_count(hlist));
     list_apply(hlist, true, write_history_el, pk);
 
-    re_buf.buf = buffer->data;
+    re_buf.buf = (uint8_t *)buffer->data;
     re_buf.size = buffer->size;
 
     err = store_add(hist->store, key, idx, &re_buf);

@@ -32,7 +32,7 @@ int x509_pub_priv(struct mbuf **rpriv, struct mbuf **rpub) {
 
     pub = mbuf_alloc(len+2);
     mbuf_write_mem(pub, (const uint8_t *)pp, len);
-    mbuf_write_mem(pub, "\0\0", 2);
+    mbuf_write_mem(pub, (const uint8_t *)"\0\0", 2);
     pub->pos = 0;
 
     (void)BIO_reset(mem);
@@ -41,7 +41,7 @@ int x509_pub_priv(struct mbuf **rpriv, struct mbuf **rpub) {
     len = BIO_get_mem_data(mem, &pp);
     priv = mbuf_alloc(len+2);
     mbuf_write_mem(priv, (const uint8_t *)pp, len);
-    mbuf_write_mem(priv, "\0\0", 2);
+    mbuf_write_mem(priv, (const uint8_t *)"\0\0", 2);
     priv->pos = 0;
 
     (void)BIO_reset(mem);

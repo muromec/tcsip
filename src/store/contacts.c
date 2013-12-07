@@ -160,7 +160,7 @@ static int store_contacts(struct contacts *ct, struct list *ctlist)
     list_apply(ctlist, true, write_contact_el, pk);
 
     key = store_key(ct->store);
-    re_buf.buf = buffer->data;
+    re_buf.buf = (uint8_t *)buffer->data;
     re_buf.size = buffer->size;
 
     err = store_add(ct->store, key, ctel->login, &re_buf);
