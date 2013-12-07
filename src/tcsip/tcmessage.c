@@ -80,6 +80,10 @@ static void message_response(int err, const struct sip_msg *smsg, void *arg) {
 
 static bool message_incoming(const struct sip_msg *msg, void *arg)
 {
+
+	if (pl_strcmp(&msg->met, "MESSAGE"))
+        return false;
+
     struct tcmessages *tcmsg = arg;
     struct timeval tv;
     char *idx;
