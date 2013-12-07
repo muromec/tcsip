@@ -167,12 +167,12 @@ static inline void do_write_history_el(msgpack_packer *pk, struct hist_el *hel)
     msgpack_pack_int(pk, hel->event);
     msgpack_pack_int(pk, hel->time);
     push_cstr_len(hel->key);
-    push_cstr_len(hel->login);
+    push_cstr_len(hel->uri);
 
     if(hel->name) {
         push_cstr_len(hel->name);
     } else {
-        push_cstr_len(hel->login);
+        push_cstr("");
     }
 }
 

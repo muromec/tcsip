@@ -43,7 +43,7 @@ static bool history_handler(struct le *le, void *arg)
 
     re_printf("hist %d event %d %r <%r>\n",
             hel->time,
-            hel->event, &hel->name, &hel->login);
+            hel->event, &hel->name, &hel->uri);
 
     return false;
 }
@@ -179,7 +179,7 @@ void got_call(struct tcsipcall* call, void *arg) {
     }
 }
 
-void got_cert(int err, struct pl*name, void*arg) {
+void got_cert(int err, struct pl*name, struct pl*uri, void*arg) {
     if(err) {
       re_cancel();
       return;
@@ -189,7 +189,7 @@ void got_cert(int err, struct pl*name, void*arg) {
     if(local)
         app->local = mem_ref(local);
 
-    re_printf("Hello, %r <%r> !\n", name, &local->auri);
+    re_printf("Hello, %r <%r> !\n", name, uri);
 }
 
 static struct sip_handlers cli_handlers = {
