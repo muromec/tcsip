@@ -31,16 +31,20 @@ lobj += g711/g711
 lobj += rehttp/http
 lobj += rehttp/auth
 
-lobj-$(linux) += sound/linux/asound
-lobj-$(apple) += sound/apple/sound
-lobj-$(apple) += sound/apple/sound_utils
-lobj-$(android) += sound/android/opensl_io
+sound-obj-$(linux) += sound/linux/asound
+sound-obj-$(apple) += sound/apple/sound
+sound-obj-$(apple) += sound/apple/sound_utils
+sound-obj-$(android) += sound/android/opensl_io
+sound-obj += sound/sound
+
+sound-obj += jitter/ajitter
+
+sound-obj += $(sound-obj-y)
 
 lobj += store/sqlite3
 lobj += store/history
 lobj += store/contacts
 lobj += store/store
 
-lobj += jitter/ajitter
-
 lobj += $(lobj-y)
+lobj += $(sound-obj)
