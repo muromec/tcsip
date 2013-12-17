@@ -36,14 +36,17 @@ all: texr-cli
 
 OPT_FLAGS := -fPIC -O2
 sources = $(patsubst %,src/%.c,$(lobj))
+sources_sound = $(patsubst %,src/%.c,$(sound-obj))
 
 sources_cli = $(sources) cli.c
 sources_libdriver = $(sources) driver.c
 sources_daemon = $(sources) driver.c driver_cli.c
+sources_shout = src/tools/tcshout.c $(sources_sound)
 
 objects_cli = $(patsubst %.c,$B/%.o,$(sources_cli))
 objects_libdriver = $(patsubst %.c,$B/%.o,$(sources_libdriver))
 objects_daemon = $(patsubst %.c,$B/%.o,$(sources_daemon))
+objects_shout = $(patsubst %.c,$B/%.o,$(sources_shout))
 
 CC := $(CC)
 
@@ -66,10 +69,14 @@ texr-cli: $(objects_cli) $(LIBS-static)
 texr-daemon: $(objects_daemon) $(LIBS-static)
 	$(CC) $(objects_daemon) $(LIBS-static) $(LIBS) -o $@
 
+tcshout: $(objects_shout)
+	$(CC) $(objects_shout) $(LIBS-static) $(LIBS) -o $@
+
 libredriver.so: $(objects_libdriver) $(LIBS-static)
 	echo $(sources_libdriver)
 	$(CC) -shared $(LD_SHARED) -o libredriver.so $(objects_libdriver)  $(LIBS-static) $(LIBS)
 
+tools: tcshout
 
 clean:
 	rm -f $(objects) texr-cli texr-daemon libredriver.so
