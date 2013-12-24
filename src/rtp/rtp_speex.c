@@ -9,8 +9,6 @@ typedef struct _rtp_send_speex_ctx {
     struct sa *dst;
     int pt;
     /// specific
-    struct tmr tmr;
-    fmt_t fmt;
     struct mbuf *mb;
     int ts;
     // codec
@@ -23,7 +21,6 @@ typedef struct _rtp_recv_speex_ctx {
     int magic;
     srtp_t srtp_in;
     ajitter *play_jitter;
-    fmt_t fmt;
     int last_read;
     // codec
     SpeexBits dec_bits;
@@ -71,23 +68,18 @@ void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct m
         arg->last_read = (int)tv.tv_sec;
 }
 
-void rtp_send_io(void *varg)
+void rtp_send_io(rtp_send_ctx *_ctx, size_t sz, const uint8_t *data)
 {
-    int len = 0, err=0;
-    rtp_send_speex_ctx * arg = varg;
+    int err=0, len;
+
+    re_printf("send speex\n");
+    rtp_send_speex_ctx * arg = (rtp_send_speex_ctx*)_ctx;
     if(arg->magic != 0x1ee1F00D)
         return;
 
     struct mbuf *mb = arg->mb;
 
-    char *obuf;
-restart:
-
-    obuf = ajitter_get_chunk(arg->record_jitter, arg->frame_size, &arg->ts);
-    if(!obuf)
-        goto timer;
-
-    len = speex_encode_int(arg->enc_state, (spx_int16_t*)obuf, &arg->enc_bits);
+    len = speex_encode_int(arg->enc_state, (spx_int16_t*)data, &arg->enc_bits);
 
     mb->pos = RTP_HEADER_SIZE;
     len = speex_bits_write(&arg->enc_bits, (char*)mbuf_buf(mb), 200); // XXX: constant
@@ -105,23 +97,18 @@ restart:
     udp_send(rtp_sock(arg->rtp), arg->dst, mb);
 
     speex_bits_reset(&arg->enc_bits);
-    goto restart;
 
-timer:
-    send_tmr(rtp_send_io);
 }
 
 rtp_send_ctx* rtp_send_speex_init() {
 
     rtp_send_speex_ctx *send_ctx = malloc(sizeof(rtp_send_speex_ctx));
-    tmr_init(&send_ctx->tmr);
     speex_bits_init(&send_ctx->enc_bits);
     speex_bits_reset(&send_ctx->enc_bits);
     send_ctx->enc_state = speex_encoder_init(&speex_nb_mode);
     speex_encoder_ctl(send_ctx->enc_state, SPEEX_GET_FRAME_SIZE, &send_ctx->frame_size);
     send_ctx->frame_size *= 2;
     send_ctx->mb = mbuf_alloc(400 + RTP_HEADER_SIZE);
-    send_ctx->fmt = FMT_SPEEX;
     send_ctx->ts = 0;
 
     send_ctx->magic = 0x1ee1F00D;
@@ -139,7 +126,6 @@ rtp_recv_ctx * rtp_recv_speex_init()
 
     speex_decoder_ctl(ctx->dec_state, SPEEX_GET_FRAME_SIZE, &ctx->frame_size); 
     ctx->frame_size *= 2;
-    ctx->fmt = FMT_SPEEX;
     ctx->last_read = 0;
 
     ctx->magic = 0x1ab1D00F;
@@ -162,4 +148,3 @@ void rtp_recv_speex_stop(rtp_recv_ctx *_ctx)
 
     speex_decoder_destroy(ctx->dec_state);
 }
-

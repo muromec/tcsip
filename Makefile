@@ -34,7 +34,7 @@ LIBS += $(LIBS-y)
 
 all: texr-cli
 
-OPT_FLAGS := -fPIC -O2
+OPT_FLAGS := -fPIC -O0 -g
 sources = $(patsubst %,src/%.c,$(lobj))
 sources_sound = $(patsubst %,src/%.c,$(sound-obj))
 sources_rtp = $(patsubst %,src/%.c,$(rtp-obj))
@@ -42,7 +42,7 @@ sources_rtp = $(patsubst %,src/%.c,$(rtp-obj))
 sources_cli = $(sources) cli.c
 sources_libdriver = $(sources) driver.c
 sources_daemon = $(sources) driver.c driver_cli.c
-sources_shout = src/tools/tcshout.c $(sources_sound)
+sources_shout = src/tools/tcshout.c $(sources_sound) $(sources_rtp)
 sources_ice = src/tools/ice.c
 
 objects_cli = $(patsubst %.c,$B/%.o,$(sources_cli))

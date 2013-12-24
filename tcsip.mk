@@ -1,8 +1,10 @@
 
-lobj += rtp/rtp_io
-lobj += rtp/rtp_opus
-lobj += rtp/rtp_pcmu
-lobj += rtp/rtp_speex
+rtp-obj += rtp/rtp
+rtp-obj += rtp/rtp_io
+rtp-obj += rtp/rtp_opus
+rtp-obj += rtp/rtp_pcmu
+rtp-obj += rtp/rtp_speex
+rtp-obj += g711/g711
 
 lobj += tcsip/tcmedia
 lobj += tcsip/tcsipuser
@@ -26,7 +28,6 @@ lobj += x509/x509gen
 lobj += util/platpath
 lobj += util/ctime
 
-lobj += g711/g711
 
 lobj += rehttp/http
 lobj += rehttp/auth
@@ -48,3 +49,4 @@ lobj += store/store
 
 lobj += $(lobj-y)
 lobj += $(sound-obj)
+lobj += $(rtp-obj)

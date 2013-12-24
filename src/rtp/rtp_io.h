@@ -10,7 +10,7 @@
 #define send_tmr(_f) (void*)1;
 #endif
 
-typedef enum {
+typedef enum fmt {
 	FMT_SPEEX,
 	FMT_PCMU,
 	FMT_OPUS,
@@ -47,7 +47,7 @@ void rtp_send_start(rtp_send_ctx* ctx);
 void rtp_send_stop(rtp_send_ctx* ctx);
 
 
-typedef void (rtp_send_h)(void *varg);
+typedef void (rtp_send_h)(rtp_send_ctx*, const uint8_t*, size_t);
 
 void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
         struct mbuf *mb, void *varg);
@@ -73,7 +73,8 @@ int rtp_un(srtp_t srtp, struct mbuf *mb);
 struct _rtp_send_speex_ctx;
 
 void rtp_recv_speex(const struct sa *src, const struct rtp_header *hdr, struct mbuf *mb, void *varg);
-void rtp_send_io(void *varg);
+
+void rtp_send_io(rtp_send_ctx *_ctx, size_t len, const uint8_t *data);
 void rtp_send_speex_stop(rtp_send_ctx *ctx);
 void rtp_recv_speex_stop(rtp_recv_ctx *ctx);
 rtp_send_ctx* rtp_send_speex_init();
