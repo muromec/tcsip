@@ -37,16 +37,19 @@ all: texr-cli
 OPT_FLAGS := -fPIC -O2
 sources = $(patsubst %,src/%.c,$(lobj))
 sources_sound = $(patsubst %,src/%.c,$(sound-obj))
+sources_rtp = $(patsubst %,src/%.c,$(rtp-obj))
 
 sources_cli = $(sources) cli.c
 sources_libdriver = $(sources) driver.c
 sources_daemon = $(sources) driver.c driver_cli.c
 sources_shout = src/tools/tcshout.c $(sources_sound)
+sources_ice = src/tools/ice.c
 
 objects_cli = $(patsubst %.c,$B/%.o,$(sources_cli))
 objects_libdriver = $(patsubst %.c,$B/%.o,$(sources_libdriver))
 objects_daemon = $(patsubst %.c,$B/%.o,$(sources_daemon))
 objects_shout = $(patsubst %.c,$B/%.o,$(sources_shout))
+objects_ice = $(patsubst %.c,$B/%.o,$(sources_ice))
 
 CC := $(CC)
 
@@ -72,11 +75,14 @@ texr-daemon: $(objects_daemon) $(LIBS-static)
 tcshout: $(objects_shout)
 	$(CC) $(objects_shout) $(LIBS-static) $(LIBS) -o $@
 
+ice: $(objects_ice)
+	$(CC) $(objects_ice) $(LIBS-static) $(LIBS) -o $@
+
 libredriver.so: $(objects_libdriver) $(LIBS-static)
 	echo $(sources_libdriver)
 	$(CC) -shared $(LD_SHARED) -o libredriver.so $(objects_libdriver)  $(LIBS-static) $(LIBS)
 
-tools: tcshout
+tools: tcshout ice
 
 clean:
 	rm -f $(objects) texr-cli texr-daemon libredriver.so
