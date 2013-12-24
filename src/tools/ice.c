@@ -17,7 +17,9 @@ static void signal_handler(int sig)
 
 struct connector {
     struct sa laddr;
+    struct sa laddr_srflx;
     struct sa raddr;
+    struct sa raddr_srflx;
     struct stun_dns *stun_dns;
     struct rtp_sock *rtp;
     struct ice* ice;
@@ -79,31 +81,68 @@ int rcand_host_add(struct icem *icem, const struct sa *addr)
     return err;
 }
 
+int rcand_srflx_add(struct icem *icem, const struct sa *addr, const struct sa *laddr)
+{
+    int err = 0;
+
+    char *foundation = NULL;
+    struct pl foundation_p;
+    uint32_t v;
+
+    v  = sa_hash(addr, SA_ADDR);
+    v ^= 1;
+    re_sdprintf(&foundation, "%08x", v);
+    pl_set_str(&foundation_p, foundation);
+
+    err = icem_rcand_add(icem, 1, 1, 1, addr, laddr, &foundation_p);
+
+    mem_deref(foundation);
+
+    return err;
+}
+
 static void gather_handler(int ret, uint16_t scode, const char *reason,
 			   void *arg)
 {
     int err;
     struct connector *app = arg;
+    const struct sa *ice_def;
 
     if(ret) {
         re_cancel();
         return;
     }
 
-    re_printf("Address %J\n", icem_cand_default(app->icem, 1));
-    re_printf("%J %s %s\n", &app->laddr, ice_ufrag(app->ice), ice_pwd(app->ice));
+    ice_def = icem_cand_default(app->icem, 1);
+    if(!sa_cmp(ice_def, &app->laddr, SA_ADDR)) {
+        sa_cpy(&app->laddr_srflx, ice_def);
+    }
 
     if(sa_isset(&app->raddr, SA_ADDR)) {
         err = rcand_host_add(app->icem, &app->raddr);
-        re_printf("rcand add %d\n", err);
+
+        if(sa_isset(&app->raddr_srflx, SA_ADDR)) {
+            err = rcand_srflx_add(app->icem, &app->raddr_srflx, &app->raddr);
+        }
 
         err = icem_verify_support(app->icem, 1, &app->raddr);
-        re_printf("verify %d\n", err);
 
         icem_update(app->icem);
         ice_conncheck_start(app->ice);
+
+        return;
     }
 
+
+    if(sa_cmp(ice_def, &app->laddr, SA_ADDR)) {
+        re_printf("White IP. reflex unneded\n");
+        re_printf("%s,%s,%J\n", ice_ufrag(app->ice), ice_pwd(app->ice),
+                &app->laddr);
+    } else {
+        re_printf("Gray IP. Both local and reflex addresses used\n");
+        re_printf("%s,%s,%J,%J\n", ice_ufrag(app->ice), ice_pwd(app->ice),
+                &app->laddr, &app->laddr_srflx);
+    }
 
     re_printf("%H\n", ice_debug, app->ice);
 }
@@ -123,9 +162,12 @@ int connect_resend(struct connector *app, const struct sa *dst)
     if(err)
         goto fail;
 
-    // XXX: local address : ufrag : pwd
-    mbuf_printf(mb, "%J;%s;%s", &app->laddr,
-            ice_ufrag(app->ice), ice_pwd(app->ice));
+    if(sa_isset(&app->laddr_srflx, SA_ADDR)) {
+        mbuf_printf(mb, "%s,%s,%J,%J", ice_ufrag(app->ice), ice_pwd(app->ice),
+                &app->laddr, &app->laddr_srflx);
+    } else {
+        mbuf_printf(mb, "%s,%s,%J", ice_ufrag(app->ice), ice_pwd(app->ice), &app->laddr);
+    }
 
     mb->pos = 0;
 
@@ -151,22 +193,37 @@ static void conncheck_handler(int ret, bool update, void *arg)
 }
 
 
-void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
-        struct mbuf *mb, void *varg)
+int connect_config(struct connector *app, char *data, size_t len)
 {
     int err;
-    struct pl host, ufrag, pwd;
+    struct pl host, host_sr, ufrag, pwd;
     char *ufrag_c = NULL, *pwd_c = NULL;
-    struct connector *app = varg;
 
-    re_printf("rtp io %J\n", src);
+    err = re_regex(data, len, "[^,]+,[^,]+,[^,]+,[^,]+",
+            &ufrag, &pwd, &host, &host_sr);
 
-    err = re_regex((char*)mbuf_buf(mb), mbuf_get_left(mb),
-            "[^;]+;[^;]+;[^;]+",
-            &host, &ufrag, &pwd);
-    if(err)
-        return;
+    switch(err) {
+    case 0:
+        err = sa_decode(&app->raddr, host.p, host.l);
+        err |= sa_decode(&app->raddr_srflx, host_sr.p, host_sr.l);
+        if(err)
+            goto fail;
 
+    break;
+    case ENOENT:
+        err = re_regex(data, len, "[^,]+,[^,]+,[^,]+",
+            &ufrag, &pwd, &host);
+        if(err)
+            goto fail;
+
+        err = sa_decode(&app->raddr, host.p, host.l);
+        sa_init(&app->raddr_srflx, AF_UNSPEC);
+
+    break;
+    default:
+        goto fail;
+    }
+    
     pl_strdup(&ufrag_c, &ufrag);
     pl_strdup(&pwd_c, &pwd);
 
@@ -175,17 +232,35 @@ void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
     err = ice_sdp_decode(app->ice, "ice-ufrag", ufrag_c);
     err = ice_sdp_decode(app->ice, "ice-pwd", pwd_c);
 
-    err = sa_decode(&app->raddr, host.p, host.l);
-    if(err)
-        goto fail;
+    re_printf("host %J, host srflx %J\n", &app->raddr, &app->raddr_srflx);
 
-    re_printf("host %J\n", &app->raddr);
+fail:
+    mem_deref(ufrag_c);
+    mem_deref(pwd_c);
+    return err;
+}
+
+void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
+        struct mbuf *mb, void *varg)
+{
+    int err;
+    struct connector *app = varg;
+
+    re_printf("rtp io %J\n", src);
+    err = connect_config(app, (char*)mbuf_buf(mb), mbuf_get_left(mb));
+    if(err) {
+        goto fail;
+    }
 
     err = rcand_host_add(app->icem, &app->raddr);
-    
-    re_printf("rcand add %d\n", err);
     if(err)
         goto fail;
+
+    if(sa_isset(&app->raddr_srflx, SA_ADDR)) {
+        err = rcand_srflx_add(app->icem, &app->raddr_srflx, &app->raddr);
+        if(err)
+            goto fail;
+    }
 
     err = icem_verify_support(app->icem, 1, &app->raddr);
 
@@ -194,8 +269,6 @@ void rtp_recv_io (const struct sa *src, const struct rtp_header *hdr,
     ice_conncheck_start(app->ice);
 
 fail:
-    mem_deref(ufrag_c);
-    mem_deref(pwd_c);
     return;
 }
 
@@ -203,22 +276,16 @@ int main(int argc, char** argv)
 {
     int err, connect=0;
     struct connector app;
-    char *remote_str, *ufrag, *pwd;
+    char *config_str = NULL;
     libre_init();
 
     sa_init(&app.laddr, AF_UNSPEC);
+    sa_init(&app.laddr_srflx, AF_UNSPEC);
     sa_init(&app.raddr, AF_UNSPEC);
+    sa_init(&app.raddr_srflx, AF_UNSPEC);
 
-    if(argc > 3) {
-        remote_str = argv[1];
-        ufrag = argv[2];
-        pwd = argv[3];
-
-        err = sa_decode(&app.raddr, remote_str, strlen(remote_str));
-        if(err) {
-            DEBUG_WARNING("invalid address %s\n", remote_str);
-            goto fail;
-        }
+    if(argc > 1) {
+        config_str = argv[1];
         connect = 1;
         app.resend = 5;
     } else {
@@ -267,9 +334,8 @@ int main(int argc, char** argv)
 
     icem_comp_add(app.icem, 1, rtp_sock(app.rtp));
 
-    if(connect) {
-        err = ice_sdp_decode(app.ice, "ice-ufrag", ufrag);
-        err = ice_sdp_decode(app.ice, "ice-pwd", pwd);
+    if(config_str) {
+        connect_config(&app, config_str, strlen(config_str));
     }
 
     re_main(signal_handler);
