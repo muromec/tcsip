@@ -177,7 +177,7 @@ static int msend(struct tcmessages *tcmsg, struct sip_addr *to, struct mbuf *dat
 
     tm = gmtime(&tv.tv_sec);
     strftime(dt, sizeof dt , "Date: %a, %d %b %Y %H:%M:%S", tm);
-    snprintf(date, sizeof date, "%s.%06u GMT\r\n", dt, tv.tv_usec);
+    snprintf(date, sizeof date, "%s.%06lu GMT\r\n", dt, tv.tv_usec);
 
     err = sip_drequestf(&req, tcmsg->sip, true, "MESSAGE", dlg,
             0, NULL, message_sent, message_response, ctx,
