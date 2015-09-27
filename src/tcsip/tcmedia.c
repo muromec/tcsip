@@ -1,5 +1,6 @@
 #include <srtp/srtp.h>
 #include <sys/time.h>
+#include <string.h>
 
 #include "re.h"
 #include "jitter/ajitter.h"
