@@ -2,7 +2,7 @@ include os.mk
 include tcsip.mk
 
 RE_CFLAGS = -DHAVE_INTTYPES_H -DHAVE_STDBOOL_H \
-    -DHAVE_INET6 -DHAVE_GAI_STRERROR -DRELEASE
+    -DHAVE_INET6 -DHAVE_GAI_STRERROR -DRELEASE -D_XOPEN_SOURCE -D_DEFAULT_SOURCE
 
 INCL = -Ideps/include/ -I./src -I./src/util -I../srtp/include/ -I../srtp/crypto/include/ \
    -I../opus/include/ -I../speex/include  -Ig711 -I./src/rehttp/
