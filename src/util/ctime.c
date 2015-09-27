@@ -30,7 +30,7 @@ bool find_date(const struct sip_hdr *hdr, const struct sip_msg *msg, void *arg)
     } else {
         ret = strptime(tmp.p, "%a, %d %b %Y %H:%M:%S.", &tm);
         if(ret) {
-            sscanf(ret, "%06u GMT", &tv->tv_usec);
+            sscanf(ret, "%06lu GMT", &tv->tv_usec);
         }
     }
 
